@@ -23,10 +23,9 @@
         .whatsapp-btn:hover {
             background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
         }
-        .active-btn {
-            background-color: #3b82f6; /* blue-600 */
-            color: white;
-            border-color: #3b82f6;
+        .thumbnail-active {
+            border: 3px solid #3b82f6; /* Borde azul para la foto activa */
+            opacity: 100% !important;
         }
     </style>
     <!-- Iconos (Inline SVG para evitar dependencias) -->
@@ -61,9 +60,10 @@
             <!-- Botón y Contador del Carrito -->
             <button id="cart-button" onclick="renderCartView()" class="relative p-2 bg-blue-50 text-blue-600 rounded-full hover:bg-blue-100 transition duration-150">
                 <svg class="w-6 h-6" aria-hidden="true"><use xlink:href="#icon-cart"></use></svg>
-                <span id="cart-count" class="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full">0</span>
+                <span id="cart-count" class="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full hidden">0</span>
             </button>
             
+            <!-- Botón de Retroceso de la Vista -->
             <p id="back-button" class="absolute left-4 top-4 text-gray-500 cursor-pointer text-sm font-medium hidden" onclick="goBackToCategories()">
                 < Back
             </p>
@@ -93,14 +93,13 @@
                     Volver a Modelos
                 </button>
                 
-                <!-- Galería de Fotos (Placeholders) -->
+                <!-- Galería de Fotos -->
                 <div class="space-y-2 mb-6">
-                    <img id="detail-main-image" src="https://placehold.co/400x500/8c8c8c/ffffff?text=FOTO+PRINCIPAL" alt="Foto principal del modelo" class="w-full h-auto object-cover rounded-xl shadow-lg">
-                    <div class="grid grid-cols-4 gap-2">
-                        <img src="https://placehold.co/100x100/999999/ffffff?text=Foto+2" class="w-full h-auto object-cover rounded-lg opacity-80 hover:opacity-100 cursor-pointer" alt="Foto adicional 1">
-                        <img src="https://placehold.co/100x100/aaaaaa/ffffff?text=Foto+3" class="w-full h-auto object-cover rounded-lg opacity-80 hover:opacity-100 cursor-pointer" alt="Foto adicional 2">
-                        <img src="https://placehold.co/100x100/bbbbbb/ffffff?text=Foto+4" class="w-full h-auto object-cover rounded-lg opacity-80 hover:opacity-100 cursor-pointer" alt="Foto adicional 3">
-                        <img src="https://placehold.co/100x100/cccccc/ffffff?text=Foto+5" class="w-full h-auto object-cover rounded-lg opacity-80 hover:opacity-100 cursor-pointer" alt="Foto adicional 4">
+                    <!-- Foto Principal -->
+                    <img id="detail-main-image" src="" alt="Foto principal del modelo" class="w-full h-auto object-cover rounded-xl shadow-lg">
+                    <!-- Miniaturas -->
+                    <div id="detail-thumbnails" class="grid grid-cols-5 gap-2">
+                        <!-- Las miniaturas se inyectarán aquí por JS -->
                     </div>
                 </div>
 
@@ -113,8 +112,6 @@
                 <!-- Formulario de Opciones para el Carrito -->
                 <form id="order-form" class="space-y-4">
                     
-                    <!-- NOTA: TALLAS ELIMINADAS -->
-
                     <!-- Selector de Colores -->
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-2">Color</label>
@@ -171,22 +168,44 @@
     <!-- JavaScript del Catálogo -->
     <script>
         // --- DATA MOCKUP (Simulación de la Base de Datos Estática) ---
-        const WHATSAPP_NUMBER = "+524451103626";
-        // Categorías Actualizadas (Fajas, Maternal, Ropa interior eliminadas)
+        const WHATSAPP_NUMBER = "+524451229267";
         const BASE_CATEGORY_NAMES = [
             "Conjuntos Deportivos", "Enterizos", "Leggings", "Shorts", "Oversize",
             "Blusas", "Calcetas"
         ];
+
+        // URLs de imágenes reales para el modelo 1 de Leggings (Ahora con todas las correcciones)
+        const LEGGINGS_MODEL_1_IMAGES = [
+            // FOTO 1 (Principal)
+            "https://blogger.googleusercontent.com/img/a/AVvXsEgs590X4v6riaUrexeEHGLIJmLC94sg4gJeZ7iY42JMqc0KUBeJ9E4kalyFg61vzQ3gD4PPrFYzipkm10rzWHCoGPC5cbk4O5lxC4FxwD8SHVb4ujO6Z04NCwyyLpE7yaNawuikBj2tIzslUEP2I_aILElHaUwwdhj87OMychqjSXCkubz7bQQ2qo73bSc",
+            // FOTO 2 (CORREGIDA)
+            "https://blogger.googleusercontent.com/img/a/AVvXsEgsjUrVy4mxWPctXMu1DAsj1wPTQ363HcbE8ftZvzt9-LGHTobjAKfeLw1V2CBES6lPPEnrC9dN-Z2Q7fwwTvLOkUNArqltlqdWy_7TlVlg59Resygq7s9Op8eq90kh_Z9qVpuvF0IQ0L2c0XViKCkoYjlpX63djYsKsQPBC7D2z2DG9bGZPltNYv2g974", 
+            // FOTO 3 (CORREGIDA)
+            "https://blogger.googleusercontent.com/img/a/AVvXsEj2-YyfL8n8rMbL08S0ZD2ng26_dTs_VVtb0YphpTnWD43ohMWMQYEcAkuuOrLFcJ2vkm_1fmiytXd7ySmiuqp6_kh7AZWWSYfL4kqz-lOtfH2XuE9xQWqtSS0fMMLMBX8CkejWF3i0UEpo9KHFZbl430A41aij9tj7cWPLQ1xV6Q6bI--SW_S_7S5EjEM", 
+            // FOTO 4
+            "https://blogger.googleusercontent.com/img/a/AVvXsEi7wfD58k5-qcbMjpmW-46TYecIGa1_J18Ys77aL6YaEDXN7-gNXvXZiLZzJYEUcm9tnkmlF8LvlPRBAs04RKIY5qdKm_KZWIXmiA-qzWxbVS11GcSEnzHp5PBKqyeMWRlBXNBIMojz5iYGkTwl9zL1duKqxSkdp1BIWSmWLYKQv-RENR4e1aGT9Y6y8Z8",
+            // FOTO 5 (CORREGIDA)
+            "https://blogger.googleusercontent.com/img/a/AVvXsEic3nBSl0NjjQy9jnUBOv-iqkdvDj5kOrIQ6Xk45OxN8ba7vsuX3aQ9N5MzQ10_6kShn2_lqNj4D-XFatqYwbiGyq0veP1ZJaZXx6w09Eg34L_sP6q-0eHGAdAc9vpxHXUgs7S0dnhW4aRoz7qqssBRFrB0IOaiQifJSuVmKF_oDSGVe0HN2z9oaF_CR0g"
+        ];
         
-        // Genera 5 modelos placeholder para cada categoría
+        // Genera 5 modelos placeholder para cada categoría, aplicando las fotos reales al primero de Leggings
         const CATALOG_DATA_MODELS = BASE_CATEGORY_NAMES.reduce((acc, cat) => {
-            acc[cat] = Array.from({ length: 5 }, (_, i) => ({
-                id: `${cat.substring(0, 3)}-${i + 1}`,
-                name: `${cat} - Modelo ${i + 1}`,
-                price: (250 + (i * 50)).toFixed(2), // Precio simulado
-                image: `https://placehold.co/300x400/${(Math.random() * 0xFFFFFF << 0).toString(16).padStart(6, '0')}/ffffff?text=MOD+${i+1}`,
-                colors: ["Negro", "Gris Humo", "Beige", "Rosa Pastel", "Azul Acero"],
-            }));
+            acc[cat] = Array.from({ length: 5 }, (_, i) => {
+                const isLegging1 = cat === "Leggings" && i === 0;
+                
+                return {
+                    id: `${cat.substring(0, 3)}-${i + 1}`,
+                    name: isLegging1 ? "Legging Ultra Seamless V1" : `${cat} - Modelo ${i + 1}`,
+                    // PRECIO FIJO DE 85.00 PARA EL MODELO 1 DE LEGGINGS
+                    price: isLegging1 ? '85.00' : (250 + (i * 50)).toFixed(2), 
+                    // La imagen principal será la primera del array si es el modelo 1 de Leggings
+                    image: isLegging1 ? LEGGINGS_MODEL_1_IMAGES[0] : `https://placehold.co/300x400/${(Math.random() * 0xFFFFFF << 0).toString(16).padStart(6, '0')}/ffffff?text=MOD+${i+1}`,
+                    // Galería de imágenes
+                    gallery: isLegging1 ? LEGGINGS_MODEL_1_IMAGES : Array.from({ length: 5 }, (_, j) => `https://placehold.co/100x100/94a3b8/ffffff?text=FOTO+${j+1}`),
+                    // COLORES ACTUALIZADOS PARA LEGGING MODELO 1
+                    colors: isLegging1 ? ["Negro", "Beige (Nude)", "Gris Oscuro", "Azul Marino", "Vino (Borgoña)"] : ["Negro", "Gris Humo", "Beige", "Rosa Pastel", "Azul Acero"],
+                };
+            });
             return acc;
         }, {});
 
@@ -197,7 +216,6 @@
         let currentCategory = null;
         let currentModel = null;
         let selectedColor = null;
-        // La estructura del carrito es: [{ id, name, category, price, color, quantity }]
         let cart = []; 
 
         // --- REFERENCIAS DOM ---
@@ -221,6 +239,7 @@
         const detailPrice = document.getElementById('detail-price');
         const addToCartBtn = document.getElementById('add-to-cart-btn');
         const validationMessage = document.getElementById('validation-message');
+        const detailThumbnails = document.getElementById('detail-thumbnails');
         
         // Carrito
         const cartItemsContainer = document.getElementById('cart-items-container');
@@ -247,20 +266,16 @@
                 backButton.classList.remove('hidden');
             } else if (viewId === 'cart-view') {
                 cartView.classList.remove('hidden');
-                // Mantener el botón de retroceso para volver a la lista de productos
                 backButton.classList.remove('hidden'); 
             }
         }
         
-        // El botón de atrás ahora decide a dónde ir
         function goBackToCategories() {
-            if (productDetailView.classList.contains('hidden')) {
-                 // Si venimos del carrito o de la lista de productos, volvemos a categorías
+            if (productDetailView.classList.contains('hidden') && productListView.classList.contains('hidden')) {
                 currentCategory = null;
                 currentModel = null;
                 updateView('category-view');
             } else {
-                 // Si estamos en detalle, volvemos a la lista de productos
                 goBackToProducts();
             }
         }
@@ -273,8 +288,6 @@
         function renderCartView() {
             renderCartItems();
             updateView('cart-view');
-            // El botón de volver en el header llevará a categorías.
-            backButton.setAttribute('onclick', 'goBackToCategories()');
         }
 
         // --- RENDERIZADO DE CATEGORÍAS ---
@@ -282,7 +295,6 @@
         function renderCategories() {
             categoriesContainer.innerHTML = '';
             
-            // Incluir "Todas" al inicio
             const allCategories = ["Todas", ...BASE_CATEGORY_NAMES];
 
             allCategories.forEach(category => {
@@ -315,7 +327,6 @@
                     <p class="text-lg font-bold text-blue-600 mt-1">$${model.price} MXN</p>
                     <button class="w-full mt-2 text-xs py-1.5 bg-blue-50 text-blue-600 rounded-md font-medium">Ver Modelo</button>
                 `;
-                // Guardamos la categoría original para la vista de detalle
                 productCard.onclick = () => renderProductDetail(category, model);
                 modelsContainer.appendChild(productCard);
             });
@@ -327,15 +338,44 @@
 
         function renderProductDetail(category, model) {
             currentModel = model;
-            selectedColor = null; // Reiniciar selección de color
+            selectedColor = null; 
             
-            // Actualizar información del modelo
-            detailImage.src = model.image.replace('300x400', '400x500'); // Usar la imagen principal
+            // 1. Actualizar información del modelo
             detailModelName.textContent = model.name;
             detailCategoryName.textContent = `Categoría: ${category === "Todas" ? 'Varios' : category}`;
             detailPrice.textContent = `$${model.price} MXN`;
             
-            // Renderizar Colores (Select)
+            // 2. Renderizar Galería (Miniaturas y Principal)
+            detailThumbnails.innerHTML = '';
+            
+            const images = model.gallery;
+
+            detailImage.src = images[0]; // Establece la primera imagen como principal
+            detailImage.onerror = function() { this.onerror=null; this.src='https://placehold.co/400x500/94a3b8/ffffff?text=Error+Loading+Image'; };
+
+            images.forEach((imgUrl, index) => {
+                const thumbnail = document.createElement('img');
+                thumbnail.src = imgUrl;
+                thumbnail.alt = `Foto ${index + 1} de ${model.name}`;
+                // Quitamos la clase de placeholder rojo, ya que las imágenes están cargadas
+                thumbnail.className = `w-full h-auto object-cover rounded-lg opacity-80 hover:opacity-100 cursor-pointer border-2 border-transparent transition duration-150`;
+                
+                if (index === 0) {
+                    thumbnail.classList.add('thumbnail-active'); // Marca la primera como activa
+                }
+
+                thumbnail.onclick = () => {
+                    // Cambiar la imagen principal
+                    detailImage.src = imgUrl;
+                    detailImage.onerror = function() { this.onerror=null; this.src='https://placehold.co/400x500/94a3b8/ffffff?text=Error+Loading+Image'; };
+                    // Actualizar estado activo de la miniatura
+                    document.querySelectorAll('#detail-thumbnails img').forEach(t => t.classList.remove('thumbnail-active'));
+                    thumbnail.classList.add('thumbnail-active');
+                };
+                detailThumbnails.appendChild(thumbnail);
+            });
+            
+            // 3. Renderizar Colores (Select)
             colorSelect.innerHTML = '<option value="" disabled selected>-- Elige un color --</option>';
             model.colors.forEach(color => {
                 const option = document.createElement('option');
@@ -344,7 +384,7 @@
                 colorSelect.appendChild(option);
             });
             
-            // Resetear cantidad y estado del botón
+            // 4. Resetear cantidad y estado del botón
             quantityInput.value = 1;
             checkFormValidity();
 
@@ -366,13 +406,11 @@
         function checkFormValidity() {
             if (selectedColor) {
                 addToCartBtn.disabled = false;
-                addToCartBtn.classList.remove('opacity-50', 'bg-blue-500');
-                addToCartBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
+                addToCartBtn.classList.remove('opacity-50');
                 validationMessage.classList.add('hidden');
             } else {
                 addToCartBtn.disabled = true;
                 addToCartBtn.classList.add('opacity-50');
-                addToCartBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
                 validationMessage.classList.remove('hidden');
             }
         }
@@ -386,14 +424,15 @@
             const quantity = parseInt(quantityInput.value);
             
             const newItem = {
-                // Generar un ID único para el item del carrito, no el ID del modelo
+                // Generar un ID único para el item del carrito
                 cartId: Date.now() + Math.random(), 
                 id: currentModel.id,
                 name: currentModel.name,
                 category: detailCategoryName.textContent.replace('Categoría: ', ''),
                 price: parseFloat(currentModel.price),
                 color: selectedColor,
-                quantity: quantity
+                quantity: quantity,
+                image: currentModel.image // Guardar la URL de la imagen principal para el carrito
             };
             
             cart.push(newItem);
@@ -453,8 +492,9 @@
                     const cartItemDiv = document.createElement('div');
                     cartItemDiv.className = 'flex items-center space-x-3 p-3 bg-gray-50 rounded-lg shadow-sm border border-gray-200';
                     cartItemDiv.innerHTML = `
-                        <img src="${item.image || 'https://placehold.co/80x80/cccccc/ffffff?text=Item'}" 
+                        <img src="${item.image}" 
                              alt="${item.name}" 
+                             onerror="this.onerror=null; this.src='https://placehold.co/80x80/94a3b8/ffffff?text=Item';"
                              class="w-16 h-16 object-cover rounded-md flex-shrink-0">
                         <div class="flex-grow">
                             <p class="font-bold text-gray-800">${item.name}</p>
@@ -514,8 +554,6 @@
 
         // --- INICIALIZACIÓN ---
         window.onload = renderCategories;
-        // Ocultar el contador de carrito al inicio
-        cartCountSpan.classList.add('hidden');
 
     </script>
 </body>
