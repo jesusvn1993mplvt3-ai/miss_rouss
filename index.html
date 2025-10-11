@@ -13,7 +13,6 @@
             font-family: 'Inter', sans-serif;
             background-color: #fcfcfc;
         }
-        /* Clase para simular el efecto de la tela seamless (textura/color de fondo suave) */
         .seamless-bg {
             background-color: #fcfcfc;
         }
@@ -24,17 +23,25 @@
         .whatsapp-btn:hover {
             background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
         }
+        .active-btn {
+            background-color: #3b82f6; /* blue-600 */
+            color: white;
+            border-color: #3b82f6;
+        }
     </style>
-    <!-- Icono de WhatsApp (Inline SVG para evitar dependencias) -->
+    <!-- Iconos (Inline SVG para evitar dependencias) -->
     <svg style="display: none;">
         <symbol id="icon-whatsapp" viewBox="0 0 24 24">
             <path fill="currentColor" d="M12.03 2.05c-5.46 0-9.92 4.46-9.92 9.92 0 1.94.57 3.8.31 5.43l-.42 2.74c-.07.45.36.8.81.74l3.18-.52c1.78.29 3.63.43 5.9.43 5.46 0 9.92-4.46 9.92-9.92.01-5.46-4.46-9.92-9.93-9.92zm3.32 12.87c-.07.13-.25.21-.49.21-.24 0-.44-.09-.64-.17-.46-.19-1.28-.52-2.17-1.34-.89-.83-1.48-1.92-1.66-2.31-.07-.15-.15-.22-.22-.36-.08-.14-.07-.33.02-.45.09-.13.25-.13.37-.13.12 0 .26.01.37.01.21 0 .28.05.4.31.11.23.38.93.42 1.01.04.09.07.18.01.29-.07.11-.13.17-.25.32-.1.14-.19.23-.29.35-.1.1-.19.23-.07.43.12.2.35.59.82.98.47.4.92.57 1.13.68.21.11.33.09.43.06.1-.03.22-.11.34-.19.12-.08.24-.13.38-.17.13-.04.28.01.38.15.1.14.1.4.01.52z"/>
+        </symbol>
+        <symbol id="icon-cart" viewBox="0 0 24 24">
+            <path fill="currentColor" d="M17 18.5a1.5 1.5 0 100-3 1.5 1.5 0 000 3zM6 18.5a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm13.1-10h-2.1l-.8-3.4c-.2-.7-.8-1.1-1.6-1.1H8.4c-.8 0-1.4.4-1.6 1.1l-.8 3.4H4.9c-.6 0-1.1.5-1.1 1.1v7c0 .6.5 1.1 1.1 1.1h14.2c.6 0 1.1-.5 1.1-1.1v-7c0-.6-.5-1.1-1.1-1.1zM8.5 6.5h7l.4 1.7h-7.8l.4-1.7zm10.6 12.8H5.9v-7h13.2v7z"/>
         </symbol>
     </svg>
 </head>
 <body class="seamless-bg antialiased flex flex-col items-center">
 
-    <!-- IMAGEN DE ENCABEZADO AGREGADA/ACTUALIZADA AQUÍ -->
+    <!-- IMAGEN DE ENCABEZADO -->
     <div class="w-full max-w-xl p-4 pt-6 pb-2">
         <img src="https://blogger.googleusercontent.com/img/a/AVvXsEhs4HzNZXY_QHms3fongUef7yLriLTVw97dIaTuLlODxxWJpGCLI8syO3vYieFe8gsgfs5RyvEoLOEWiWFRa8bDUni3RbeMBKmLX0GQ8Pt4uWASOO8YbyuInFTWmUJGnhZ_UymOMNUQfFc6whnZ7dX099ILe9nXlN0yUF3DIhfLkygTitl4Afe3HDejNpxo" 
              alt="Logo de la marca Seamless" 
@@ -46,10 +53,17 @@
     <div id="app" class="min-h-screen w-full max-w-xl mx-auto shadow-xl bg-white">
 
         <!-- Header -->
-        <header class="p-4 bg-white border-b border-gray-100 sticky top-0 z-10 shadow-sm">
-            <h1 class="text-2xl font-extrabold text-gray-800 text-center">
-                CATÁLOGO SEAMLESS
+        <header class="p-4 bg-white border-b border-gray-100 sticky top-0 z-10 shadow-sm flex justify-between items-center">
+            <h1 class="text-2xl font-extrabold text-gray-800 text-center flex-grow">
+                CATÁLOGO
             </h1>
+            
+            <!-- Botón y Contador del Carrito -->
+            <button id="cart-button" onclick="renderCartView()" class="relative p-2 bg-blue-50 text-blue-600 rounded-full hover:bg-blue-100 transition duration-150">
+                <svg class="w-6 h-6" aria-hidden="true"><use xlink:href="#icon-cart"></use></svg>
+                <span id="cart-count" class="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full">0</span>
+            </button>
+            
             <p id="back-button" class="absolute left-4 top-4 text-gray-500 cursor-pointer text-sm font-medium hidden" onclick="goBackToCategories()">
                 < Back
             </p>
@@ -96,17 +110,10 @@
                     <p id="detail-price" class="text-3xl font-extrabold text-blue-600 mb-4">$X.XXX MXN</p>
                 </div>
                 
-                <!-- Formulario de Opciones -->
+                <!-- Formulario de Opciones para el Carrito -->
                 <form id="order-form" class="space-y-4">
                     
-                    <!-- Selector de Tallas -->
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">Talla</label>
-                        <div id="size-options" class="flex flex-wrap gap-2">
-                            <!-- Tallas se inyectarán aquí -->
-                        </div>
-                        <input type="hidden" id="selected-size" required>
-                    </div>
+                    <!-- NOTA: TALLAS ELIMINADAS -->
 
                     <!-- Selector de Colores -->
                     <div>
@@ -124,14 +131,38 @@
                                class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
                     </div>
 
-                    <!-- Botón de WhatsApp -->
-                    <button type="submit" id="whatsapp-submit-btn" disabled
-                            class="whatsapp-btn w-full p-4 mt-6 rounded-xl text-white font-bold text-lg flex items-center justify-center space-x-2 transition duration-300 opacity-50 disabled:cursor-not-allowed">
-                        <svg class="w-6 h-6" aria-hidden="true"><use xlink:href="#icon-whatsapp"></use></svg>
-                        <span>PÍDELO YA!</span>
+                    <!-- Botón de Añadir al Carrito -->
+                    <button type="submit" id="add-to-cart-btn" disabled
+                            class="w-full p-4 mt-6 rounded-xl text-white font-bold text-lg flex items-center justify-center space-x-2 transition duration-300 bg-blue-600 hover:bg-blue-700 opacity-50 disabled:cursor-not-allowed">
+                        Añadir al Carrito
                     </button>
-                    <p id="validation-message" class="text-center text-red-500 text-sm hidden">Selecciona Talla y Color para ordenar.</p>
+                    <p id="validation-message" class="text-center text-red-500 text-sm hidden">Selecciona Color para añadir al carrito.</p>
                 </form>
+            </div>
+
+            <!-- 4. Vista del Carrito de Compras -->
+            <div id="cart-view" class="hidden p-4 bg-white rounded-xl">
+                <button onclick="goBackToProducts()" class="text-blue-600 font-semibold mb-6 flex items-center">
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                    Seguir Comprando
+                </button>
+
+                <h2 class="text-2xl font-bold text-gray-800 mb-4">Tu Carrito de Compras</h2>
+                
+                <div id="cart-items-container" class="space-y-4 mb-6">
+                    <!-- Items del carrito se inyectarán aquí -->
+                </div>
+                
+                <div class="text-right text-xl font-semibold text-gray-700 border-t pt-4">
+                    Total de artículos: <span id="cart-total-items" class="text-blue-600">0</span>
+                </div>
+
+                <!-- Botón Final de WhatsApp -->
+                <button id="whatsapp-order-btn" onclick="sendWhatsAppOrder()" disabled
+                        class="whatsapp-btn w-full p-4 mt-6 rounded-xl text-white font-bold text-lg flex items-center justify-center space-x-2 transition duration-300 opacity-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                    <svg class="w-6 h-6" aria-hidden="true"><use xlink:href="#icon-whatsapp"></use></svg>
+                    <span>CONFIRMAR PEDIDO POR WHATSAPP</span>
+                </button>
             </div>
             
         </main>
@@ -140,52 +171,61 @@
     <!-- JavaScript del Catálogo -->
     <script>
         // --- DATA MOCKUP (Simulación de la Base de Datos Estática) ---
-        const WHATSAPP_NUMBER = "+524451229267";
-        const CATEGORY_NAMES = [
+        const WHATSAPP_NUMBER = "+524451103626";
+        // Categorías Actualizadas (Fajas, Maternal, Ropa interior eliminadas)
+        const BASE_CATEGORY_NAMES = [
             "Conjuntos Deportivos", "Enterizos", "Leggings", "Shorts", "Oversize",
-            "Blusas", "Fajas", "Maternal", "Ropa interior", "Calcetas"
+            "Blusas", "Calcetas"
         ];
         
         // Genera 5 modelos placeholder para cada categoría
-        const CATALOG_DATA = CATEGORY_NAMES.reduce((acc, cat) => {
+        const CATALOG_DATA_MODELS = BASE_CATEGORY_NAMES.reduce((acc, cat) => {
             acc[cat] = Array.from({ length: 5 }, (_, i) => ({
                 id: `${cat.substring(0, 3)}-${i + 1}`,
                 name: `${cat} - Modelo ${i + 1}`,
                 price: (250 + (i * 50)).toFixed(2), // Precio simulado
                 image: `https://placehold.co/300x400/${(Math.random() * 0xFFFFFF << 0).toString(16).padStart(6, '0')}/ffffff?text=MOD+${i+1}`,
-                sizes: ["XS", "S", "M", "L", "XL"],
                 colors: ["Negro", "Gris Humo", "Beige", "Rosa Pastel", "Azul Acero"],
-                // Aquí podrías agregar más fotos, pero por simplicidad solo usaremos el placeholder principal
             }));
             return acc;
         }, {});
 
-        // --- ESTADO DE LA APLICACIÓN ---
+        // Obtener todos los modelos en una lista plana para la categoría "Todas"
+        const ALL_MODELS = Object.values(CATALOG_DATA_MODELS).flat();
+
+        // --- ESTADO DE LA APLICACIÓN Y CARRITO ---
         let currentCategory = null;
         let currentModel = null;
-        let selectedSize = null;
         let selectedColor = null;
+        // La estructura del carrito es: [{ id, name, category, price, color, quantity }]
+        let cart = []; 
 
         // --- REFERENCIAS DOM ---
         const categoryView = document.getElementById('category-view');
         const productListView = document.getElementById('product-list-view');
         const productDetailView = document.getElementById('product-detail-view');
+        const cartView = document.getElementById('cart-view');
         const categoriesContainer = document.getElementById('category-view');
         const modelsContainer = document.getElementById('models-container');
         const backButton = document.getElementById('back-button');
         const categoryTitle = document.getElementById('current-category-title');
+        const cartCountSpan = document.getElementById('cart-count');
         
         // Detalle del producto
         const form = document.getElementById('order-form');
-        const sizeOptionsDiv = document.getElementById('size-options');
         const colorSelect = document.getElementById('selected-color');
         const quantityInput = document.getElementById('selected-quantity');
         const detailImage = document.getElementById('detail-main-image');
         const detailModelName = document.getElementById('detail-model-name');
         const detailCategoryName = document.getElementById('detail-category-name');
         const detailPrice = document.getElementById('detail-price');
-        const whatsappBtn = document.getElementById('whatsapp-submit-btn');
+        const addToCartBtn = document.getElementById('add-to-cart-btn');
         const validationMessage = document.getElementById('validation-message');
+        
+        // Carrito
+        const cartItemsContainer = document.getElementById('cart-items-container');
+        const cartTotalItems = document.getElementById('cart-total-items');
+        const whatsappOrderBtn = document.getElementById('whatsapp-order-btn');
 
 
         // --- FUNCIONES DE NAVEGACIÓN ---
@@ -194,6 +234,7 @@
             categoryView.classList.add('hidden');
             productListView.classList.add('hidden');
             productDetailView.classList.add('hidden');
+            cartView.classList.add('hidden');
             backButton.classList.add('hidden');
 
             if (viewId === 'category-view') {
@@ -204,25 +245,47 @@
             } else if (viewId === 'product-detail-view') {
                 productDetailView.classList.remove('hidden');
                 backButton.classList.remove('hidden');
+            } else if (viewId === 'cart-view') {
+                cartView.classList.remove('hidden');
+                // Mantener el botón de retroceso para volver a la lista de productos
+                backButton.classList.remove('hidden'); 
+            }
+        }
+        
+        // El botón de atrás ahora decide a dónde ir
+        function goBackToCategories() {
+            if (productDetailView.classList.contains('hidden')) {
+                 // Si venimos del carrito o de la lista de productos, volvemos a categorías
+                currentCategory = null;
+                currentModel = null;
+                updateView('category-view');
+            } else {
+                 // Si estamos en detalle, volvemos a la lista de productos
+                goBackToProducts();
             }
         }
 
-        function goBackToCategories() {
-            currentCategory = null;
-            currentModel = null;
-            updateView('category-view');
-        }
-        
         function goBackToProducts() {
             currentModel = null;
             renderProductList(currentCategory);
+        }
+        
+        function renderCartView() {
+            renderCartItems();
+            updateView('cart-view');
+            // El botón de volver en el header llevará a categorías.
+            backButton.setAttribute('onclick', 'goBackToCategories()');
         }
 
         // --- RENDERIZADO DE CATEGORÍAS ---
 
         function renderCategories() {
             categoriesContainer.innerHTML = '';
-            CATEGORY_NAMES.forEach(category => {
+            
+            // Incluir "Todas" al inicio
+            const allCategories = ["Todas", ...BASE_CATEGORY_NAMES];
+
+            allCategories.forEach(category => {
                 const button = document.createElement('div');
                 button.className = 'w-full p-4 bg-gray-50 rounded-xl shadow-md transition duration-200 hover:bg-blue-50 hover:shadow-lg cursor-pointer text-center';
                 button.innerHTML = `<span class="text-lg font-semibold text-gray-700">${category}</span>`;
@@ -239,20 +302,20 @@
             categoryTitle.textContent = category;
             modelsContainer.innerHTML = '';
 
-            const models = CATALOG_DATA[category] || [];
+            const models = category === "Todas" ? ALL_MODELS : CATALOG_DATA_MODELS[category];
             
             models.forEach(model => {
                 const productCard = document.createElement('div');
                 productCard.className = 'bg-white rounded-xl shadow-lg border border-gray-100 p-2 overflow-hidden cursor-pointer hover:shadow-xl transition duration-300';
                 
-                // Usamos el mismo image placeholder con el nombre del modelo
                 productCard.innerHTML = `
-                    <img src="${model.image}" alt="${model.name}" class="w-full h-48 object-cover rounded-lg mb-2 transform hover:scale-105 transition duration-300">
+                    <img src="${model.image}" alt="${model.name}" onerror="this.onerror=null; this.src='https://placehold.co/300x400/94a3b8/ffffff?text=No+Photo';" class="w-full h-48 object-cover rounded-lg mb-2 transform hover:scale-105 transition duration-300">
                     <h3 class="font-semibold text-gray-800 text-sm truncate">${model.name}</h3>
-                    <p class="text-xs text-gray-500">Tallas: ${model.sizes.join(', ')}</p>
+                    <p class="text-xs text-gray-500">Colores: ${model.colors.length}</p>
                     <p class="text-lg font-bold text-blue-600 mt-1">$${model.price} MXN</p>
                     <button class="w-full mt-2 text-xs py-1.5 bg-blue-50 text-blue-600 rounded-md font-medium">Ver Modelo</button>
                 `;
+                // Guardamos la categoría original para la vista de detalle
                 productCard.onclick = () => renderProductDetail(category, model);
                 modelsContainer.appendChild(productCard);
             });
@@ -264,26 +327,13 @@
 
         function renderProductDetail(category, model) {
             currentModel = model;
-            selectedSize = null;
-            selectedColor = null;
-
-            // Actualizar información del modelo
-            detailImage.src = model.image.replace('400x500', '400x500'); // Usar la imagen principal
-            detailModelName.textContent = model.name;
-            detailCategoryName.textContent = `Categoría: ${category}`;
-            detailPrice.textContent = `$${model.price} MXN`;
+            selectedColor = null; // Reiniciar selección de color
             
-            // Renderizar Tallas (Botones)
-            sizeOptionsDiv.innerHTML = '';
-            model.sizes.forEach(size => {
-                const sizeBtn = document.createElement('button');
-                sizeBtn.type = 'button';
-                sizeBtn.className = 'size-btn px-4 py-2 text-sm font-medium border border-gray-300 rounded-full bg-white hover:bg-gray-100 transition duration-150';
-                sizeBtn.textContent = size;
-                sizeBtn.setAttribute('data-size', size);
-                sizeBtn.onclick = () => selectSize(size, sizeBtn);
-                sizeOptionsDiv.appendChild(sizeBtn);
-            });
+            // Actualizar información del modelo
+            detailImage.src = model.image.replace('300x400', '400x500'); // Usar la imagen principal
+            detailModelName.textContent = model.name;
+            detailCategoryName.textContent = `Categoría: ${category === "Todas" ? 'Varios' : category}`;
+            detailPrice.textContent = `$${model.price} MXN`;
             
             // Renderizar Colores (Select)
             colorSelect.innerHTML = '<option value="" disabled selected>-- Elige un color --</option>';
@@ -301,77 +351,171 @@
             updateView('product-detail-view');
         }
 
-        // --- LÓGICA DE SELECCIÓN ---
+        // --- LÓGICA DEL CARRITO ---
 
-        function selectSize(size, element) {
-            selectedSize = size;
-            // Deseleccionar todos los botones
-            document.querySelectorAll('.size-btn').forEach(btn => {
-                btn.classList.remove('bg-blue-600', 'text-white', 'border-blue-600');
-                btn.classList.add('bg-white', 'text-gray-700', 'border-gray-300');
-            });
-            // Seleccionar el botón actual
-            element.classList.add('bg-blue-600', 'text-white', 'border-blue-600');
+        function selectColor(color) {
+            selectedColor = color;
             checkFormValidity();
         }
 
         colorSelect.addEventListener('change', (e) => {
-            selectedColor = e.target.value;
-            checkFormValidity();
+            selectColor(e.target.value);
         });
 
-        // Habilitar/Deshabilitar botón de WhatsApp
+        // Habilitar/Deshabilitar botón de Añadir al Carrito
         function checkFormValidity() {
-            if (selectedSize && selectedColor) {
-                whatsappBtn.disabled = false;
-                whatsappBtn.classList.remove('opacity-50');
+            if (selectedColor) {
+                addToCartBtn.disabled = false;
+                addToCartBtn.classList.remove('opacity-50', 'bg-blue-500');
+                addToCartBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
                 validationMessage.classList.add('hidden');
             } else {
-                whatsappBtn.disabled = true;
-                whatsappBtn.classList.add('opacity-50');
+                addToCartBtn.disabled = true;
+                addToCartBtn.classList.add('opacity-50');
+                addToCartBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
                 validationMessage.classList.remove('hidden');
             }
         }
         
-        // --- FUNCIÓN DE WHATSAPP ---
-        
+        // Listener para añadir al carrito
         form.addEventListener('submit', (e) => {
             e.preventDefault();
             
+            if (!currentModel || !selectedColor) return;
+
             const quantity = parseInt(quantityInput.value);
             
-            if (!currentModel || !selectedSize || !selectedColor || quantity < 1) {
-                // Esto no debería suceder si el botón está deshabilitado correctamente, pero es una protección
-                validationMessage.textContent = 'Por favor, selecciona todas las opciones.';
-                validationMessage.classList.remove('hidden');
-                return;
+            const newItem = {
+                // Generar un ID único para el item del carrito, no el ID del modelo
+                cartId: Date.now() + Math.random(), 
+                id: currentModel.id,
+                name: currentModel.name,
+                category: detailCategoryName.textContent.replace('Categoría: ', ''),
+                price: parseFloat(currentModel.price),
+                color: selectedColor,
+                quantity: quantity
+            };
+            
+            cart.push(newItem);
+            
+            // Resetear y volver a la vista de productos con un mensaje de éxito
+            form.reset();
+            currentModel = null;
+            selectedColor = null;
+            updateCartCount();
+            
+            // Mensaje temporal de éxito (simulando un toast/popup)
+            const successMessage = document.createElement('div');
+            successMessage.className = 'fixed bottom-4 left-1/2 transform -translate-x-1/2 p-3 bg-green-500 text-white rounded-xl shadow-lg z-50 transition duration-300';
+            successMessage.textContent = `✅ ¡${newItem.quantity}x ${newItem.name} añadido al carrito!`;
+            document.body.appendChild(successMessage);
+            
+            setTimeout(() => {
+                successMessage.remove();
+                renderProductList(currentCategory); // Volver a la lista después de añadir
+            }, 1000); 
+        });
+
+        function updateCartCount() {
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            cartCountSpan.textContent = totalItems;
+
+            if (totalItems > 0) {
+                cartCountSpan.classList.remove('hidden');
+                whatsappOrderBtn.disabled = false;
+                whatsappOrderBtn.classList.remove('opacity-50');
+            } else {
+                cartCountSpan.classList.add('hidden');
+                whatsappOrderBtn.disabled = true;
+                whatsappOrderBtn.classList.add('opacity-50');
+            }
+        }
+        
+        // --- RENDERIZADO DE ITEMS DEL CARRITO ---
+        
+        function removeItemFromCart(cartId) {
+            cart = cart.filter(item => item.cartId !== cartId);
+            renderCartItems();
+            updateCartCount();
+        }
+
+        function renderCartItems() {
+            cartItemsContainer.innerHTML = '';
+            let totalItems = 0;
+            
+            if (cart.length === 0) {
+                cartItemsContainer.innerHTML = '<p class="text-center text-gray-500 p-8 border rounded-lg">El carrito está vacío. ¡Añade algunos modelos!</p>';
+            } else {
+                cart.forEach(item => {
+                    totalItems += item.quantity;
+                    const itemTotal = (item.price * item.quantity).toFixed(2);
+
+                    const cartItemDiv = document.createElement('div');
+                    cartItemDiv.className = 'flex items-center space-x-3 p-3 bg-gray-50 rounded-lg shadow-sm border border-gray-200';
+                    cartItemDiv.innerHTML = `
+                        <img src="${item.image || 'https://placehold.co/80x80/cccccc/ffffff?text=Item'}" 
+                             alt="${item.name}" 
+                             class="w-16 h-16 object-cover rounded-md flex-shrink-0">
+                        <div class="flex-grow">
+                            <p class="font-bold text-gray-800">${item.name}</p>
+                            <p class="text-sm text-gray-600">Color: ${item.color} | Cantidad: ${item.quantity}</p>
+                            <p class="text-md font-semibold text-blue-600">$${itemTotal} MXN</p>
+                        </div>
+                        <button onclick="removeItemFromCart(${item.cartId})" 
+                                class="text-red-500 hover:text-red-700 font-semibold text-sm flex-shrink-0 p-1">
+                            Eliminar
+                        </button>
+                    `;
+                    cartItemsContainer.appendChild(cartItemDiv);
+                });
             }
 
-            const message = `¡Hola! Me gustaría hacer un pedido.
+            cartTotalItems.textContent = totalItems;
+            updateCartCount();
+        }
+        
+        // --- FUNCIÓN DE WHATSAPP FINAL ---
+        
+        function sendWhatsAppOrder() {
+            if (cart.length === 0) return;
 
-Producto: ${currentCategory} - ${currentModel.name}
-Precio Unitario: $${currentModel.price} MXN
+            let orderSummary = "¡Hola! Me gustaría hacer un pedido de los siguientes modelos Seamless:\n\n";
+            let grandTotal = 0;
+            let totalItems = 0;
 
-Talla: ${selectedSize}
-Color: ${selectedColor}
-Cantidad: ${quantity}
+            cart.forEach((item, index) => {
+                const itemTotal = item.price * item.quantity;
+                grandTotal += itemTotal;
+                totalItems += item.quantity;
+                
+                orderSummary += `*${index + 1}. ${item.name}*\n`;
+                orderSummary += `   - Categoría: ${item.category}\n`;
+                orderSummary += `   - Color: ${item.color}\n`;
+                orderSummary += `   - Cantidad: ${item.quantity} unidades\n`;
+                orderSummary += `   - Precio Unitario: $${item.price} MXN\n`;
+                orderSummary += `   - Subtotal: $${itemTotal.toFixed(2)} MXN\n\n`;
+            });
 
-Total Estimado: $${(currentModel.price * quantity).toFixed(2)} MXN
-            
-¡Espero su confirmación!`;
+            orderSummary += "--------------------------------------\n";
+            orderSummary += `*TOTAL DE ARTÍCULOS:* ${totalItems}\n`;
+            orderSummary += `*GRAN TOTAL ESTIMADO:* $${grandTotal.toFixed(2)} MXN\n\n`;
+            orderSummary += "Por favor, confirmen disponibilidad y costo total. ¡Gracias!";
+
 
             // Codificar el mensaje para la URL
-            const encodedMessage = encodeURIComponent(message);
+            const encodedMessage = encodeURIComponent(orderSummary);
             
             // Generar el enlace de WhatsApp
             const whatsappLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodedMessage}`;
 
             // Redirigir al usuario
             window.open(whatsappLink, '_blank');
-        });
+        }
 
         // --- INICIALIZACIÓN ---
         window.onload = renderCategories;
+        // Ocultar el contador de carrito al inicio
+        cartCountSpan.classList.add('hidden');
 
     </script>
 </body>
