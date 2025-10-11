@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo de Ropa Seamless | Venta WhatsApp</title>
+    <!-- Carga de Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Configuración de la fuente Inter -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #fcfcfc;
+        }
+        /* Clase para simular el efecto de la tela seamless (textura/color de fondo suave) */
+        .seamless-bg {
+            background-color: #fcfcfc;
+        }
+        .whatsapp-btn {
+            background: linear-gradient(135deg, #128C7E 0%, #25D366 100%);
+            box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4);
+        }
+        .whatsapp-btn:hover {
+            background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+        }
+    </style>
+    <!-- Icono de WhatsApp (Inline SVG para evitar dependencias) -->
+    <svg style="display: none;">
+        <symbol id="icon-whatsapp" viewBox="0 0 24 24">
+            <path fill="currentColor" d="M12.03 2.05c-5.46 0-9.92 4.46-9.92 9.92 0 1.94.57 3.8.31 5.43l-.42 2.74c-.07.45.36.8.81.74l3.18-.52c1.78.29 3.63.43 5.9.43 5.46 0 9.92-4.46 9.92-9.92.01-5.46-4.46-9.92-9.93-9.92zm3.32 12.87c-.07.13-.25.21-.49.21-.24 0-.44-.09-.64-.17-.46-.19-1.28-.52-2.17-1.34-.89-.83-1.48-1.92-1.66-2.31-.07-.15-.15-.22-.22-.36-.08-.14-.07-.33.02-.45.09-.13.25-.13.37-.13.12 0 .26.01.37.01.21 0 .28.05.4.31.11.23.38.93.42 1.01.04.09.07.18.01.29-.07.11-.13.17-.25.32-.1.14-.19.23-.29.35-.1.1-.19.23-.07.43.12.2.35.59.82.98.47.4.92.57 1.13.68.21.11.33.09.43.06.1-.03.22-.11.34-.19.12-.08.24-.13.38-.17.13-.04.28.01.38.15.1.14.1.4.01.52z"/>
+        </symbol>
+    </svg>
+</head>
+<body class="seamless-bg antialiased flex flex-col items-center">
+
+    <!-- IMAGEN DE ENCABEZADO AGREGADA/ACTUALIZADA AQUÍ -->
+    <div class="w-full max-w-xl p-4 pt-6 pb-2">
+        <img src="https://blogger.googleusercontent.com/img/a/AVvXsEhs4HzNZXY_QHms3fongUef7yLriLTVw97dIaTuLlODxxWJpGCLI8syO3vYieFe8gsgfs5RyvEoLOEWiWFRa8bDUni3RbeMBKmLX0GQ8Pt4uWASOO8YbyuInFTWmUJGnhZ_UymOMNUQfFc6whnZ7dX099ILe9nXlN0yUF3DIhfLkygTitl4Afe3HDejNpxo" 
+             alt="Logo de la marca Seamless" 
+             class="w-full h-auto object-contain rounded-xl shadow-lg border border-gray-100 mx-auto">
+    </div>
+    <!-- FIN IMAGEN -->
+
+    <!-- Contenedor Principal de la App (Pantalla completa en móvil) -->
+    <div id="app" class="min-h-screen w-full max-w-xl mx-auto shadow-xl bg-white">
+
+        <!-- Header -->
+        <header class="p-4 bg-white border-b border-gray-100 sticky top-0 z-10 shadow-sm">
+            <h1 class="text-2xl font-extrabold text-gray-800 text-center">
+                CATÁLOGO SEAMLESS
+            </h1>
+            <p id="back-button" class="absolute left-4 top-4 text-gray-500 cursor-pointer text-sm font-medium hidden" onclick="goBackToCategories()">
+                < Back
+            </p>
+        </header>
+
+        <!-- Vistas -->
+        <main class="p-4">
+
+            <!-- 1. Vista de Categorías -->
+            <div id="category-view" class="space-y-3">
+                <p class="text-gray-500 mb-4 text-center text-sm">Selecciona una categoría para ver los modelos disponibles.</p>
+                <!-- Las categorías se inyectarán aquí por JS -->
+            </div>
+
+            <!-- 2. Vista de Modelos de la Categoría -->
+            <div id="product-list-view" class="hidden">
+                <h2 id="current-category-title" class="text-xl font-bold text-gray-700 mb-4"></h2>
+                <div id="models-container" class="grid grid-cols-2 gap-4">
+                    <!-- Los 5 modelos se inyectarán aquí por JS -->
+                </div>
+            </div>
+            
+            <!-- 3. Vista de Detalle del Producto (Modal simulado) -->
+            <div id="product-detail-view" class="hidden p-4 bg-white rounded-xl">
+                <button onclick="goBackToProducts()" class="text-blue-600 font-semibold mb-4 flex items-center">
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                    Volver a Modelos
+                </button>
+                
+                <!-- Galería de Fotos (Placeholders) -->
+                <div class="space-y-2 mb-6">
+                    <img id="detail-main-image" src="https://placehold.co/400x500/8c8c8c/ffffff?text=FOTO+PRINCIPAL" alt="Foto principal del modelo" class="w-full h-auto object-cover rounded-xl shadow-lg">
+                    <div class="grid grid-cols-4 gap-2">
+                        <img src="https://placehold.co/100x100/999999/ffffff?text=Foto+2" class="w-full h-auto object-cover rounded-lg opacity-80 hover:opacity-100 cursor-pointer" alt="Foto adicional 1">
+                        <img src="https://placehold.co/100x100/aaaaaa/ffffff?text=Foto+3" class="w-full h-auto object-cover rounded-lg opacity-80 hover:opacity-100 cursor-pointer" alt="Foto adicional 2">
+                        <img src="https://placehold.co/100x100/bbbbbb/ffffff?text=Foto+4" class="w-full h-auto object-cover rounded-lg opacity-80 hover:opacity-100 cursor-pointer" alt="Foto adicional 3">
+                        <img src="https://placehold.co/100x100/cccccc/ffffff?text=Foto+5" class="w-full h-auto object-cover rounded-lg opacity-80 hover:opacity-100 cursor-pointer" alt="Foto adicional 4">
+                    </div>
+                </div>
+
+                <div class="mb-6">
+                    <h3 id="detail-model-name" class="text-2xl font-bold text-gray-800 mb-1">Modelo de Ejemplo</h3>
+                    <p id="detail-category-name" class="text-md font-medium text-gray-500 mb-3"></p>
+                    <p id="detail-price" class="text-3xl font-extrabold text-blue-600 mb-4">$X.XXX MXN</p>
+                </div>
+                
+                <!-- Formulario de Opciones -->
+                <form id="order-form" class="space-y-4">
+                    
+                    <!-- Selector de Tallas -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Talla</label>
+                        <div id="size-options" class="flex flex-wrap gap-2">
+                            <!-- Tallas se inyectarán aquí -->
+                        </div>
+                        <input type="hidden" id="selected-size" required>
+                    </div>
+
+                    <!-- Selector de Colores -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Color</label>
+                        <select id="selected-color" required
+                                class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-white">
+                            <!-- Colores se inyectarán aquí -->
+                        </select>
+                    </div>
+
+                    <!-- Cantidad -->
+                    <div>
+                        <label for="selected-quantity" class="block text-sm font-semibold text-gray-700 mb-2">Cantidad</label>
+                        <input type="number" id="selected-quantity" value="1" min="1" required
+                               class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+
+                    <!-- Botón de WhatsApp -->
+                    <button type="submit" id="whatsapp-submit-btn" disabled
+                            class="whatsapp-btn w-full p-4 mt-6 rounded-xl text-white font-bold text-lg flex items-center justify-center space-x-2 transition duration-300 opacity-50 disabled:cursor-not-allowed">
+                        <svg class="w-6 h-6" aria-hidden="true"><use xlink:href="#icon-whatsapp"></use></svg>
+                        <span>PÍDELO YA!</span>
+                    </button>
+                    <p id="validation-message" class="text-center text-red-500 text-sm hidden">Selecciona Talla y Color para ordenar.</p>
+                </form>
+            </div>
+            
+        </main>
+    </div>
+
+    <!-- JavaScript del Catálogo -->
+    <script>
+        // --- DATA MOCKUP (Simulación de la Base de Datos Estática) ---
+        const WHATSAPP_NUMBER = "+524451229267";
+        const CATEGORY_NAMES = [
+            "Conjuntos Deportivos", "Enterizos", "Leggings", "Shorts", "Oversize",
+            "Blusas", "Fajas", "Maternal", "Ropa interior", "Calcetas"
+        ];
+        
+        // Genera 5 modelos placeholder para cada categoría
+        const CATALOG_DATA = CATEGORY_NAMES.reduce((acc, cat) => {
+            acc[cat] = Array.from({ length: 5 }, (_, i) => ({
+                id: `${cat.substring(0, 3)}-${i + 1}`,
+                name: `${cat} - Modelo ${i + 1}`,
+                price: (250 + (i * 50)).toFixed(2), // Precio simulado
+                image: `https://placehold.co/300x400/${(Math.random() * 0xFFFFFF << 0).toString(16).padStart(6, '0')}/ffffff?text=MOD+${i+1}`,
+                sizes: ["XS", "S", "M", "L", "XL"],
+                colors: ["Negro", "Gris Humo", "Beige", "Rosa Pastel", "Azul Acero"],
+                // Aquí podrías agregar más fotos, pero por simplicidad solo usaremos el placeholder principal
+            }));
+            return acc;
+        }, {});
+
+        // --- ESTADO DE LA APLICACIÓN ---
+        let currentCategory = null;
+        let currentModel = null;
+        let selectedSize = null;
+        let selectedColor = null;
+
+        // --- REFERENCIAS DOM ---
+        const categoryView = document.getElementById('category-view');
+        const productListView = document.getElementById('product-list-view');
+        const productDetailView = document.getElementById('product-detail-view');
+        const categoriesContainer = document.getElementById('category-view');
+        const modelsContainer = document.getElementById('models-container');
+        const backButton = document.getElementById('back-button');
+        const categoryTitle = document.getElementById('current-category-title');
+        
+        // Detalle del producto
+        const form = document.getElementById('order-form');
+        const sizeOptionsDiv = document.getElementById('size-options');
+        const colorSelect = document.getElementById('selected-color');
+        const quantityInput = document.getElementById('selected-quantity');
+        const detailImage = document.getElementById('detail-main-image');
+        const detailModelName = document.getElementById('detail-model-name');
+        const detailCategoryName = document.getElementById('detail-category-name');
+        const detailPrice = document.getElementById('detail-price');
+        const whatsappBtn = document.getElementById('whatsapp-submit-btn');
+        const validationMessage = document.getElementById('validation-message');
+
+
+        // --- FUNCIONES DE NAVEGACIÓN ---
+
+        function updateView(viewId) {
+            categoryView.classList.add('hidden');
+            productListView.classList.add('hidden');
+            productDetailView.classList.add('hidden');
+            backButton.classList.add('hidden');
+
+            if (viewId === 'category-view') {
+                categoryView.classList.remove('hidden');
+            } else if (viewId === 'product-list-view') {
+                productListView.classList.remove('hidden');
+                backButton.classList.remove('hidden');
+            } else if (viewId === 'product-detail-view') {
+                productDetailView.classList.remove('hidden');
+                backButton.classList.remove('hidden');
+            }
+        }
+
+        function goBackToCategories() {
+            currentCategory = null;
+            currentModel = null;
+            updateView('category-view');
+        }
+        
+        function goBackToProducts() {
+            currentModel = null;
+            renderProductList(currentCategory);
+        }
+
+        // --- RENDERIZADO DE CATEGORÍAS ---
+
+        function renderCategories() {
+            categoriesContainer.innerHTML = '';
+            CATEGORY_NAMES.forEach(category => {
+                const button = document.createElement('div');
+                button.className = 'w-full p-4 bg-gray-50 rounded-xl shadow-md transition duration-200 hover:bg-blue-50 hover:shadow-lg cursor-pointer text-center';
+                button.innerHTML = `<span class="text-lg font-semibold text-gray-700">${category}</span>`;
+                button.onclick = () => renderProductList(category);
+                categoriesContainer.appendChild(button);
+            });
+            updateView('category-view');
+        }
+
+        // --- RENDERIZADO DE LISTA DE PRODUCTOS ---
+
+        function renderProductList(category) {
+            currentCategory = category;
+            categoryTitle.textContent = category;
+            modelsContainer.innerHTML = '';
+
+            const models = CATALOG_DATA[category] || [];
+            
+            models.forEach(model => {
+                const productCard = document.createElement('div');
+                productCard.className = 'bg-white rounded-xl shadow-lg border border-gray-100 p-2 overflow-hidden cursor-pointer hover:shadow-xl transition duration-300';
+                
+                // Usamos el mismo image placeholder con el nombre del modelo
+                productCard.innerHTML = `
+                    <img src="${model.image}" alt="${model.name}" class="w-full h-48 object-cover rounded-lg mb-2 transform hover:scale-105 transition duration-300">
+                    <h3 class="font-semibold text-gray-800 text-sm truncate">${model.name}</h3>
+                    <p class="text-xs text-gray-500">Tallas: ${model.sizes.join(', ')}</p>
+                    <p class="text-lg font-bold text-blue-600 mt-1">$${model.price} MXN</p>
+                    <button class="w-full mt-2 text-xs py-1.5 bg-blue-50 text-blue-600 rounded-md font-medium">Ver Modelo</button>
+                `;
+                productCard.onclick = () => renderProductDetail(category, model);
+                modelsContainer.appendChild(productCard);
+            });
+
+            updateView('product-list-view');
+        }
+
+        // --- RENDERIZADO DEL DETALLE DEL PRODUCTO ---
+
+        function renderProductDetail(category, model) {
+            currentModel = model;
+            selectedSize = null;
+            selectedColor = null;
+
+            // Actualizar información del modelo
+            detailImage.src = model.image.replace('400x500', '400x500'); // Usar la imagen principal
+            detailModelName.textContent = model.name;
+            detailCategoryName.textContent = `Categoría: ${category}`;
+            detailPrice.textContent = `$${model.price} MXN`;
+            
+            // Renderizar Tallas (Botones)
+            sizeOptionsDiv.innerHTML = '';
+            model.sizes.forEach(size => {
+                const sizeBtn = document.createElement('button');
+                sizeBtn.type = 'button';
+                sizeBtn.className = 'size-btn px-4 py-2 text-sm font-medium border border-gray-300 rounded-full bg-white hover:bg-gray-100 transition duration-150';
+                sizeBtn.textContent = size;
+                sizeBtn.setAttribute('data-size', size);
+                sizeBtn.onclick = () => selectSize(size, sizeBtn);
+                sizeOptionsDiv.appendChild(sizeBtn);
+            });
+            
+            // Renderizar Colores (Select)
+            colorSelect.innerHTML = '<option value="" disabled selected>-- Elige un color --</option>';
+            model.colors.forEach(color => {
+                const option = document.createElement('option');
+                option.value = color;
+                option.textContent = color;
+                colorSelect.appendChild(option);
+            });
+            
+            // Resetear cantidad y estado del botón
+            quantityInput.value = 1;
+            checkFormValidity();
+
+            updateView('product-detail-view');
+        }
+
+        // --- LÓGICA DE SELECCIÓN ---
+
+        function selectSize(size, element) {
+            selectedSize = size;
+            // Deseleccionar todos los botones
+            document.querySelectorAll('.size-btn').forEach(btn => {
+                btn.classList.remove('bg-blue-600', 'text-white', 'border-blue-600');
+                btn.classList.add('bg-white', 'text-gray-700', 'border-gray-300');
+            });
+            // Seleccionar el botón actual
+            element.classList.add('bg-blue-600', 'text-white', 'border-blue-600');
+            checkFormValidity();
+        }
+
+        colorSelect.addEventListener('change', (e) => {
+            selectedColor = e.target.value;
+            checkFormValidity();
+        });
+
+        // Habilitar/Deshabilitar botón de WhatsApp
+        function checkFormValidity() {
+            if (selectedSize && selectedColor) {
+                whatsappBtn.disabled = false;
+                whatsappBtn.classList.remove('opacity-50');
+                validationMessage.classList.add('hidden');
+            } else {
+                whatsappBtn.disabled = true;
+                whatsappBtn.classList.add('opacity-50');
+                validationMessage.classList.remove('hidden');
+            }
+        }
+        
+        // --- FUNCIÓN DE WHATSAPP ---
+        
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const quantity = parseInt(quantityInput.value);
+            
+            if (!currentModel || !selectedSize || !selectedColor || quantity < 1) {
+                // Esto no debería suceder si el botón está deshabilitado correctamente, pero es una protección
+                validationMessage.textContent = 'Por favor, selecciona todas las opciones.';
+                validationMessage.classList.remove('hidden');
+                return;
+            }
+
+            const message = `¡Hola! Me gustaría hacer un pedido.
+
+Producto: ${currentCategory} - ${currentModel.name}
+Precio Unitario: $${currentModel.price} MXN
+
+Talla: ${selectedSize}
+Color: ${selectedColor}
+Cantidad: ${quantity}
+
+Total Estimado: $${(currentModel.price * quantity).toFixed(2)} MXN
+            
+¡Espero su confirmación!`;
+
+            // Codificar el mensaje para la URL
+            const encodedMessage = encodeURIComponent(message);
+            
+            // Generar el enlace de WhatsApp
+            const whatsappLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodedMessage}`;
+
+            // Redirigir al usuario
+            window.open(whatsappLink, '_blank');
+        });
+
+        // --- INICIALIZACIÓN ---
+        window.onload = renderCategories;
+
+    </script>
+</body>
+</html>
+
