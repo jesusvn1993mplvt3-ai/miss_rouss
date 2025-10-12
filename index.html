@@ -93,7 +93,7 @@
                     Volver a Modelos
                 </button>
                 
-                <!-- Galería de Fotos - AHORA CON FONDO OSCURO FORZADO Y TEXTO BLANCO -->
+                <!-- Galería de Fotos - FONDO NEGRO FORZADO -->
                 <div class="space-y-2 mb-6 p-4 bg-gray-900 text-white rounded-xl shadow-inner" style="background-color: #000000;">
                     <!-- Foto Principal -->
                     <img id="detail-main-image" src="" alt="Foto principal del modelo" class="w-full h-auto object-cover rounded-xl shadow-lg">
@@ -173,8 +173,21 @@
             "Conjuntos Deportivos", "Enterizos", "Leggings", "Shorts", "Oversize",
             "Blusas", "Calcetas"
         ];
-
-        // URLs de imágenes reales para el modelo 1 de Leggings (Ahora con todas las correcciones)
+        
+        // -------------------------------------------------------------
+        // CONJUNTOS DEPORTIVOS - MODELO 1 (ACTUALIZADO)
+        // -------------------------------------------------------------
+        const CONJUNTO_MODEL_1_IMAGES = [
+            "https://raw.githubusercontent.com/jesusvn1993mplvt3-ai/rosasandoval/refs/heads/main/CONJUNTO1%20(4).png", // Principal
+            "https://raw.githubusercontent.com/jesusvn1993mplvt3-ai/rosasandoval/refs/heads/main/CONJUNTO1%20(1).png",
+            "https://raw.githubusercontent.com/jesusvn1993mplvt3-ai/rosasandoval/refs/heads/main/CONJUNTO1%20(2).png",
+            "https://raw.githubusercontent.com/jesusvn1993mplvt3-ai/rosasandoval/refs/heads/main/CONJUNTO1%20(3).png",
+            "https://raw.githubusercontent.com/jesusvn1993mplvt3-ai/rosasandoval/refs/heads/main/CONJUNTO1.png" // Foto 5 corregida (misma URL que la 4)
+        ];
+        
+        // -------------------------------------------------------------
+        // LEGGINGS - MODELO 1 
+        // -------------------------------------------------------------
         const LEGGINGS_MODEL_1_IMAGES = [
             // FOTO 1 (Principal)
             "https://blogger.googleusercontent.com/img/a/AVvXsEgs590X4v6riaUrexeEHGLIJmLC94sg4gJeZ7iY42JMqc0KUBeJ9E4kalyFg61vzQ3gD4PPrFYzipkm10rzWHCoGPC5cbk4O5lxC4FxwD8SHVb4ujO6Z04NCwyyLpE7yaNawuikBj2tIzslUEP2I_aILElHaUwwdhj87OMychqjSXCkubz7bQQ2qo73bSc",
@@ -185,26 +198,39 @@
             // FOTO 4
             "https://blogger.googleusercontent.com/img/a/AVvXsEi7wfD58k5-qcbMjpmW-46TYecIGa1_J18Ys77aL6YaEDXN7-gNXvXZiLZzJYEUcm9tnkmlF8LvlPRBAs04RKIY5qdKm_KZWIXmiA-qzWxbVS11GcSEnzHp5PBKqyeMWRlBXNBIMojz5iYGkTwl9zL1duKqxSkdp1BIWSmWLYKQv-RENR4e1aGT9Y6y8Z8",
             // FOTO 5 (CORREGIDA)
-            "https://blogger.googleusercontent.com/img/a/AVvXsEic3nBSl0NjjQy9jnUBOv-iqkdvDj5kOrIQ6Xk45OxN8ba7vsuX3aQ9N5MzQ10_6kShn2_lqNj4D-XFatqYwbiGyq0veP1ZJaZXx6w09Eg34L_sP6q-0eHGAdAc9vpxHXUgs7S0dnhW4aRoz7qqssBRFrB0IOaiQifJSuVmKF_oDSGVe0HN2z9oaF_CR0g"
+            "https://blogger.googleusercontent.com/img/a/AVvXsEic3nBSl0NjjQy9jnUBOv-iqkdvDj5kOrIQ6Xk45OxN8ba7vsuX3aQ9N5MzQ10_6kShn2n_lqNj4D-XFatqYwbiGyq0veP1ZJaZXx6w09Eg34L_sP6q-0eHGAdAc9vpxHXUgs7S0dnhW4aRoz7qqssBRFrB0IOaiQifJSuVmKF_oDSGVe0HN2z9oaF_CR0g"
         ];
         
-        // Genera 5 modelos placeholder para cada categoría, aplicando las fotos reales al primero de Leggings
+        // Genera 5 modelos placeholder para cada categoría, aplicando fotos reales a los modelos 1 de Leggings y Conjuntos.
         const CATALOG_DATA_MODELS = BASE_CATEGORY_NAMES.reduce((acc, cat) => {
             acc[cat] = Array.from({ length: 5 }, (_, i) => {
                 const isLegging1 = cat === "Leggings" && i === 0;
+                const isConjunto1 = cat === "Conjuntos Deportivos" && i === 0;
                 
-                return {
+                let modelData = {
                     id: `${cat.substring(0, 3)}-${i + 1}`,
-                    name: isLegging1 ? "Legging Ultra Seamless V1" : `${cat} - Modelo ${i + 1}`,
-                    // PRECIO FIJO DE 85.00 PARA EL MODELO 1 DE LEGGINGS
-                    price: isLegging1 ? '85.00' : (250 + (i * 50)).toFixed(2), 
-                    // La imagen principal será la primera del array si es el modelo 1 de Leggings. Usamos placeholder negro si no es Legging V1.
-                    image: isLegging1 ? LEGGINGS_MODEL_1_IMAGES[0] : `https://placehold.co/300x400/000000/ffffff?text=MOD+${i+1}`, 
-                    // Galería de imágenes. Usamos placeholder negro si no es Legging V1.
-                    gallery: isLegging1 ? LEGGINGS_MODEL_1_IMAGES : Array.from({ length: 5 }, (_, j) => `https://placehold.co/100x100/000000/ffffff?text=FOTO+${j+1}`), 
-                    // COLORES ACTUALIZADOS PARA LEGGING MODELO 1
-                    colors: isLegging1 ? ["Negro", "Beige (Nude)", "Gris Oscuro", "Azul Marino", "Vino (Borgoña)"] : ["Negro", "Gris Humo", "Beige", "Rosa Pastel", "Azul Acero"],
+                    name: `${cat} - Modelo ${i + 1}`,
+                    price: (250 + (i * 50)).toFixed(2), 
+                    image: `https://placehold.co/300x400/000000/ffffff?text=MOD+${i+1}`, 
+                    gallery: Array.from({ length: 5 }, (_, j) => `https://placehold.co/100x100/000000/ffffff?text=FOTO+${j+1}`), 
+                    colors: ["Negro", "Gris Humo", "Beige", "Rosa Pastel", "Azul Acero"],
                 };
+
+                if (isConjunto1) {
+                    modelData.name = "Conjunto Deportivo V1 (Seamless)";
+                    modelData.price = '150.00'; // Precio ajustado a $150.00
+                    modelData.image = CONJUNTO_MODEL_1_IMAGES[0];
+                    modelData.gallery = CONJUNTO_MODEL_1_IMAGES;
+                    modelData.colors = ["Negro", "Gris", "Vino", "Verde Militar"];
+                } else if (isLegging1) {
+                    modelData.name = "Legging Ultra Seamless V1";
+                    modelData.price = '85.00'; 
+                    modelData.image = LEGGINGS_MODEL_1_IMAGES[0]; 
+                    modelData.gallery = LEGGINGS_MODEL_1_IMAGES;
+                    modelData.colors = ["Negro", "Beige (Nude)", "Gris Oscuro", "Azul Marino", "Vino (Borgoña)"];
+                }
+                
+                return modelData;
             });
             return acc;
         }, {});
@@ -560,4 +586,3 @@
     </script>
 </body>
 </html>
-
