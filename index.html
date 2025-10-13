@@ -27,6 +27,16 @@
             border: 3px solid #3b82f6; /* Borde azul para la foto activa */
             opacity: 100% !important;
         }
+        .llm-output {
+            white-space: pre-wrap;
+            text-align: left;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            background-color: #f3f4f6;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            border-left: 4px solid #3b82f6;
+        }
     </style>
     <!-- Iconos (Inline SVG para evitar dependencias) -->
     <svg style="display: none;">
@@ -108,12 +118,25 @@
                     <p id="detail-category-name" class="text-md font-medium text-gray-500 mb-3"></p>
                     <p id="detail-price" class="text-3xl font-extrabold text-blue-600 mb-4">$X.XXX MXN</p>
                 </div>
+
+                <!-- NEW: Asesor de Estilo LLM -->
+                <div class="mb-6 border-t pt-4">
+                    <button id="style-advisor-btn" 
+                            onclick="getStyleAdvice()" 
+                            class="w-full p-3 rounded-lg text-sm font-bold flex items-center justify-center space-x-2 transition duration-300 
+                                   bg-yellow-100 text-yellow-800 hover:bg-yellow-200">
+                        <span>✨ Asesor de Estilo Gemini</span>
+                        <span id="advisor-loading" class="hidden animate-spin h-4 w-4 border-2 border-yellow-800 border-t-transparent rounded-full"></span>
+                    </button>
+                    <div id="style-advice-output" class="hidden"></div>
+                </div>
+                <!-- END NEW -->
                 
                 <!-- Formulario de Opciones para el Carrito -->
                 <form id="order-form" class="space-y-4">
                     
-                    <!-- Selector de Colores -->
-                    <div>
+                    <!-- Selector de Colores (Este grupo se oculta si no hay colores) -->
+                    <div id="color-selector-group">
                         <label class="block text-sm font-semibold text-gray-700 mb-2">Color</label>
                         <select id="selected-color" required
                                 class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-white">
@@ -154,6 +177,18 @@
                     Total de artículos: <span id="cart-total-items" class="text-blue-600">0</span>
                 </div>
 
+                <!-- NEW: Ideas de Outfit LLM -->
+                <button id="outfit-ideas-btn" 
+                        onclick="getOutfitIdeas()" 
+                        disabled
+                        class="w-full p-3 mt-4 rounded-lg text-sm font-bold flex items-center justify-center space-x-2 transition duration-300 
+                               bg-indigo-100 text-indigo-800 hover:bg-indigo-200 disabled:opacity-50 disabled:cursor-not-allowed">
+                    <span>✨ Generar Ideas de Outfit con Gemini</span>
+                    <span id="outfit-loading" class="hidden animate-spin h-4 w-4 border-2 border-indigo-800 border-t-transparent rounded-full"></span>
+                </button>
+                <div id="outfit-ideas-output" class="hidden"></div>
+                <!-- END NEW -->
+
                 <!-- Botón Final de WhatsApp -->
                 <button id="whatsapp-order-btn" onclick="sendWhatsAppOrder()" disabled
                         class="whatsapp-btn w-full p-4 mt-6 rounded-xl text-white font-bold text-lg flex items-center justify-center space-x-2 transition duration-300 opacity-50 disabled:opacity-50 disabled:cursor-not-allowed">
@@ -162,11 +197,19 @@
                 </button>
             </div>
             
+            <!-- Contenedor para mensajes de error (toast) -->
+            <div id="toast-container" class="fixed bottom-4 right-4 z-50"></div>
+
         </main>
     </div>
 
     <!-- JavaScript del Catálogo -->
     <script>
+        // --- CONFIGURACIÓN DE GEMINI API ---
+        const API_MODEL = 'gemini-2.5-flash-preview-05-20';
+        const apiKey = "";
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${API_MODEL}:generateContent?key=${apiKey}`;
+
         // --- DATA MOCKUP (Simulación de la Base de Datos Estática) ---
         const WHATSAPP_NUMBER = "+524451103626";
         const BASE_CATEGORY_NAMES = [
@@ -182,30 +225,42 @@
             "https://raw.githubusercontent.com/jesusvn1993mplvt3-ai/rosasandoval/refs/heads/main/CONJUNTO1%20(1).png",
             "https://raw.githubusercontent.com/jesusvn1993mplvt3-ai/rosasandoval/refs/heads/main/CONJUNTO1%20(2).png",
             "https://raw.githubusercontent.com/jesusvn1993mplvt3-ai/rosasandoval/refs/heads/main/CONJUNTO1%20(3).png",
-            "https://raw.githubusercontent.com/jesusvn1993mplvt3-ai/rosasandoval/refs/heads/main/CONJUNTO1.png" // Foto 5 corregida (misma URL que la 4)
+            "https://raw.githubusercontent.com/jesusvn1993mplvt3-ai/rosasandoval/refs/heads/main/CONJUNTO1%20(5).png" // Foto 5 (Corregida)
         ];
         
+        // -------------------------------------------------------------
+        // ENTERIZOS (NUEVAS URLs)
+        // -------------------------------------------------------------
+        const ENTERIZO_IMAGES = [
+            "https://github.com/jesusvn1993mplvt3-ai/rosasandoval/blob/main/fotos/Enterizos/IMG-20251011-WA0013.jpg?raw=true",
+            "https://github.com/jesusvn1993mplvt3-ai/rosasandoval/blob/main/fotos/Enterizos/IMG-20251011-WA0014.jpg?raw=true",
+            "https://github.com/jesusvn1993mplvt3-ai/rosasandoval/blob/main/fotos/Enterizos/IMG-20251011-WA0043.jpg?raw=true",
+            "https://github.com/jesusvn1993mplvt3-ai/rosasandoval/blob/main/fotos/Enterizos/IMG-20251011-WA0045.jpg?raw=true",
+            "https://github.com/jesusvn1993mplvt3-ai/rosasandoval/blob/main/fotos/Enterizos/IMG-20251011-WA0046.jpg?raw=true"
+        ];
+
         // -------------------------------------------------------------
         // LEGGINGS - MODELO 1 
         // -------------------------------------------------------------
         const LEGGINGS_MODEL_1_IMAGES = [
             // FOTO 1 (Principal)
             "https://blogger.googleusercontent.com/img/a/AVvXsEgs590X4v6riaUrexeEHGLIJmLC94sg4gJeZ7iY42JMqc0KUBeJ9E4kalyFg61vzQ3gD4PPrFYzipkm10rzWHCoGPC5cbk4O5lxC4FxwD8SHVb4ujO6Z04NCwyyLpE7yaNawuikBj2tIzslUEP2I_aILElHaUwwdhj87OMychqjSXCkubz7bQQ2qo73bSc",
-            // FOTO 2 (CORREGIDA)
+            // FOTO 2 
             "https://blogger.googleusercontent.com/img/a/AVvXsEgsjUrVy4mxWPctXMu1DAsj1wPTQ363HcbE8ftZvzt9-LGHTobjAKfeLw1V2CBES6lPPEnrC9dN-Z2Q7fwwTvLOkUNArqltlqdWy_7TlVlg59Resygq7s9Op8eq90kh_Z9qVpuvF0IQ0L2c0XViKCkoYjlpX63djYsKsQPBC7D2z2DG9bGZPltNYv2g974", 
-            // FOTO 3 (CORREGIDA)
+            // FOTO 3
             "https://blogger.googleusercontent.com/img/a/AVvXsEj2-YyfL8n8rMbL08S0ZD2ng26_dTs_VVtb0YphpTnWD43ohMWMQYEcAkuuOrLFcJ2vkm_1fmiytXd7ySmiuqp6_kh7AZWWSYfL4kqz-lOtfH2XuE9xQWqtSS0fMMLMBX8CkejWF3i0UEpo9KHFZbl430A41aij9tj7cWPLQ1xV6Q6bI--SW_S_7S5EjEM", 
             // FOTO 4
-            "https://blogger.googleusercontent.com/img/a/AVvXsEi7wfD58k5-qcbMjpmW-46TYecIGa1_J18Ys77aL6YaEDXN7-gNXvXZiLZzJYEUcm9tnkmlF8LvlPRBAs04RKIY5qdKm_KZWIXmiA-qzWxbVS11GcSEnzHp5PBKqyeMWRlBXNBIMojz5iYGkTwl9zL1duKqxSkdp1BIWSmWLYKQv-RENR4e1aGT9Y6y8Z8",
-            // FOTO 5 (CORREGIDA)
+            "https://blogger.googleusercontent.com/img/a/AVvXsEi7wfD58k5-qcbMjpmW-46TYecIGa1_J18Ys77aL6YaEDXN7-gNXvXZiLZzJYEUcm9tnkmlF8LvlPRBAs04RKIY5qdKm-KZWIXmiA-qzWxbVS11GcSEnzHp5PBKqyeMWRlBXNBIMojz5iYGkTwl9zL1duKqxSkdp1BIWSmWLYKQv-RENR4e1aGT9Y6y8Z8",
+            // FOTO 5 
             "https://blogger.googleusercontent.com/img/a/AVvXsEic3nBSl0NjjQy9jnUBOv-iqkdvDj5kOrIQ6Xk45OxN8ba7vsuX3aQ9N5MzQ10_6kShn2n_lqNj4D-XFatqYwbiGyq0veP1ZJaZXx6w09Eg34L_sP6q-0eHGAdAc9vpxHXUgs7S0dnhW4aRoz7qqssBRFrB0IOaiQifJSuVmKF_oDSGVe0HN2z9oaF_CR0g"
         ];
         
-        // Genera 5 modelos placeholder para cada categoría, aplicando fotos reales a los modelos 1 de Leggings y Conjuntos.
+        // Genera 5 modelos placeholder para cada categoría, aplicando fotos reales a los modelos 1 de Enterizos, Leggings y Conjuntos.
         const CATALOG_DATA_MODELS = BASE_CATEGORY_NAMES.reduce((acc, cat) => {
             acc[cat] = Array.from({ length: 5 }, (_, i) => {
                 const isLegging1 = cat === "Leggings" && i === 0;
                 const isConjunto1 = cat === "Conjuntos Deportivos" && i === 0;
+                const isEnterizo = cat === "Enterizos"; // Aplica a todos los enterizos
                 
                 let modelData = {
                     id: `${cat.substring(0, 3)}-${i + 1}`,
@@ -216,9 +271,20 @@
                     colors: ["Negro", "Gris Humo", "Beige", "Rosa Pastel", "Azul Acero"],
                 };
 
-                if (isConjunto1) {
+                if (isEnterizo) {
+                    // Nuevos modelos de Enterizos (un solo color, una sola foto)
+                    const enterizoId = i + 1;
+                    modelData.id = `ENT-${enterizoId}`;
+                    modelData.name = `Enterizo Seamless E${enterizoId}`;
+                    modelData.price = (299.00 + (i * 10)).toFixed(2); // Precio de ejemplo
+                    // Usar la URL de la lista de ENTERIZO_IMAGES.
+                    const imageUrl = ENTERIZO_IMAGES[i] || modelData.image; 
+                    modelData.image = imageUrl; 
+                    modelData.gallery = [imageUrl]; 
+                    modelData.colors = []; // Sin opciones de color
+                } else if (isConjunto1) {
                     modelData.name = "Conjunto Deportivo V1 (Seamless)";
-                    modelData.price = '150.00'; // Precio ajustado a $150.00
+                    modelData.price = '150.00'; // Precio ajustado
                     modelData.image = CONJUNTO_MODEL_1_IMAGES[0];
                     modelData.gallery = CONJUNTO_MODEL_1_IMAGES;
                     modelData.colors = ["Negro", "Gris", "Vino", "Verde Militar"];
@@ -241,7 +307,8 @@
         // --- ESTADO DE LA APLICACIÓN Y CARRITO ---
         let currentCategory = null;
         let currentModel = null;
-        let selectedColor = null;
+        // Para modelos sin color, esto se actualizará a "Modelo Único"
+        let selectedColor = null; 
         let cart = []; 
 
         // --- REFERENCIAS DOM ---
@@ -254,10 +321,12 @@
         const backButton = document.getElementById('back-button');
         const categoryTitle = document.getElementById('current-category-title');
         const cartCountSpan = document.getElementById('cart-count');
+        const toastContainer = document.getElementById('toast-container');
         
         // Detalle del producto
         const form = document.getElementById('order-form');
         const colorSelect = document.getElementById('selected-color');
+        const colorSelectorGroup = document.getElementById('color-selector-group'); // Nuevo ID
         const quantityInput = document.getElementById('selected-quantity');
         const detailImage = document.getElementById('detail-main-image');
         const detailModelName = document.getElementById('detail-model-name');
@@ -267,10 +336,174 @@
         const validationMessage = document.getElementById('validation-message');
         const detailThumbnails = document.getElementById('detail-thumbnails');
         
+        // Elementos LLM de Detalle
+        const styleAdvisorBtn = document.getElementById('style-advisor-btn');
+        const advisorLoading = document.getElementById('advisor-loading');
+        const styleAdviceOutput = document.getElementById('style-advice-output');
+        
         // Carrito
         const cartItemsContainer = document.getElementById('cart-items-container');
         const cartTotalItems = document.getElementById('cart-total-items');
         const whatsappOrderBtn = document.getElementById('whatsapp-order-btn');
+
+        // Elementos LLM de Carrito
+        const outfitIdeasBtn = document.getElementById('outfit-ideas-btn');
+        const outfitLoading = document.getElementById('outfit-loading');
+        const outfitIdeasOutput = document.getElementById('outfit-ideas-output');
+
+
+        // --- UTILIDADES ---
+
+        /**
+         * Muestra un mensaje temporal tipo "toast".
+         * @param {string} message - El mensaje a mostrar.
+         * @param {string} type - 'success' o 'error'.
+         */
+        function showToast(message, type = 'success') {
+            const colors = {
+                success: 'bg-green-500',
+                error: 'bg-red-500'
+            };
+            
+            const toast = document.createElement('div');
+            toast.className = `p-3 mb-2 ${colors[type]} text-white rounded-lg shadow-xl opacity-0 transform translate-y-2 transition-all duration-300`;
+            toast.textContent = message;
+            
+            toastContainer.appendChild(toast);
+
+            // Animación de entrada
+            setTimeout(() => {
+                toast.classList.remove('opacity-0', 'translate-y-2');
+            }, 10);
+            
+            // Animación de salida y remoción
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-2');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        /**
+         * Realiza la llamada a la API de Gemini con reintentos (exponential backoff).
+         * @param {object} payload - El cuerpo de la solicitud de la API.
+         * @param {number} maxRetries - Número máximo de reintentos.
+         * @param {number} delay - Retraso inicial en ms.
+         * @returns {Promise<string>} El texto generado por el LLM.
+         */
+        async function fetchGemini(payload, maxRetries = 3, delay = 1000) {
+            for (let i = 0; i < maxRetries; i++) {
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        // Si es un error 429 (Too Many Requests) o 500/503, reintenta
+                        if (response.status === 429 || response.status >= 500) {
+                            throw new Error(`API Error: ${response.statusText}`, { status: response.status });
+                        }
+                        // Otros errores (400, 403, etc.) se lanzan sin reintentar
+                        const errorBody = await response.json();
+                        throw new Error(`API Request Failed: ${JSON.stringify(errorBody)}`);
+                    }
+
+                    const result = await response.json();
+                    const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                    
+                    if (!text) {
+                        throw new Error('Respuesta del LLM vacía o mal formada.');
+                    }
+                    return text;
+
+                } catch (error) {
+                    // console.error(`Intento ${i + 1} fallido:`, error);
+                    if (i < maxRetries - 1) {
+                        // console.log(`Reintentando en ${delay / 1000}s...`);
+                        await new Promise(resolve => setTimeout(resolve, delay));
+                        delay *= 2; // Duplicar el retraso
+                    } else {
+                        // Último intento fallido
+                        throw new Error('No se pudo obtener la respuesta del Asistente (Gemini API agotó los reintentos).');
+                    }
+                }
+            }
+        }
+
+        // --- FUNCIONES LLM DE ESTILO ---
+
+        async function getStyleAdvice() {
+            if (!currentModel) return;
+
+            styleAdviceOutput.classList.add('hidden');
+            styleAdviceOutput.innerHTML = '';
+            styleAdvisorBtn.disabled = true;
+            advisorLoading.classList.remove('hidden');
+            
+            const modelName = currentModel.name;
+            const category = detailCategoryName.textContent.replace('Categoría: ', '');
+            const colorsAvailable = currentModel.colors.join(', ') || 'Color Único (solo disponible el color de la foto)';
+            const productType = category.toLowerCase().includes('conjunto') || category.toLowerCase().includes('legging') || category.toLowerCase().includes('short') ? 'ropa deportiva seamless' : 'prenda de vestir seamless';
+
+            const userQuery = `Eres un experto en moda y estilo de vida activo. Genera una descripción de marketing de 3 párrafos para el producto: *${modelName}* de la categoría *${category}* (que es ${productType}). Los colores disponibles son: ${colorsAvailable}. El texto debe ser persuasivo, usar un tono positivo, destacar los beneficios de la tecnología seamless (comodidad, ajuste perfecto, invisibilidad), y sugerir al menos un outfit o uso ideal (ej. gimnasio, yoga, casual). Usa emojis relevantes.`;
+            
+            const systemPrompt = "Actúa como un copywriter de moda premium. Tu respuesta debe estar en español de México, ser concisa, creativa y enfocada en el cliente que busca calidad y estilo en ropa deportiva/casual.";
+
+            const payload = {
+                contents: [{ parts: [{ text: userQuery }] }],
+                systemInstruction: { parts: [{ text: systemPrompt }] },
+            };
+
+            try {
+                const text = await fetchGemini(payload);
+                styleAdviceOutput.innerHTML = `<div class="llm-output">${text}</div>`;
+            } catch (error) {
+                // console.error(error);
+                styleAdviceOutput.innerHTML = `<div class="llm-output text-red-700">❌ Error al generar el consejo de estilo: ${error.message}</div>`;
+                showToast('Error al conectar con el Asesor de Estilo.', 'error');
+            } finally {
+                styleAdviceOutput.classList.remove('hidden');
+                styleAdvisorBtn.disabled = false;
+                advisorLoading.classList.add('hidden');
+            }
+        }
+
+        async function getOutfitIdeas() {
+            if (cart.length === 0) return;
+
+            outfitIdeasOutput.classList.add('hidden');
+            outfitIdeasOutput.innerHTML = '';
+            outfitIdeasBtn.disabled = true;
+            outfitLoading.classList.remove('hidden');
+
+            // Formatear el carrito para el prompt
+            const cartItems = cart.map(item => 
+                `${item.quantity}x ${item.name} (Color: ${item.color}, Categoría: ${item.category})`
+            ).join('; ');
+
+            const userQuery = `Eres un estilista personal virtual. El cliente tiene los siguientes artículos en su carrito: ${cartItems}. Genera 3 ideas de outfit diferentes. Cada idea debe incorporar al menos un artículo del carrito y sugerir 2 o 3 piezas complementarias (que no están en el carrito, como zapatillas, accesorios, o una chaqueta) para crear un look completo. Usa el siguiente formato para cada idea: *Idea #: [Nombre Corto del Look]*\n[Descripción de la combinación].`;
+            
+            const systemPrompt = "Actúa como un estilista de ropa deportiva que busca maximizar el potencial de las prendas seamless. Usa un tono moderno, juvenil y enfocado en la versatilidad de las piezas. Tu respuesta debe estar en español y ser fácil de leer con formato Markdown (negritas, saltos de línea).";
+
+            const payload = {
+                contents: [{ parts: [{ text: userQuery }] }],
+                systemInstruction: { parts: [{ text: systemPrompt }] },
+            };
+
+            try {
+                const text = await fetchGemini(payload);
+                outfitIdeasOutput.innerHTML = `<div class="llm-output">${text}</div>`;
+            } catch (error) {
+                // console.error(error);
+                outfitIdeasOutput.innerHTML = `<div class="llm-output text-red-700">❌ Error al generar ideas de outfit: ${error.message}</div>`;
+                showToast('Error al conectar con el Estilista (Gemini API).', 'error');
+            } finally {
+                outfitIdeasOutput.classList.remove('hidden');
+                outfitIdeasBtn.disabled = false;
+                outfitLoading.classList.add('hidden');
+            }
+        }
 
 
         // --- FUNCIONES DE NAVEGACIÓN ---
@@ -297,6 +530,7 @@
         }
         
         function goBackToCategories() {
+            // Si estamos en la vista de carrito o detalle, regresamos a la lista de productos
             if (productDetailView.classList.contains('hidden') && productListView.classList.contains('hidden')) {
                 currentCategory = null;
                 currentModel = null;
@@ -308,10 +542,18 @@
 
         function goBackToProducts() {
             currentModel = null;
+            // Ocultar resultados LLM al salir del detalle
+            styleAdviceOutput.classList.add('hidden');
+            styleAdviceOutput.innerHTML = ''; 
+
             renderProductList(currentCategory);
         }
         
         function renderCartView() {
+            // Ocultar resultados LLM al entrar al carrito
+            outfitIdeasOutput.classList.add('hidden');
+            outfitIdeasOutput.innerHTML = '';
+            
             renderCartItems();
             updateView('cart-view');
         }
@@ -340,17 +582,27 @@
             categoryTitle.textContent = category;
             modelsContainer.innerHTML = '';
 
-            const models = category === "Todas" ? ALL_MODELS : CATALOG_DATA_MODELS[category];
-            
-            models.forEach(model => {
+            const modelsToDisplay = category === "Todas" 
+                ? ALL_MODELS
+                : CATALOG_DATA_MODELS[category];
+
+            if (!modelsToDisplay || modelsToDisplay.length === 0) {
+                 modelsContainer.innerHTML = '<p class="text-center text-gray-500 col-span-2 p-8 border rounded-lg">No hay modelos disponibles en esta categoría.</p>';
+            }
+
+            modelsToDisplay.forEach(model => {
                 const productCard = document.createElement('div');
                 productCard.className = 'bg-white rounded-xl shadow-lg border border-gray-100 p-2 overflow-hidden cursor-pointer hover:shadow-xl transition duration-300';
                 
+                const colorInfo = model.colors && model.colors.length > 0 
+                    ? `Colores: ${model.colors.length}` 
+                    : 'Color Único';
+
                 // Usamos el placeholder negro si la imagen principal falla
                 productCard.innerHTML = `
                     <img src="${model.image}" alt="${model.name}" onerror="this.onerror=null; this.src='https://placehold.co/300x400/000000/ffffff?text=No+Photo';" class="w-full h-48 object-cover rounded-lg mb-2 transform hover:scale-105 transition duration-300">
                     <h3 class="font-semibold text-gray-800 text-sm truncate">${model.name}</h3>
-                    <p class="text-xs text-gray-500">Colores: ${model.colors.length}</p>
+                    <p class="text-xs text-gray-500">${colorInfo}</p>
                     <p class="text-lg font-bold text-blue-600 mt-1">$${model.price} MXN</p>
                     <button class="w-full mt-2 text-xs py-1.5 bg-blue-50 text-blue-600 rounded-md font-medium">Ver Modelo</button>
                 `;
@@ -365,14 +617,17 @@
 
         function renderProductDetail(category, model) {
             currentModel = model;
-            selectedColor = null; 
             
             // 1. Actualizar información del modelo
             detailModelName.textContent = model.name;
             detailCategoryName.textContent = `Categoría: ${category === "Todas" ? 'Varios' : category}`;
             detailPrice.textContent = `$${model.price} MXN`;
             
-            // 2. Renderizar Galería (Miniaturas y Principal)
+            // 2. Ocultar y limpiar LLM Output
+            styleAdviceOutput.classList.add('hidden');
+            styleAdviceOutput.innerHTML = '';
+            
+            // 3. Renderizar Galería (Miniaturas y Principal)
             detailThumbnails.innerHTML = '';
             
             const images = model.gallery;
@@ -381,38 +636,57 @@
             detailImage.src = images[0]; 
             detailImage.onerror = function() { this.onerror=null; this.src='https://placehold.co/400x500/000000/ffffff?text=Error+Loading+Image'; };
 
-            images.forEach((imgUrl, index) => {
-                const thumbnail = document.createElement('img');
-                thumbnail.src = imgUrl;
-                thumbnail.alt = `Foto ${index + 1} de ${model.name}`;
-                // Quitamos la clase de placeholder rojo, ya que las imágenes están cargadas
-                thumbnail.className = `w-full h-auto object-cover rounded-lg opacity-80 hover:opacity-100 cursor-pointer border-2 border-transparent transition duration-150`;
-                
-                if (index === 0) {
-                    thumbnail.classList.add('thumbnail-active'); // Marca la primera como activa
-                }
+            // Renderizar miniaturas solo si hay más de una imagen.
+            if (images.length > 1) {
+                detailThumbnails.classList.remove('hidden');
+                images.forEach((imgUrl, index) => {
+                    const thumbnail = document.createElement('img');
+                    thumbnail.src = imgUrl;
+                    thumbnail.alt = `Foto ${index + 1} de ${model.name}`;
+                    thumbnail.className = `w-full h-auto object-cover rounded-lg opacity-80 hover:opacity-100 cursor-pointer border-2 border-transparent transition duration-150`;
+                    
+                    if (index === 0) {
+                        thumbnail.classList.add('thumbnail-active'); // Marca la primera como activa
+                    }
 
-                thumbnail.onclick = () => {
-                    // Cambiar la imagen principal
-                    detailImage.src = imgUrl;
-                    detailImage.onerror = function() { this.onerror=null; this.src='https://placehold.co/400x500/000000/ffffff?text=Error+Loading+Image'; }; // Placeholder negro en error
-                    // Actualizar estado activo de la miniatura
-                    document.querySelectorAll('#detail-thumbnails img').forEach(t => t.classList.remove('thumbnail-active'));
-                    thumbnail.classList.add('thumbnail-active');
-                };
-                detailThumbnails.appendChild(thumbnail);
-            });
+                    thumbnail.onclick = () => {
+                        // Cambiar la imagen principal
+                        detailImage.src = imgUrl;
+                        detailImage.onerror = function() { this.onerror=null; this.src='https://placehold.co/400x500/000000/ffffff?text=Error+Loading+Image'; }; // Placeholder negro en error
+                        // Actualizar estado activo de la miniatura
+                        document.querySelectorAll('#detail-thumbnails img').forEach(t => t.classList.remove('thumbnail-active'));
+                        thumbnail.classList.add('thumbnail-active');
+                    };
+                    detailThumbnails.appendChild(thumbnail);
+                });
+            } else {
+                detailThumbnails.classList.add('hidden');
+            }
             
-            // 3. Renderizar Colores (Select)
-            colorSelect.innerHTML = '<option value="" disabled selected>-- Elige un color --</option>';
-            model.colors.forEach(color => {
-                const option = document.createElement('option');
-                option.value = color;
-                option.textContent = color;
-                colorSelect.appendChild(option);
-            });
+            // 4. Manejar Colores y Formulario
+            const requiresColor = model.colors && model.colors.length > 0;
             
-            // 4. Resetear cantidad y estado del botón
+            if (requiresColor) {
+                // Mostrar selector de color
+                colorSelectorGroup.classList.remove('hidden');
+                validationMessage.textContent = 'Selecciona Color para añadir al carrito.';
+                
+                colorSelect.innerHTML = '<option value="" disabled selected>-- Elige un color --</option>';
+                model.colors.forEach(color => {
+                    const option = document.createElement('option');
+                    option.value = color;
+                    option.textContent = color;
+                    colorSelect.appendChild(option);
+                });
+                selectedColor = null; // Reiniciar
+            } else {
+                // Ocultar selector de color y usar un valor predeterminado
+                colorSelectorGroup.classList.add('hidden');
+                validationMessage.textContent = 'Añade la cantidad para confirmar.';
+                selectedColor = "Modelo Único"; // Valor de color por defecto para el carrito
+            }
+            
+            // 5. Resetear cantidad y estado del botón
             quantityInput.value = 1;
             checkFormValidity();
 
@@ -421,18 +695,28 @@
 
         // --- LÓGICA DEL CARRITO ---
 
-        function selectColor(color) {
-            selectedColor = color;
-            checkFormValidity();
-        }
-
         colorSelect.addEventListener('change', (e) => {
-            selectColor(e.target.value);
+            // Solo se ejecuta si el selector de color está visible
+            selectedColor = e.target.value;
+            checkFormValidity();
         });
 
         // Habilitar/Deshabilitar botón de Añadir al Carrito
         function checkFormValidity() {
-            if (selectedColor) {
+            if (!currentModel) return;
+
+            const requiresColor = currentModel.colors && currentModel.colors.length > 0;
+            let isValid = true;
+            
+            if (requiresColor) {
+                // Si el color es requerido, es válido si se ha seleccionado algo diferente a null
+                isValid = !!selectedColor; 
+            } else {
+                // Si el color NO es requerido (como Enterizos), es válido por defecto
+                isValid = true;
+            }
+
+            if (isValid) {
                 addToCartBtn.disabled = false;
                 addToCartBtn.classList.remove('opacity-50');
                 validationMessage.classList.add('hidden');
@@ -441,14 +725,20 @@
                 addToCartBtn.classList.add('opacity-50');
                 validationMessage.classList.remove('hidden');
             }
+            
+            // También revisar para el botón LLM de estilo (aunque este siempre debería estar habilitado)
+            styleAdvisorBtn.disabled = false;
         }
         
         // Listener para añadir al carrito
         form.addEventListener('submit', (e) => {
             e.preventDefault();
             
-            if (!currentModel || !selectedColor) return;
-
+            if (!currentModel || !checkFormValidity()) return;
+            
+            const requiresColor = currentModel.colors && currentModel.colors.length > 0;
+            const finalColor = requiresColor ? selectedColor : "Modelo Único";
+            
             const quantity = parseInt(quantityInput.value);
             
             const newItem = {
@@ -458,7 +748,7 @@
                 name: currentModel.name,
                 category: detailCategoryName.textContent.replace('Categoría: ', ''),
                 price: parseFloat(currentModel.price),
-                color: selectedColor,
+                color: finalColor, // Usar el color final
                 quantity: quantity,
                 image: currentModel.image // Guardar la URL de la imagen principal para el carrito
             };
@@ -468,17 +758,13 @@
             // Resetear y volver a la vista de productos con un mensaje de éxito
             form.reset();
             currentModel = null;
-            selectedColor = null;
+            selectedColor = null; // Asegurar que se reinicie
             updateCartCount();
             
-            // Mensaje temporal de éxito (simulando un toast/popup)
-            const successMessage = document.createElement('div');
-            successMessage.className = 'fixed bottom-4 left-1/2 transform -translate-x-1/2 p-3 bg-green-500 text-white rounded-xl shadow-lg z-50 transition duration-300';
-            successMessage.textContent = `✅ ¡${newItem.quantity}x ${newItem.name} añadido al carrito!`;
-            document.body.appendChild(successMessage);
+            // Mostrar mensaje temporal de éxito (toast)
+            showToast(`✅ ¡${newItem.quantity}x ${newItem.name} añadido al carrito!`, 'success');
             
             setTimeout(() => {
-                successMessage.remove();
                 renderProductList(currentCategory); // Volver a la lista después de añadir
             }, 1000); 
         });
@@ -491,10 +777,12 @@
                 cartCountSpan.classList.remove('hidden');
                 whatsappOrderBtn.disabled = false;
                 whatsappOrderBtn.classList.remove('opacity-50');
+                outfitIdeasBtn.disabled = false; // Habilitar botón de ideas de outfit
             } else {
                 cartCountSpan.classList.add('hidden');
                 whatsappOrderBtn.disabled = true;
                 whatsappOrderBtn.classList.add('opacity-50');
+                outfitIdeasBtn.disabled = true; // Deshabilitar botón de ideas de outfit
             }
         }
         
@@ -504,6 +792,9 @@
             cart = cart.filter(item => item.cartId !== cartId);
             renderCartItems();
             updateCartCount();
+            // Ocultar LLM output al cambiar el carrito
+            outfitIdeasOutput.classList.add('hidden');
+            outfitIdeasOutput.innerHTML = '';
         }
 
         function renderCartItems() {
