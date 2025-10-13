@@ -37,6 +37,18 @@
             font-size: 0.9rem;
             border-left: 4px solid #3b82f6;
         }
+        /* Estilo para el botón de ir atrás */
+        .back-nav-btn {
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            color: #3b82f6;
+            transition: color 150ms;
+        }
+        .back-nav-btn:hover {
+            color: #1d4ed8;
+        }
     </style>
     <!-- Iconos (Inline SVG para evitar dependencias) -->
     <svg style="display: none;">
@@ -45,6 +57,9 @@
         </symbol>
         <symbol id="icon-cart" viewBox="0 0 24 24">
             <path fill="currentColor" d="M17 18.5a1.5 1.5 0 100-3 1.5 1.5 0 000 3zM6 18.5a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm13.1-10h-2.1l-.8-3.4c-.2-.7-.8-1.1-1.6-1.1H8.4c-.8 0-1.4.4-1.6 1.1l-.8 3.4H4.9c-.6 0-1.1.5-1.1 1.1v7c0 .6.5 1.1 1.1 1.1h14.2c.6 0 1.1-.5 1.1-1.1v-7c0-.6-.5-1.1-1.1-1.1zM8.5 6.5h7l.4 1.7h-7.8l.4-1.7zm10.6 12.8H5.9v-7h13.2v7z"/>
+        </symbol>
+        <symbol id="icon-back" viewBox="0 0 24 24">
+            <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
         </symbol>
     </svg>
 </head>
@@ -61,7 +76,7 @@
     <!-- Contenedor Principal de la App (Pantalla completa en móvil) -->
     <div id="app" class="min-h-screen w-full max-w-xl mx-auto shadow-xl bg-white">
 
-        <!-- Header -->
+        <!-- Header Fijo (Solo Título y Carrito) -->
         <header class="p-4 bg-white border-b border-gray-100 sticky top-0 z-10 shadow-sm flex justify-between items-center">
             <h1 class="text-2xl font-extrabold text-gray-800 text-center flex-grow">
                 CATÁLOGO
@@ -72,11 +87,6 @@
                 <svg class="w-6 h-6" aria-hidden="true"><use xlink:href="#icon-cart"></use></svg>
                 <span id="cart-count" class="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full hidden">0</span>
             </button>
-            
-            <!-- Botón de Retroceso de la Vista -->
-            <p id="back-button" class="absolute left-4 top-4 text-gray-500 cursor-pointer text-sm font-medium hidden" onclick="goBackToCategories()">
-                < Back
-            </p>
         </header>
 
         <!-- Vistas -->
@@ -90,6 +100,12 @@
 
             <!-- 2. Vista de Modelos de la Categoría -->
             <div id="product-list-view" class="hidden">
+                <!-- Botón de Retroceso a Categorías -->
+                <button onclick="goBackToCategories()" class="back-nav-btn cursor-pointer">
+                    <svg class="w-4 h-4 mr-1" aria-hidden="true"><use xlink:href="#icon-back"></use></svg>
+                    Volver a Categorías
+                </button>
+                
                 <h2 id="current-category-title" class="text-xl font-bold text-gray-700 mb-4"></h2>
                 <div id="models-container" class="grid grid-cols-2 gap-4">
                     <!-- Los 5 modelos se inyectarán aquí por JS -->
@@ -98,8 +114,9 @@
             
             <!-- 3. Vista de Detalle del Producto (Modal simulado) -->
             <div id="product-detail-view" class="hidden p-4 bg-white rounded-xl">
-                <button onclick="goBackToProducts()" class="text-blue-600 font-semibold mb-4 flex items-center">
-                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                <!-- Botón de Retroceso a Lista de Productos -->
+                <button onclick="goBackToProducts()" class="back-nav-btn cursor-pointer">
+                    <svg class="w-4 h-4 mr-1" aria-hidden="true"><use xlink:href="#icon-back"></use></svg>
                     Volver a Modelos
                 </button>
                 
@@ -118,19 +135,6 @@
                     <p id="detail-category-name" class="text-md font-medium text-gray-500 mb-3"></p>
                     <p id="detail-price" class="text-3xl font-extrabold text-blue-600 mb-4">$X.XXX MXN</p>
                 </div>
-
-                <!-- NEW: Asesor de Estilo LLM -->
-                <div class="mb-6 border-t pt-4">
-                    <button id="style-advisor-btn" 
-                            onclick="getStyleAdvice()" 
-                            class="w-full p-3 rounded-lg text-sm font-bold flex items-center justify-center space-x-2 transition duration-300 
-                                   bg-yellow-100 text-yellow-800 hover:bg-yellow-200">
-                        <span>✨ Asesor de Estilo Gemini</span>
-                        <span id="advisor-loading" class="hidden animate-spin h-4 w-4 border-2 border-yellow-800 border-t-transparent rounded-full"></span>
-                    </button>
-                    <div id="style-advice-output" class="hidden"></div>
-                </div>
-                <!-- END NEW -->
                 
                 <!-- Formulario de Opciones para el Carrito -->
                 <form id="order-form" class="space-y-4">
@@ -162,8 +166,9 @@
 
             <!-- 4. Vista del Carrito de Compras -->
             <div id="cart-view" class="hidden p-4 bg-white rounded-xl">
-                <button onclick="goBackToProducts()" class="text-blue-600 font-semibold mb-6 flex items-center">
-                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                <!-- Botón de Retroceso a Lista de Productos -->
+                <button onclick="goBackToProducts()" class="back-nav-btn cursor-pointer">
+                    <svg class="w-4 h-4 mr-1" aria-hidden="true"><use xlink:href="#icon-back"></use></svg>
                     Seguir Comprando
                 </button>
 
@@ -177,7 +182,7 @@
                     Total de artículos: <span id="cart-total-items" class="text-blue-600">0</span>
                 </div>
 
-                <!-- NEW: Ideas de Outfit LLM -->
+                <!-- Ideas de Outfit LLM -->
                 <button id="outfit-ideas-btn" 
                         onclick="getOutfitIdeas()" 
                         disabled
@@ -192,7 +197,7 @@
                 <!-- Botón Final de WhatsApp -->
                 <button id="whatsapp-order-btn" onclick="sendWhatsAppOrder()" disabled
                         class="whatsapp-btn w-full p-4 mt-6 rounded-xl text-white font-bold text-lg flex items-center justify-center space-x-2 transition duration-300 opacity-50 disabled:opacity-50 disabled:cursor-not-allowed">
-                    <svg class="w-6 h-6" aria-hidden="true"><use xlink:href="#icon-whatsapp"></use></svg>
+                    <svg class="w-6 h-6" aria-hidden="true"><use xlink:href="#icon-whatsapp"></use></use></svg>
                     <span>CONFIRMAR PEDIDO POR WHATSAPP</span>
                 </button>
             </div>
@@ -218,25 +223,55 @@
         ];
         
         // -------------------------------------------------------------
-        // CONJUNTOS DEPORTIVOS - MODELO 1 (ACTUALIZADO)
+        // CONJUNTOS DEPORTIVOS - MODELO 1 
         // -------------------------------------------------------------
         const CONJUNTO_MODEL_1_IMAGES = [
-            "https://raw.githubusercontent.com/jesusvn1993mplvt3-ai/rosasandoval/refs/heads/main/CONJUNTO1%20(4).png", // Principal
+            "https://raw.githubusercontent.com/jesusvn1993mplvt3-ai/rosasandoval/refs/heads/main/CONJUNTO1%20(4).png", 
             "https://raw.githubusercontent.com/jesusvn1993mplvt3-ai/rosasandoval/refs/heads/main/CONJUNTO1%20(1).png",
             "https://raw.githubusercontent.com/jesusvn1993mplvt3-ai/rosasandoval/refs/heads/main/CONJUNTO1%20(2).png",
             "https://raw.githubusercontent.com/jesusvn1993mplvt3-ai/rosasandoval/refs/heads/main/CONJUNTO1%20(3).png",
-            "https://raw.githubusercontent.com/jesusvn1993mplvt3-ai/rosasandoval/refs/heads/main/CONJUNTO1%20(5).png" // Foto 5 (Corregida)
+            "https://raw.githubusercontent.com/jesusvn1993mplvt3-ai/rosasandoval/refs/heads/main/CONJUNTO1%20(5).png"
         ];
         
         // -------------------------------------------------------------
-        // ENTERIZOS (NUEVAS URLs)
+        // ENTERIZOS (Lista completa de 33 URLs)
         // -------------------------------------------------------------
         const ENTERIZO_IMAGES = [
+            // URLs originales (10)
             "https://github.com/jesusvn1993mplvt3-ai/rosasandoval/blob/main/fotos/Enterizos/IMG-20251011-WA0013.jpg?raw=true",
             "https://github.com/jesusvn1993mplvt3-ai/rosasandoval/blob/main/fotos/Enterizos/IMG-20251011-WA0014.jpg?raw=true",
             "https://github.com/jesusvn1993mplvt3-ai/rosasandoval/blob/main/fotos/Enterizos/IMG-20251011-WA0043.jpg?raw=true",
             "https://github.com/jesusvn1993mplvt3-ai/rosasandoval/blob/main/fotos/Enterizos/IMG-20251011-WA0045.jpg?raw=true",
-            "https://github.com/jesusvn1993mplvt3-ai/rosasandoval/blob/main/fotos/Enterizos/IMG-20251011-WA0046.jpg?raw=true"
+            "https://github.com/jesusvn1993mplvt3-ai/rosasandoval/blob/main/fotos/Enterizos/IMG-20251011-WA0046.jpg?raw=true",
+            "https://github.com/jesusvn1993mplvt3-ai/rosasandoval/blob/main/fotos/Enterizos/IMG-20251011-WA0047.jpg?raw=true",
+            "https://github.com/jesusvn1993mplvt3-ai/rosasandoval/blob/main/fotos/Enterizos/IMG-20251011-WA0048.jpg?raw=true",
+            "https://github.com/jesusvn1993mplvt3-ai/rosasandoval/blob/main/fotos/Enterizos/IMG-20251011-WA0049.jpg?raw=true",
+            "https://github.com/jesusvn1993mplvt3-ai/rosasandoval/blob/main/fotos/Enterizos/IMG-20251011-WA0050.jpg?raw=true",
+            "https://github.com/jesusvn1993mplvt3-ai/rosasandoval/blob/main/fotos/Enterizos/IMG-20251011-WA0058.jpg?raw=true",
+            // Nuevas URLs añadidas (23)
+            "https://github.com/jesusvn1993mplvt3-ai/rosasandoval/blob/main/fotos/Enterizos/IMG-20251011-WA0059.jpg?raw=true",
+            "https://github.com/jesusvn1993mplvt3-ai/rosasandoval/blob/main/fotos/Enterizos/IMG-20251011-WA0060.jpg?raw=true",
+            "https://github.com/jesusvn1993mplvt3-ai/rosasandoval/blob/main/fotos/Enterizos/IMG-20251011-WA0061.jpg?raw=true",
+            "https://github.com/jesusvn1993mplvt3-ai/rosasandoval/blob/main/fotos/Enterizos/IMG-20251011-WA0062.jpg?raw=true",
+            "https://github.com/jesusvn1993mplvt3-ai/rosasandoval/blob/main/fotos/Enterizos/IMG-20251011-WA0063.jpg?raw=true",
+            "https://github.com/jesusvn1993mplvt3-ai/rosasandoval/blob/main/fotos/Enterizos/IMG-20251011-WA0064.jpg?raw=true",
+            "https://github.com/jesusvn1993mplvt3-ai/rosasandoval/blob/main/fotos/Enterizos/IMG-20251011-WA0065.jpg?raw=true",
+            "https://github.com/jesusvn1993mplvt3-ai/rosasandoval/blob/main/fotos/Enterizos/IMG-20251011-WA0066.jpg?raw=true",
+            "https://github.com/jesusvn1993mplvt3-ai/rosasandoval/blob/main/fotos/Enterizos/IMG-20251011-WA0067.jpg?raw=true",
+            "https://github.com/jesusvn1993mplvt3-ai/rosasandoval/blob/main/fotos/Enterizos/IMG-20251011-WA0068.jpg?raw=true",
+            "https://github.com/jesusvn1993mplvt3-ai/rosasandoval/blob/main/fotos/Enterizos/IMG-20251011-WA0073.jpg?raw=true",
+            "https://github.com/jesusvn1993mplvt3-ai/rosasandoval/blob/main/fotos/Enterizos/IMG-20251011-WA0074.jpg?raw=true",
+            "https://github.com/jesusvn1993mplvt3-ai/rosasandoval/blob/main/fotos/Enterizos/IMG-20251011-WA0082.jpg?raw=true",
+            "https://github.com/jesusvn1993mplvt3-ai/rosasandoval/blob/main/fotos/Enterizos/IMG-20251011-WA0083.jpg?raw=true",
+            "https://github.com/jesusvn1993mplvt3-ai/rosasandoval/blob/main/fotos/Enterizos/IMG-20251011-WA0084.jpg?raw=true",
+            "https://github.com/jesusvn1993mplvt3-ai/rosasandoval/blob/main/fotos/Enterizos/IMG-20251011-WA0086.jpg?raw=true",
+            "https://github.com/jesusvn1993mplvt3-ai/rosasandoval/blob/main/fotos/Enterizos/IMG-20251011-WA0087.jpg?raw=true",
+            "https://github.com/jesusvn1993mplvt3-ai/rosasandoval/blob/main/fotos/Enterizos/IMG-20251011-WA0090.jpg?raw=true",
+            "https://github.com/jesusvn1993mplvt3-ai/rosasandoval/blob/main/fotos/Enterizos/IMG-20251011-WA0091.jpg?raw=true",
+            "https://github.com/jesusvn1993mplvt3-ai/rosasandoval/blob/main/fotos/Enterizos/IMG-20251011-WA0092.jpg?raw=true",
+            "https://github.com/jesusvn1993mplvt3-ai/rosasandoval/blob/main/fotos/Enterizos/IMG-20251011-WA0093.jpg?raw=true",
+            "https://github.com/jesusvn1993mplvt3-ai/rosasandoval/blob/main/fotos/Enterizos/IMG-20251011-WA0096.jpg?raw=true",
+            "https://github.com/jesusvn1993mplvt3-ai/rosasandoval/blob/main/fotos/Enterizos/IMG-20251011-WA0097.jpg?raw=true"
         ];
 
         // -------------------------------------------------------------
@@ -255,12 +290,15 @@
             "https://blogger.googleusercontent.com/img/a/AVvXsEic3nBSl0NjjQy9jnUBOv-iqkdvDj5kOrIQ6Xk45OxN8ba7vsuX3aQ9N5MzQ10_6kShn2n_lqNj4D-XFatqYwbiGyq0veP1ZJaZXx6w09Eg34L_sP6q-0eHGAdAc9vpxHXUgs7S0dnhW4aRoz7qqssBRFrB0IOaiQifJSuVmKF_oDSGVe0HN2z9oaF_CR0g"
         ];
         
-        // Genera 5 modelos placeholder para cada categoría, aplicando fotos reales a los modelos 1 de Enterizos, Leggings y Conjuntos.
+        // Genera modelos placeholder, ajustando la cantidad de Enterizos
         const CATALOG_DATA_MODELS = BASE_CATEGORY_NAMES.reduce((acc, cat) => {
-            acc[cat] = Array.from({ length: 5 }, (_, i) => {
+            const isEnterizo = cat === "Enterizos";
+            // Si es Enterizos, usa la longitud de la lista completa (33)
+            const count = isEnterizo ? ENTERIZO_IMAGES.length : 5; 
+
+            acc[cat] = Array.from({ length: count }, (_, i) => {
                 const isLegging1 = cat === "Leggings" && i === 0;
                 const isConjunto1 = cat === "Conjuntos Deportivos" && i === 0;
-                const isEnterizo = cat === "Enterizos"; // Aplica a todos los enterizos
                 
                 let modelData = {
                     id: `${cat.substring(0, 3)}-${i + 1}`,
@@ -272,19 +310,21 @@
                 };
 
                 if (isEnterizo) {
-                    // Nuevos modelos de Enterizos (un solo color, una sola foto)
+                    // Modelos de Enterizos (un solo color, una sola foto)
                     const enterizoId = i + 1;
                     modelData.id = `ENT-${enterizoId}`;
                     modelData.name = `Enterizo Seamless E${enterizoId}`;
-                    modelData.price = (299.00 + (i * 10)).toFixed(2); // Precio de ejemplo
+                    // Un precio base para los nuevos modelos (se mantiene el esquema de precios anterior)
+                    modelData.price = (299.00 + (i * 5)).toFixed(2); 
+                    
                     // Usar la URL de la lista de ENTERIZO_IMAGES.
                     const imageUrl = ENTERIZO_IMAGES[i] || modelData.image; 
                     modelData.image = imageUrl; 
-                    modelData.gallery = [imageUrl]; 
+                    modelData.gallery = [imageUrl]; // Unica foto como galería
                     modelData.colors = []; // Sin opciones de color
                 } else if (isConjunto1) {
                     modelData.name = "Conjunto Deportivo V1 (Seamless)";
-                    modelData.price = '150.00'; // Precio ajustado
+                    modelData.price = '150.00'; 
                     modelData.image = CONJUNTO_MODEL_1_IMAGES[0];
                     modelData.gallery = CONJUNTO_MODEL_1_IMAGES;
                     modelData.colors = ["Negro", "Gris", "Vino", "Verde Militar"];
@@ -318,7 +358,6 @@
         const cartView = document.getElementById('cart-view');
         const categoriesContainer = document.getElementById('category-view');
         const modelsContainer = document.getElementById('models-container');
-        const backButton = document.getElementById('back-button');
         const categoryTitle = document.getElementById('current-category-title');
         const cartCountSpan = document.getElementById('cart-count');
         const toastContainer = document.getElementById('toast-container');
@@ -336,17 +375,10 @@
         const validationMessage = document.getElementById('validation-message');
         const detailThumbnails = document.getElementById('detail-thumbnails');
         
-        // Elementos LLM de Detalle
-        const styleAdvisorBtn = document.getElementById('style-advisor-btn');
-        const advisorLoading = document.getElementById('advisor-loading');
-        const styleAdviceOutput = document.getElementById('style-advice-output');
-        
-        // Carrito
+        // Elementos LLM de Carrito
         const cartItemsContainer = document.getElementById('cart-items-container');
         const cartTotalItems = document.getElementById('cart-total-items');
         const whatsappOrderBtn = document.getElementById('whatsapp-order-btn');
-
-        // Elementos LLM de Carrito
         const outfitIdeasBtn = document.getElementById('outfit-ideas-btn');
         const outfitLoading = document.getElementById('outfit-loading');
         const outfitIdeasOutput = document.getElementById('outfit-ideas-output');
@@ -431,43 +463,7 @@
             }
         }
 
-        // --- FUNCIONES LLM DE ESTILO ---
-
-        async function getStyleAdvice() {
-            if (!currentModel) return;
-
-            styleAdviceOutput.classList.add('hidden');
-            styleAdviceOutput.innerHTML = '';
-            styleAdvisorBtn.disabled = true;
-            advisorLoading.classList.remove('hidden');
-            
-            const modelName = currentModel.name;
-            const category = detailCategoryName.textContent.replace('Categoría: ', '');
-            const colorsAvailable = currentModel.colors.join(', ') || 'Color Único (solo disponible el color de la foto)';
-            const productType = category.toLowerCase().includes('conjunto') || category.toLowerCase().includes('legging') || category.toLowerCase().includes('short') ? 'ropa deportiva seamless' : 'prenda de vestir seamless';
-
-            const userQuery = `Eres un experto en moda y estilo de vida activo. Genera una descripción de marketing de 3 párrafos para el producto: *${modelName}* de la categoría *${category}* (que es ${productType}). Los colores disponibles son: ${colorsAvailable}. El texto debe ser persuasivo, usar un tono positivo, destacar los beneficios de la tecnología seamless (comodidad, ajuste perfecto, invisibilidad), y sugerir al menos un outfit o uso ideal (ej. gimnasio, yoga, casual). Usa emojis relevantes.`;
-            
-            const systemPrompt = "Actúa como un copywriter de moda premium. Tu respuesta debe estar en español de México, ser concisa, creativa y enfocada en el cliente que busca calidad y estilo en ropa deportiva/casual.";
-
-            const payload = {
-                contents: [{ parts: [{ text: userQuery }] }],
-                systemInstruction: { parts: [{ text: systemPrompt }] },
-            };
-
-            try {
-                const text = await fetchGemini(payload);
-                styleAdviceOutput.innerHTML = `<div class="llm-output">${text}</div>`;
-            } catch (error) {
-                // console.error(error);
-                styleAdviceOutput.innerHTML = `<div class="llm-output text-red-700">❌ Error al generar el consejo de estilo: ${error.message}</div>`;
-                showToast('Error al conectar con el Asesor de Estilo.', 'error');
-            } finally {
-                styleAdviceOutput.classList.remove('hidden');
-                styleAdvisorBtn.disabled = false;
-                advisorLoading.classList.add('hidden');
-            }
-        }
+        // --- FUNCIONES LLM DE OUTFIT (Mantenida) ---
 
         async function getOutfitIdeas() {
             if (cart.length === 0) return;
@@ -513,40 +509,38 @@
             productListView.classList.add('hidden');
             productDetailView.classList.add('hidden');
             cartView.classList.add('hidden');
-            backButton.classList.add('hidden');
-
+            
             if (viewId === 'category-view') {
                 categoryView.classList.remove('hidden');
             } else if (viewId === 'product-list-view') {
                 productListView.classList.remove('hidden');
-                backButton.classList.remove('hidden');
             } else if (viewId === 'product-detail-view') {
                 productDetailView.classList.remove('hidden');
-                backButton.classList.remove('hidden');
             } else if (viewId === 'cart-view') {
                 cartView.classList.remove('hidden');
-                backButton.classList.remove('hidden'); 
             }
         }
         
+        /**
+         * Vuelve a la vista de categorías (Home).
+         */
         function goBackToCategories() {
-            // Si estamos en la vista de carrito o detalle, regresamos a la lista de productos
-            if (productDetailView.classList.contains('hidden') && productListView.classList.contains('hidden')) {
-                currentCategory = null;
-                currentModel = null;
-                updateView('category-view');
-            } else {
-                goBackToProducts();
-            }
+            currentCategory = null;
+            currentModel = null;
+            updateView('category-view');
         }
 
+        /**
+         * Vuelve a la vista de la lista de productos de la categoría actual.
+         */
         function goBackToProducts() {
             currentModel = null;
-            // Ocultar resultados LLM al salir del detalle
-            styleAdviceOutput.classList.add('hidden');
-            styleAdviceOutput.innerHTML = ''; 
-
-            renderProductList(currentCategory);
+            if (currentCategory) {
+                 renderProductList(currentCategory);
+            } else {
+                // Si por alguna razón no hay categoría, vuelve a categorías
+                goBackToCategories(); 
+            }
         }
         
         function renderCartView() {
@@ -623,11 +617,7 @@
             detailCategoryName.textContent = `Categoría: ${category === "Todas" ? 'Varios' : category}`;
             detailPrice.textContent = `$${model.price} MXN`;
             
-            // 2. Ocultar y limpiar LLM Output
-            styleAdviceOutput.classList.add('hidden');
-            styleAdviceOutput.innerHTML = '';
-            
-            // 3. Renderizar Galería (Miniaturas y Principal)
+            // 2. Renderizar Galería (Miniaturas y Principal)
             detailThumbnails.innerHTML = '';
             
             const images = model.gallery;
@@ -663,7 +653,7 @@
                 detailThumbnails.classList.add('hidden');
             }
             
-            // 4. Manejar Colores y Formulario
+            // 3. Manejar Colores y Formulario
             const requiresColor = model.colors && model.colors.length > 0;
             
             if (requiresColor) {
@@ -686,7 +676,7 @@
                 selectedColor = "Modelo Único"; // Valor de color por defecto para el carrito
             }
             
-            // 5. Resetear cantidad y estado del botón
+            // 4. Resetear cantidad y estado del botón
             quantityInput.value = 1;
             checkFormValidity();
 
@@ -725,9 +715,6 @@
                 addToCartBtn.classList.add('opacity-50');
                 validationMessage.classList.remove('hidden');
             }
-            
-            // También revisar para el botón LLM de estilo (aunque este siempre debería estar habilitado)
-            styleAdvisorBtn.disabled = false;
         }
         
         // Listener para añadir al carrito
