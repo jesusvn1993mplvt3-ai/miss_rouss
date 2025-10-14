@@ -58,14 +58,19 @@
         .cart-pop {
             animation: pop 0.3s ease-out;
         }
+        /* Estilo para el contenedor del emoji del carrito */
+        .cart-icon-container {
+            font-size: 2.2rem; /* Tamaño grande para el emoji */
+            line-height: 1; /* Asegura que el contador se posicione correctamente */
+            padding: 0.25rem;
+            display: inline-block;
+            transition: transform 0.3s ease-out; /* Para la animación de escalado */
+        }
     </style>
     <!-- Iconos (Inline SVG para evitar dependencias) -->
     <svg style="display: none;">
         <symbol id="icon-whatsapp" viewBox="0 0 24 24">
             <path fill="currentColor" d="M12.03 2.05c-5.46 0-9.92 4.46-9.92 9.92 0 1.94.57 3.8.31 5.43l-.42 2.74c-.07.45.36.8.81.74l3.18-.52c1.78.29 3.63.43 5.9.43 5.46 0 9.92-4.46 9.92-9.92.01-5.46-4.46-9.92-9.93-9.92zm3.32 12.87c-.07.13-.25.21-.49.21-.24 0-.44-.09-.64-.17-.46-.19-1.28-.52-2.17-1.34-.89-.83-1.48-1.92-1.66-2.31-.07-.15-.15-.22-.22-.36-.08-.14-.07-.33.02-.45.09-.13.25-.13.37-.13.12 0 .26.01.37.01.21 0 .28.05.4.31.11.23.38.93.42 1.01.04.09.07.18.01.29-.07.11-.13.17-.25.32-.1.14-.19.23-.29.35-.1.1-.19.23-.07.43.12.2.35.59.82.98.47.4.92.57 1.13.68.21.11.33.09.43.06.1-.03.22-.11.34-.19.12-.08.24-.13.38-.17.13-.04.28.01.38.15.1.14.1.4.01.52z"/>
-        </symbol>
-        <symbol id="icon-cart" viewBox="0 0 24 24">
-            <path fill="currentColor" d="M17 18.5a1.5 1.5 0 100-3 1.5 1.5 0 000 3zM6 18.5a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm13.1-10h-2.1l-.8-3.4c-.2-.7-.8-1.1-1.6-1.1H8.4c-.8 0-1.4.4-1.6 1.1l-.8 3.4H4.9c-.6 0-1.1.5-1.1 1.1v7c0 .6.5 1.1 1.1 1.1h14.2c.6 0 1.1-.5 1.1-1.1v-7c0-.6-.5-1.1-1.1-1.1zM8.5 6.5h7l.4 1.7h-7.8l.4-1.7zm10.6 12.8H5.9v-7h13.2v7z"/>
         </symbol>
         <symbol id="icon-back" viewBox="0 0 24 24">
             <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
@@ -91,9 +96,9 @@
                 CATÁLOGO
             </h1>
             
-            <!-- Botón y Contador del Carrito -->
-            <button id="cart-button" onclick="renderCartView()" class="relative p-2 bg-blue-50 text-blue-600 rounded-full hover:bg-blue-100 transition duration-150">
-                <svg class="w-6 h-6" aria-hidden="true"><use xlink:href="#icon-cart"></use></svg>
+            <!-- **CAMBIO:** Botón y Contador del Carrito con emoji y animación -->
+            <button id="cart-button" onclick="renderCartView()" class="relative rounded-full hover:opacity-90 transition-opacity duration-150 p-1">
+                <span id="cart-icon-container" class="cart-icon-container">🛒</span>
                 <span id="cart-count" class="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full hidden">0</span>
             </button>
         </header>
@@ -246,7 +251,6 @@
         // ENTERIZOS (Lista completa de 33 URLs)
         // -------------------------------------------------------------
         const ENTERIZO_IMAGES = [
-            // URLs originales (10)
             "https://github.com/jesusvn1993mplvt3-ai/rosasandoval/blob/main/fotos/Enterizos/IMG-20251011-WA0013.jpg?raw=true",
             "https://github.com/jesusvn1993mplvt3-ai/rosasandoval/blob/main/fotos/Enterizos/IMG-20251011-WA0014.jpg?raw=true",
             "https://github.com/jesusvn1993mplvt3-ai/rosasandoval/blob/main/fotos/Enterizos/IMG-20251011-WA0043.jpg?raw=true",
@@ -257,7 +261,6 @@
             "https://github.com/jesusvn1993mplvt3-ai/rosasandoval/blob/main/fotos/Enterizos/IMG-20251011-WA0049.jpg?raw=true",
             "https://github.com/jesusvn1993mplvt3-ai/rosasandoval/blob/main/fotos/Enterizos/IMG-20251011-WA0050.jpg?raw=true",
             "https://github.com/jesusvn1993mplvt3-ai/rosasandoval/blob/main/fotos/Enterizos/IMG-20251011-WA0058.jpg?raw=true",
-            // Nuevas URLs añadidas (23)
             "https://github.com/jesusvn1993mplvt3-ai/rosasandoval/blob/main/fotos/Enterizos/IMG-20251011-WA0059.jpg?raw=true",
             "https://github.com/jesusvn1993mplvt3-ai/rosasandoval/blob/main/fotos/Enterizos/IMG-20251011-WA0060.jpg?raw=true",
             "https://github.com/jesusvn1993mplvt3-ai/rosasandoval/blob/main/fotos/Enterizos/IMG-20251011-WA0061.jpg?raw=true",
@@ -287,15 +290,10 @@
         // LEGGINGS - MODELO 1 
         // -------------------------------------------------------------
         const LEGGINGS_MODEL_1_IMAGES = [
-            // FOTO 1 (Principal)
             "https://blogger.googleusercontent.com/img/a/AVvXsEgs590X4v6riaUrexeEHGLIJmLC94sg4gJeZ7iY42JMqc0KUBeJ9E4kalyFg61vzQ3gD4PPrFYzipkm10rzWHCoGPC5cbk4O5lxC4FxwD8SHVb4ujO6Z04NCwyyLpE7yaNawuikBj2tIzslUEP2I_aILElHaUwwdhj87OMychqjSXCkubz7bQQ2qo73bSc",
-            // FOTO 2 
             "https://blogger.googleusercontent.com/img/a/AVvXsEgsjUrVy4mxWPctXMu1DAsj1wPTQ363HcbE8ftZvzt9-LGHTobjAKfeLw1V2CBES6lPPEnrC9dN-Z2Q7fwwTvLOkUNArqltlqdWy_7TlVlg59Resygq7s9Op8eq90kh_Z9qVpuvF0IQ0L2c0XViKCkoYjlpX63djYsKsQPBC7D2z2DG9bGZPltNYv2g974", 
-            // FOTO 3
             "https://blogger.googleusercontent.com/img/a/AVvXsEj2-YyfL8n8rMbL08S0ZD2ng26_dTs_VVtb0YphpTnWD43ohMWMQYEcAkuuOrLFcJ2vkm_1fmiytXd7ySmiuqp6_kh7AZWWSYfL4kqz-lOtfH2XuE9xQWqtSS0fMMLMBX8CkejWF3i0UEpo9KHFZbl430A41aij9tj7cWPLQ1xV6Q6bI--SW_S_7S5EjEM", 
-            // FOTO 4
             "https://blogger.googleusercontent.com/img/a/AVvXsEi7wfD58k5-qcbMjpmW-46TYecIGa1_J18Ys77aL6YaEDXN7-gNXvXZiLZzJYEUcm9tnkmlF8LvlPRBAs04RKIY5qdKm-KZWIXmiA-qzWxbVS11GcSEnzHp5PBKqyeMWRlBXNBIMojz5iYGkTwl9zL1duKqxSkdp1BIWSmWLYKQv-RENR4e1aGT9Y6y8Z8",
-            // FOTO 5 
             "https://blogger.googleusercontent.com/img/a/AVvXsEic3nBSl0NjjQy9jnUBOv-iqkdvDj5kOrIQ6Xk45OxN8ba7vsuX3aQ9N5MzQ10_6kShn2n_lqNj4D-XFatqYwbiGyq0veP1ZJaZXx6w09Eg34L_sP6q-0eHGAdAc9vpxHXUgs7S0dnhW4aRoz7qqssBRFrB0IOaiQifJSuVmKF_oDSGVe0HN2z9oaF_CR0g"
         ];
         
@@ -325,7 +323,6 @@
                     const imageUrl = ENTERIZO_IMAGES[i] || modelData.image; 
                     modelData.image = imageUrl; 
                     modelData.gallery = [imageUrl];
-                    // **CAMBIO AÑADIDO:** Agregar una lista de colores a todos los enterizos.
                     modelData.colors = ["Negro", "Gris Oxford", "Azul Marino", "Vino", "Verde Militar", "Rosa Palo", "Beige (Nude)", "Lila"];
                 } else if (isConjunto1) {
                     modelData.name = "Conjunto Deportivo V1 (Seamless)";
@@ -346,17 +343,13 @@
             return acc;
         }, {});
 
-        // Obtener todos los modelos en una lista plana para la categoría "Todas"
         const ALL_MODELS = Object.values(CATALOG_DATA_MODELS).flat();
 
-        // --- ESTADO DE LA APLICACIÓN Y CARRITO ---
         let currentCategory = null;
         let currentModel = null;
-        // Para modelos sin color, esto se actualizará a "Modelo Único"
         let selectedColor = null; 
         let cart = []; 
 
-        // --- REFERENCIAS DOM ---
         const categoryView = document.getElementById('category-view');
         const productListView = document.getElementById('product-list-view');
         const productDetailView = document.getElementById('product-detail-view');
@@ -365,9 +358,8 @@
         const modelsContainer = document.getElementById('models-container');
         const categoryTitle = document.getElementById('current-category-title');
         const cartCountSpan = document.getElementById('cart-count');
+        const cartIconContainer = document.getElementById('cart-icon-container'); // Nuevo ID para el contenedor del icono
         const toastContainer = document.getElementById('toast-container');
-        
-        // Detalle del producto
         const form = document.getElementById('order-form');
         const colorSelect = document.getElementById('selected-color');
         const colorSelectorGroup = document.getElementById('color-selector-group'); 
@@ -379,8 +371,6 @@
         const addToCartBtn = document.getElementById('add-to-cart-btn');
         const validationMessage = document.getElementById('validation-message');
         const detailThumbnails = document.getElementById('detail-thumbnails');
-        
-        // Elementos LLM de Carrito
         const cartItemsContainer = document.getElementById('cart-items-container');
         const cartTotalItems = document.getElementById('cart-total-items');
         const whatsappOrderBtn = document.getElementById('whatsapp-order-btn');
@@ -388,45 +378,19 @@
         const outfitLoading = document.getElementById('outfit-loading');
         const outfitIdeasOutput = document.getElementById('outfit-ideas-output');
 
-
-        // --- UTILIDADES ---
-
-        /**
-         * Muestra un mensaje temporal tipo "toast".
-         * @param {string} message - El mensaje a mostrar.
-         * @param {string} type - 'success' o 'error'.
-         */
         function showToast(message, type = 'success') {
-            const colors = {
-                success: 'bg-green-500',
-                error: 'bg-red-500'
-            };
-            
+            const colors = { success: 'bg-green-500', error: 'bg-red-500' };
             const toast = document.createElement('div');
             toast.className = `p-3 mb-2 ${colors[type]} text-white rounded-lg shadow-xl opacity-0 transform translate-y-2 transition-all duration-300`;
             toast.textContent = message;
-            
             toastContainer.appendChild(toast);
-
-            // Animación de entrada
-            setTimeout(() => {
-                toast.classList.remove('opacity-0', 'translate-y-2');
-            }, 10);
-            
-            // Animación de salida y remoción
+            setTimeout(() => toast.classList.remove('opacity-0', 'translate-y-2'), 10);
             setTimeout(() => {
                 toast.classList.add('opacity-0', 'translate-y-2');
                 setTimeout(() => toast.remove(), 300);
             }, 3000);
         }
 
-        /**
-         * Realiza la llamada a la API de Gemini con reintentos (exponential backoff).
-         * @param {object} payload - El cuerpo de la solicitud de la API.
-         * @param {number} maxRetries - Número máximo de reintentos.
-         * @param {number} delay - Retraso inicial en ms.
-         * @returns {Promise<string>} El texto generado por el LLM.
-         */
         async function fetchGemini(payload, maxRetries = 3, delay = 1000) {
             for (let i = 0; i < maxRetries; i++) {
                 try {
@@ -435,57 +399,34 @@
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(payload)
                     });
-
                     if (!response.ok) {
-                        if (response.status === 429 || response.status >= 500) {
-                            throw new Error(`API Error: ${response.statusText}`, { status: response.status });
-                        }
+                        if (response.status === 429 || response.status >= 500) throw new Error(`API Error: ${response.statusText}`);
                         const errorBody = await response.json();
                         throw new Error(`API Request Failed: ${JSON.stringify(errorBody)}`);
                     }
-
                     const result = await response.json();
                     const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
-                    
-                    if (!text) {
-                        throw new Error('Respuesta del LLM vacía o mal formada.');
-                    }
+                    if (!text) throw new Error('Respuesta del LLM vacía o mal formada.');
                     return text;
-
                 } catch (error) {
                     if (i < maxRetries - 1) {
                         await new Promise(resolve => setTimeout(resolve, delay));
                         delay *= 2;
-                    } else {
-                        throw new Error('No se pudo obtener la respuesta del Asistente (Gemini API agotó los reintentos).');
-                    }
+                    } else throw new Error('No se pudo obtener la respuesta del Asistente (Gemini API agotó los reintentos).');
                 }
             }
         }
 
-        // --- FUNCIONES LLM DE OUTFIT ---
-
         async function getOutfitIdeas() {
             if (cart.length === 0) return;
-
             outfitIdeasOutput.classList.add('hidden');
             outfitIdeasOutput.innerHTML = '';
             outfitIdeasBtn.disabled = true;
             outfitLoading.classList.remove('hidden');
-
-            const cartItems = cart.map(item => 
-                `${item.quantity}x ${item.name} (Color: ${item.color}, Categoría: ${item.category})`
-            ).join('; ');
-
+            const cartItems = cart.map(item => `${item.quantity}x ${item.name} (Color: ${item.color}, Categoría: ${item.category})`).join('; ');
             const userQuery = `Eres un estilista personal virtual. El cliente tiene los siguientes artículos en su carrito: ${cartItems}. Genera 3 ideas de outfit diferentes. Cada idea debe incorporar al menos un artículo del carrito y sugerir 2 o 3 piezas complementarias (que no están en el carrito, como zapatillas, accesorios, o una chaqueta) para crear un look completo. Usa el siguiente formato para cada idea: *Idea #: [Nombre Corto del Look]*\n[Descripción de la combinación].`;
-            
             const systemPrompt = "Actúa como un estilista de ropa deportiva que busca maximizar el potencial de las prendas seamless. Usa un tono moderno, juvenil y enfocado en la versatilidad de las piezas. Tu respuesta debe estar en español y ser fácil de leer con formato Markdown (negritas, saltos de línea).";
-
-            const payload = {
-                contents: [{ parts: [{ text: userQuery }] }],
-                systemInstruction: { parts: [{ text: systemPrompt }] },
-            };
-
+            const payload = { contents: [{ parts: [{ text: userQuery }] }], systemInstruction: { parts: [{ text: systemPrompt }] } };
             try {
                 const text = await fetchGemini(payload);
                 outfitIdeasOutput.innerHTML = `<div class="llm-output">${text}</div>`;
@@ -498,9 +439,6 @@
                 outfitLoading.classList.add('hidden');
             }
         }
-
-
-        // --- FUNCIONES DE NAVEGACIÓN ---
 
         function updateView(viewId) {
             ['category-view', 'product-list-view', 'product-detail-view', 'cart-view'].forEach(id => {
@@ -517,22 +455,16 @@
 
         function goBackToProducts() {
             currentModel = null;
-            if (currentCategory) {
-                 renderProductList(currentCategory);
-            } else {
-                goBackToCategories(); 
-            }
+            if (currentCategory) renderProductList(currentCategory);
+            else goBackToCategories(); 
         }
         
         function renderCartView() {
             outfitIdeasOutput.classList.add('hidden');
             outfitIdeasOutput.innerHTML = ''; 
-
             updateView('cart-view');
-
             cartItemsContainer.innerHTML = '';
             let totalItems = 0;
-
             if (cart.length === 0) {
                 cartItemsContainer.innerHTML = '<p class="text-center text-gray-500 py-8">Tu carrito está vacío. ¡Añade tu primera prenda Seamless!</p>';
                 whatsappOrderBtn.disabled = true;
@@ -541,7 +473,6 @@
                 cart.forEach((item, index) => {
                     totalItems += item.quantity;
                     const itemTotal = item.price * item.quantity;
-
                     const itemHtml = `
                         <div class="flex items-start p-3 border rounded-xl shadow-sm bg-gray-50 space-x-3">
                             <img src="${item.image}" onerror="this.onerror=null;this.src='https://placehold.co/60x80/cccccc/333333?text=N/A';" class="w-16 h-20 object-cover rounded-lg shadow-md flex-shrink-0" alt="${item.name}">
@@ -560,50 +491,47 @@
                                     <button onclick="updateCartItemQuantity(${index}, 1)" class="w-6 h-6 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-lg font-bold">+</button>
                                 </div>
                             </div>
-                        </div>
-                    `;
+                        </div>`;
                     cartItemsContainer.insertAdjacentHTML('beforeend', itemHtml);
                 });
                 whatsappOrderBtn.disabled = false;
                 outfitIdeasBtn.disabled = false;
             }
-
             cartTotalItems.textContent = totalItems;
-            updateCartCount();
+            updateCartCount(false); // No animar si solo se renderiza la vista
         }
 
-        // --- FUNCIONES DE PERSISTENCIA DEL CARRITO ---
-        
         function saveCart() {
-            try {
-                localStorage.setItem('seamlessUserCart', JSON.stringify(cart));
-            } catch (e) {
-                console.error("No se pudo guardar el carrito en localStorage:", e);
-            }
+            try { localStorage.setItem('seamlessUserCart', JSON.stringify(cart)); } 
+            catch (e) { console.error("No se pudo guardar el carrito en localStorage:", e); }
         }
         
         function loadCart() {
             try {
                 const savedCart = localStorage.getItem('seamlessUserCart');
-                if (savedCart) {
-                    cart = JSON.parse(savedCart);
-                }
+                if (savedCart) cart = JSON.parse(savedCart);
             } catch (e) {
                 console.error("No se pudo cargar el carrito desde localStorage:", e);
                 cart = [];
             }
         }
 
-
-        // --- FUNCIONES DEL CARRITO Y DETALLE ---
-        
-        function updateCartCount() {
+        function updateCartCount(animate = true) {
             const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
             cartCountSpan.textContent = totalItems;
+            
             if (totalItems > 0) {
                 cartCountSpan.classList.remove('hidden');
-                cartCountSpan.classList.add('cart-pop');
-                setTimeout(() => cartCountSpan.classList.remove('cart-pop'), 300);
+                
+                if (animate) {
+                    // Remover y añadir la clase de animación para dispararla de nuevo
+                    cartIconContainer.classList.remove('cart-pop');
+                    // Forzar reflow/repaint
+                    void cartIconContainer.offsetWidth; 
+                    cartIconContainer.classList.add('cart-pop');
+                    setTimeout(() => cartIconContainer.classList.remove('cart-pop'), 300);
+                }
+                
             } else {
                 cartCountSpan.classList.add('hidden');
             }
@@ -620,11 +548,11 @@
         function updateCartItemQuantity(index, change) {
             if (cart[index]) {
                 cart[index].quantity += change;
-                if (cart[index].quantity <= 0) {
-                    removeFromCart(index);
-                } else {
+                if (cart[index].quantity <= 0) removeFromCart(index);
+                else {
                     saveCart();
-                    renderCartView();
+                    renderCartView(); // Llama a renderCartView, que internamente llamará a updateCartCount(false)
+                    updateCartCount(); // Llama directamente para animar el icono
                 }
             }
         }
@@ -641,7 +569,6 @@
 
         function updateDetailOptions() {
             if (!currentModel) return;
-            
             if (currentModel.colors.length === 0) {
                 addToCartBtn.disabled = false;
                 addToCartBtn.classList.remove('disabled:opacity-50', 'disabled:cursor-not-allowed');
@@ -651,7 +578,6 @@
                 selectedColor = colorSelect.value;
                 const isValid = selectedColor && selectedColor !== 'placeholder';
                 addToCartBtn.disabled = !isValid;
-                
                 if (isValid) {
                     addToCartBtn.classList.remove('disabled:opacity-50', 'disabled:cursor-not-allowed');
                     validationMessage.classList.add('hidden');
@@ -664,42 +590,32 @@
 
         function addToCart(event) {
             event.preventDefault();
-
             if (!currentModel) return;
             if (currentModel.colors.length > 0 && (!selectedColor || selectedColor === 'placeholder')) {
                 showToast('Por favor, selecciona un color.', 'error');
                 return;
             }
-
             const quantity = parseInt(quantityInput.value, 10);
             if (quantity < 1 || isNaN(quantity)) {
                 showToast('La cantidad debe ser 1 o más.', 'error');
                 return;
             }
-            
             const color = selectedColor || 'N/A';
-
             const existingItemIndex = cart.findIndex(item => item.id === currentModel.id && item.color === color);
-
             if (existingItemIndex > -1) {
                 cart[existingItemIndex].quantity += quantity;
                 showToast(`✅ Cantidad actualizada: ${currentModel.name}`, 'success');
             } else {
                 const itemToAdd = {
-                    id: currentModel.id,
-                    name: currentModel.name,
-                    category: currentCategory,
-                    color: color,
-                    price: parseFloat(currentModel.price),
-                    quantity: quantity,
+                    id: currentModel.id, name: currentModel.name, category: currentCategory,
+                    color: color, price: parseFloat(currentModel.price), quantity: quantity,
                     image: currentModel.image
                 };
                 cart.push(itemToAdd);
                 showToast(`✅ Añadido: ${currentModel.name}`, 'success');
             }
-            
             saveCart();
-            updateCartCount();
+            updateCartCount(); // Llama para animar el carrito
             goBackToProducts();
         }
 
@@ -708,42 +624,24 @@
                 showToast('El carrito está vacío. Añade artículos antes de ordenar.', 'error');
                 return;
             }
-            
             let orderSummary = `¡Hola! Me gustaría hacer un pedido del Catálogo Seamless:\n\n*RESUMEN DEL PEDIDO*\n\n`;
             let grandTotal = 0;
             let totalItems = 0;
-
             cart.forEach((item, index) => {
                 const itemTotal = item.price * item.quantity;
                 grandTotal += itemTotal;
                 totalItems += item.quantity;
-                
-                orderSummary += `*${index + 1}. ${item.name}* (ID: ${item.id})\n`;
-                orderSummary += `   - Categoría: ${item.category}\n`;
-                orderSummary += `   - Color: ${item.color}\n`;
-                orderSummary += `   - Cantidad: ${item.quantity} unidades\n`;
-                orderSummary += `   - Precio Unitario: $${item.price.toFixed(2)} MXN\n`;
-                orderSummary += `   - Subtotal: $${itemTotal.toFixed(2)} MXN\n\n`;
+                orderSummary += `*${index + 1}. ${item.name}* (ID: ${item.id})\n   - Categoría: ${item.category}\n   - Color: ${item.color}\n   - Cantidad: ${item.quantity} unidades\n   - Precio Unitario: $${item.price.toFixed(2)} MXN\n   - Subtotal: $${itemTotal.toFixed(2)} MXN\n\n`;
             });
-
-            orderSummary += "--------------------------------------\n";
-            orderSummary += `*TOTAL DE ARTÍCULOS:* ${totalItems}\n`;
-            orderSummary += `*GRAN TOTAL ESTIMADO:* $${grandTotal.toFixed(2)} MXN\n\n`;
-            orderSummary += "Por favor, confirmen disponibilidad, talla y costo total. ¡Gracias!";
-
-
+            orderSummary += `--------------------------------------\n*TOTAL DE ARTÍCULOS:* ${totalItems}\n*GRAN TOTAL ESTIMADO:* $${grandTotal.toFixed(2)} MXN\n\nPor favor, confirmen disponibilidad, talla y costo total. ¡Gracias!`;
             const encodedMessage = encodeURIComponent(orderSummary);
             const whatsappLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodedMessage}`;
             window.open(whatsappLink, '_blank');
         }
 
-
-        // --- FUNCIONES DE RENDERIZADO DEL CATÁLOGO ---
-
         function renderCategories() {
             updateView('category-view');
             categoriesContainer.innerHTML = '';
-            
             BASE_CATEGORY_NAMES.forEach(category => {
                 const modelsCount = CATALOG_DATA_MODELS[category]?.length || 0;
                 const cardHtml = `
@@ -751,8 +649,7 @@
                         class="p-5 bg-white rounded-xl shadow-md hover:shadow-lg transition duration-300 cursor-pointer border border-gray-100 transform hover:scale-[1.02]">
                         <h3 class="text-lg font-bold text-gray-800">${category}</h3>
                         <p class="text-sm text-gray-500 mt-1">${modelsCount} modelos</p>
-                    </div>
-                `;
+                    </div>`;
                 categoriesContainer.insertAdjacentHTML('beforeend', cardHtml);
             });
         }
@@ -762,9 +659,7 @@
             updateView('product-list-view');
             categoryTitle.textContent = categoryName.toUpperCase();
             modelsContainer.innerHTML = '';
-            
             const models = CATALOG_DATA_MODELS[categoryName] || [];
-            
             models.forEach(model => {
                 const cardHtml = `
                     <div onclick="renderProductDetail('${model.id}')"
@@ -775,29 +670,23 @@
                             <p class="text-sm font-semibold text-gray-800 truncate">${model.name}</p>
                             <p class="text-lg font-extrabold text-blue-600 mt-1">$${model.price} MXN</p>
                         </div>
-                    </div>
-                `;
+                    </div>`;
                 modelsContainer.insertAdjacentHTML('beforeend', cardHtml);
             });
         }
 
         function renderProductDetail(modelId) {
             currentModel = ALL_MODELS.find(m => m.id === modelId);
-
             if (!currentModel) {
                 showToast('Modelo no encontrado.', 'error');
                 return;
             }
-
             updateView('product-detail-view');
-
             detailModelName.textContent = currentModel.name;
             detailCategoryName.textContent = currentCategory; 
             detailPrice.textContent = `$${parseFloat(currentModel.price).toFixed(2)} MXN`;
             quantityInput.value = 1;
-
             renderGallery(currentModel);
-
             colorSelect.innerHTML = '';
             if (currentModel.colors && currentModel.colors.length > 0) {
                 colorSelectorGroup.classList.remove('hidden');
@@ -808,7 +697,6 @@
             } else {
                 colorSelectorGroup.classList.add('hidden');
             }
-            
             updateDetailOptions();
         }
 
@@ -816,33 +704,26 @@
             detailThumbnails.innerHTML = '';
             if (model.gallery && model.gallery.length > 0) {
                 detailImage.src = model.gallery[0];
-                
                 model.gallery.forEach((url, index) => {
                     const isFirst = index === 0;
                     const thumbnailHtml = `
                         <img src="${url}" onclick="changeMainImage('${url}', this)"
                             class="w-full h-16 object-cover rounded-md cursor-pointer transition ${isFirst ? 'thumbnail-active opacity-100' : 'opacity-70'}"
                             alt="Miniatura ${index + 1}"
-                            onerror="this.onerror=null;this.src='https://placehold.co/100x100/333333/ffffff?text=X';"
-                        >
-                    `;
+                            onerror="this.onerror=null;this.src='https://placehold.co/100x100/333333/ffffff?text=X';">`;
                     detailThumbnails.insertAdjacentHTML('beforeend', thumbnailHtml);
                 });
             }
         }
 
-
-        // --- INICIALIZACIÓN ---
-        
         form.addEventListener('submit', addToCart);
 
         window.onload = () => {
             loadCart();
-            updateCartCount();
+            updateCartCount(false); // No animar en la carga inicial
             renderCategories();
         };
 
     </script>
 </body>
 </html>
-
