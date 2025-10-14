@@ -11,28 +11,22 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #fcfcfc;
-        }
-        .seamless-bg {
-            background-color: #fcfcfc;
+            background-color: #f3f4f6; /* Fondo gris claro */
+            color: #1f2937; /* Texto base oscuro */
         }
         .whatsapp-btn {
-            background: linear-gradient(135deg, #128C7E 0%, #25D366 100%);
-            box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4);
+            background-color: #25D366; /* Color de WhatsApp */
         }
         .whatsapp-btn:hover {
-            background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
-        }
-        .thumbnail-active {
-            border: 3px solid #3b82f6; /* Borde azul para la foto activa */
-            opacity: 100% !important;
+            background-color: #128C7E;
         }
         .llm-output {
             white-space: pre-wrap;
             text-align: left;
             padding: 1rem;
-            border-radius: 0.75rem;
-            background-color: #f3f4f6;
+            border-radius: 0.5rem;
+            background-color: #e5e7eb; /* Fondo claro para el output */
+            color: #1f2937;
             margin-top: 1rem;
             font-size: 0.9rem;
             border-left: 4px solid #3b82f6;
@@ -47,24 +41,7 @@
             transition: color 150ms;
         }
         .back-nav-btn:hover {
-            color: #1d4ed8;
-        }
-        /* Animación para el contador del carrito */
-        @keyframes pop {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.3); }
-            100% { transform: scale(1); }
-        }
-        .cart-pop {
-            animation: pop 0.3s ease-out;
-        }
-        /* Estilo para el contenedor del emoji del carrito */
-        .cart-icon-container {
-            font-size: 2.2rem; /* Tamaño grande para el emoji */
-            line-height: 1; /* Asegura que el contador se posicione correctamente */
-            padding: 0.25rem;
-            display: inline-block;
-            transition: transform 0.3s ease-out; /* Para la animación de escalado */
+            color: #60a5fa;
         }
     </style>
     <!-- Iconos (Inline SVG para evitar dependencias) -->
@@ -77,28 +54,28 @@
         </symbol>
     </svg>
 </head>
-<body class="seamless-bg antialiased flex flex-col items-center">
+<body class="antialiased flex flex-col items-center bg-gray-100">
 
     <!-- IMAGEN DE ENCABEZADO -->
     <div class="w-full max-w-xl p-4 pt-6 pb-2">
         <img src="https://raw.githubusercontent.com/jesusvn1993mplvt3-ai/rosasandoval/refs/heads/main/Miss%20rouss.jpg" 
              alt="Logo de la marca Seamless" 
-             class="w-full h-auto object-contain rounded-xl shadow-lg border border-gray-100 mx-auto">
+             class="w-full h-auto object-contain rounded-xl shadow-lg border border-gray-300 mx-auto">
     </div>
     <!-- FIN IMAGEN -->
 
-    <!-- Contenedor Principal de la App (Pantalla completa en móvil) -->
+    <!-- Contenedor Principal de la App -->
     <div id="app" class="min-h-screen w-full max-w-xl mx-auto shadow-xl bg-white">
 
         <!-- Header Fijo (Solo Título y Carrito) -->
-        <header class="p-4 bg-white border-b border-gray-100 sticky top-0 z-10 shadow-sm flex justify-between items-center">
+        <header class="p-4 bg-white border-b border-gray-200 sticky top-0 z-10 shadow-md flex justify-between items-center">
             <h1 class="text-2xl font-extrabold text-gray-800 text-center flex-grow">
                 CATÁLOGO
             </h1>
             
-            <!-- **CAMBIO:** Botón y Contador del Carrito con emoji y animación -->
+            <!-- Botón y Contador del Carrito -->
             <button id="cart-button" onclick="renderCartView()" class="relative rounded-full hover:opacity-90 transition-opacity duration-150 p-1">
-                <span id="cart-icon-container" class="cart-icon-container">🛒</span>
+                <span id="cart-icon-container" class="text-3xl">🛒</span>
                 <span id="cart-count" class="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full hidden">0</span>
             </button>
         </header>
@@ -108,7 +85,7 @@
 
             <!-- 1. Vista de Categorías -->
             <div id="category-view" class="space-y-3">
-                <p class="text-gray-500 mb-4 text-center text-sm">Selecciona una categoría para ver los modelos disponibles.</p>
+                <p class="text-gray-600 mb-4 text-center text-sm">Selecciona una categoría para ver los modelos disponibles.</p>
                 <!-- Las categorías se inyectarán aquí por JS -->
             </div>
 
@@ -120,13 +97,13 @@
                     Volver a Categorías
                 </button>
                 
-                <h2 id="current-category-title" class="text-xl font-bold text-gray-700 mb-4"></h2>
+                <h2 id="current-category-title" class="text-xl font-bold text-gray-800 mb-4"></h2>
                 <div id="models-container" class="grid grid-cols-2 gap-4">
                     <!-- Los modelos se inyectarán aquí por JS -->
                 </div>
             </div>
             
-            <!-- 3. Vista de Detalle del Producto (Modal simulado) -->
+            <!-- 3. Vista de Detalle del Producto (Solo imagen principal + botón de Zoom) -->
             <div id="product-detail-view" class="hidden p-4 bg-white rounded-xl">
                 <!-- Botón de Retroceso a Lista de Productos -->
                 <button onclick="goBackToProducts()" class="back-nav-btn cursor-pointer">
@@ -134,13 +111,23 @@
                     Volver a Modelos
                 </button>
                 
-                <!-- Galería de Fotos - FONDO NEGRO FORZADO -->
-                <div class="space-y-2 mb-6 p-4 bg-gray-900 text-white rounded-xl shadow-inner" style="background-color: #000000;">
-                    <!-- Foto Principal -->
-                    <img id="detail-main-image" src="" alt="Foto principal del modelo" class="w-full h-auto object-cover rounded-xl shadow-lg">
-                    <!-- Miniaturas -->
-                    <div id="detail-thumbnails" class="grid grid-cols-5 gap-2 pt-2">
-                        <!-- Las miniaturas se inyectarán aquí por JS -->
+                <!-- Galería de Fotos (Simplified to single image and zoom button) -->
+                <div class="space-y-2 mb-6 p-4 rounded-xl shadow-lg border border-gray-300">
+                    <!-- Contenedor de la Imagen Principal y el Botón de Zoom -->
+                    <div class="relative group">
+                        <!-- Imagen Principal -->
+                        <img id="detail-main-image" src="" alt="Foto principal del modelo" 
+                            class="w-full h-auto object-cover rounded-xl shadow-lg border-2 border-gray-200 cursor-pointer">
+                        
+                        <!-- Botón de Zoom (Overlay) -->
+                        <button onclick="openZoomModal(event)"
+                                class="absolute bottom-3 right-3 p-2 bg-blue-600/80 text-white rounded-full 
+                                    opacity-0 group-hover:opacity-100 transition-opacity duration-300 shadow-xl 
+                                    flex items-center space-x-1 hover:bg-blue-700/90 focus:outline-none focus:ring-4 focus:ring-blue-300">
+                            <!-- Icono de lupa con + -->
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="8" y1="11" x2="14" y2="11"/><line x1="11" y1="8" x2="11" y2="14"/></svg>
+                            <span class="text-xs font-semibold">Zoom</span>
+                        </button>
                     </div>
                 </div>
 
@@ -157,7 +144,7 @@
                     <div id="color-selector-group">
                         <label class="block text-sm font-semibold text-gray-700 mb-2">Color</label>
                         <select id="selected-color" required onchange="updateDetailOptions()"
-                                class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-white">
+                                class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900">
                             <!-- Colores se inyectarán aquí -->
                         </select>
                     </div>
@@ -166,12 +153,12 @@
                     <div>
                         <label for="selected-quantity" class="block text-sm font-semibold text-gray-700 mb-2">Cantidad</label>
                         <input type="number" id="selected-quantity" value="1" min="1" required
-                               class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                               class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900">
                     </div>
 
                     <!-- Botón de Añadir al Carrito -->
                     <button type="submit" id="add-to-cart-btn" disabled
-                            class="w-full p-4 mt-6 rounded-xl text-white font-bold text-lg flex items-center justify-center space-x-2 transition duration-300 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed">
+                            class="w-full p-4 mt-6 rounded-xl text-white font-bold text-lg flex items-center justify-center space-x-2 transition duration-300 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed">
                         Añadir al Carrito
                     </button>
                     <p id="validation-message" class="text-center text-red-500 text-sm hidden">Selecciona Color para añadir al carrito.</p>
@@ -192,21 +179,21 @@
                     <!-- Items del carrito se inyectarán aquí -->
                 </div>
                 
-                <div class="text-right text-xl font-semibold text-gray-700 border-t pt-4">
+                <div class="text-right text-xl font-semibold text-gray-700 border-t border-gray-300 pt-4">
                     Total de artículos: <span id="cart-total-items" class="text-blue-600">0</span>
                 </div>
 
-                <!-- Ideas de Outfit LLM -->
+                <!-- Ideas de Outfit LLM (Feature que debe funcionar) -->
                 <button id="outfit-ideas-btn" 
                         onclick="getOutfitIdeas()" 
                         disabled
                         class="w-full p-3 mt-4 rounded-lg text-sm font-bold flex items-center justify-center space-x-2 transition duration-300 
-                               bg-indigo-100 text-indigo-800 hover:bg-indigo-200 disabled:opacity-50 disabled:cursor-not-allowed">
+                               bg-indigo-600 text-white hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed">
                     <span>✨ Generar Ideas de Outfit con Gemini</span>
-                    <span id="outfit-loading" class="hidden animate-spin h-4 w-4 border-2 border-indigo-800 border-t-transparent rounded-full"></span>
+                    <span id="outfit-loading" class="hidden animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></span>
                 </button>
                 <div id="outfit-ideas-output" class="hidden"></div>
-                <!-- END NEW -->
+                <!-- END LLM FEATURE -->
 
                 <!-- Botón Final de WhatsApp -->
                 <button id="whatsapp-order-btn" onclick="sendWhatsAppOrder()" disabled
@@ -222,6 +209,23 @@
         </main>
     </div>
 
+    <!-- 5. Modal de Zoom (Nueva Vista) -->
+    <div id="zoom-modal" class="fixed inset-0 z-50 hidden bg-black bg-opacity-90 flex items-center justify-center p-4" onclick="closeZoomModal()">
+        <div class="relative w-full h-full flex items-center justify-center" onclick="event.stopPropagation()">
+            
+            <!-- Imagen Zoom -->
+            <img id="zoomed-image" src="" alt="Imagen ampliada del modelo" 
+                class="max-w-full max-h-full object-contain rounded-lg shadow-2xl">
+            
+            <!-- Botón de Cerrar -->
+            <button onclick="closeZoomModal()"
+                    class="absolute top-4 right-4 p-2 bg-white/30 text-white rounded-full hover:bg-white/50 transition duration-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+        </div>
+    </div>
+
+
     <!-- JavaScript del Catálogo -->
     <script>
         // --- CONFIGURACIÓN DE GEMINI API ---
@@ -236,20 +240,22 @@
             "Blusas", "Calcetas"
         ];
         
-        // -------------------------------------------------------------
-        // CONJUNTOS DEPORTIVOS - MODELO 1 
-        // -------------------------------------------------------------
-        const CONJUNTO_MODEL_1_IMAGES = [
-            "https://raw.githubusercontent.com/jesusvn1993mplvt3-ai/rosasandoval/refs/heads/main/CONJUNTO1%20(4).png", 
-            "https://raw.githubusercontent.com/jesusvn1993mplvt3-ai/rosasandoval/refs/heads/main/CONJUNTO1%20(1).png",
-            "https://raw.githubusercontent.com/jesusvn1993mplvt3-ai/rosasandoval/refs/heads/main/CONJUNTO1%20(2).png",
-            "https://raw.githubusercontent.com/jesusvn1993mplvt3-ai/rosasandoval/refs/heads/main/CONJUNTO1%20(3).png",
-            "https://raw.githubusercontent.com/jesusvn1993mplvt3-ai/rosasandoval/refs/heads/main/CONJUNTO1%20(5).png"
+        // URLs de imágenes de los 12 Conjuntos Deportivos solicitados (02 al 13)
+        const CONJUNTO_IMAGES = [
+            "https://raw.githubusercontent.com/jesusvn1993mplvt3-ai/rosasandoval/main/fotos/Conjunto/CONJUNTO_02.jpg",
+            "https://raw.githubusercontent.com/jesusvn1993mplvt3-ai/rosasandoval/main/fotos/Conjunto/CONJUNTO_03.jpg",
+            "https://raw.githubusercontent.com/jesusvn1993mplvt3-ai/rosasandoval/main/fotos/Conjunto/CONJUNTO_04.jpg",
+            "https://raw.githubusercontent.com/jesusvn1993mplvt3-ai/rosasandoval/main/fotos/Conjunto/CONJUNTO_05.jpg",
+            "https://raw.githubusercontent.com/jesusvn1993mplvt3-ai/rosasandoval/main/fotos/Conjunto/CONJUNTO_06.jpg",
+            "https://raw.githubusercontent.com/jesusvn1993mplvt3-ai/rosasandoval/main/fotos/Conjunto/CONJUNTO_07.jpg",
+            "https://raw.githubusercontent.com/jesusvn1993mplvt3-ai/rosasandoval/main/fotos/Conjunto/CONJUNTO_08.jpg",
+            "https://raw.githubusercontent.com/jesusvn1993mplvt3-ai/rosasandoval/main/fotos/Conjunto/CONJUNTO_09.jpg",
+            "https://raw.githubusercontent.com/jesusvn1993mplvt3-ai/rosasandoval/main/fotos/Conjunto/CONJUNTO_10.jpg",
+            "https://raw.githubusercontent.com/jesusvn1993mplvt3-ai/rosasandoval/main/fotos/Conjunto/CONJUNTO_11.jpg",
+            "https://raw.githubusercontent.com/jesusvn1993mplvt3-ai/rosasandoval/main/fotos/Conjunto/CONJUNTO_12.jpg",
+            "https://raw.githubusercontent.com/jesusvn1993mplvt3-ai/rosasandoval/main/fotos/Conjunto/CONJUNTO_13.jpg",
         ];
-        
-        // -------------------------------------------------------------
-        // ENTERIZOS (Lista completa de 33 URLs)
-        // -------------------------------------------------------------
+
         const ENTERIZO_IMAGES = [
             "https://github.com/jesusvn1993mplvt3-ai/rosasandoval/blob/main/fotos/Enterizos/IMG-20251011-WA0013.jpg?raw=true",
             "https://github.com/jesusvn1993mplvt3-ai/rosasandoval/blob/main/fotos/Enterizos/IMG-20251011-WA0014.jpg?raw=true",
@@ -285,33 +291,33 @@
             "https://github.com/jesusvn1993mplvt3-ai/rosasandoval/blob/main/fotos/Enterizos/IMG-20251011-WA0096.jpg?raw=true",
             "https://github.com/jesusvn1993mplvt3-ai/rosasandoval/blob/main/fotos/Enterizos/IMG-20251011-WA0097.jpg?raw=true"
         ];
-
-        // -------------------------------------------------------------
-        // LEGGINGS - MODELO 1 
-        // -------------------------------------------------------------
         const LEGGINGS_MODEL_1_IMAGES = [
-            "https://blogger.googleusercontent.com/img/a/AVvXsEgs590X4v6riaUrexeEHGLIJmLC94sg4gJeZ7iY42JMqc0KUBeJ9E4kalyFg61vzQ3gD4PPrFYzipkm10rzWHCoGPC5cbk4O5lxC4FxwD8SHVb4ujO6Z04NCwyyLpE7yaNawuikBj2tIzslUEP2I_aILElHaUwwdhj87OMychqjSXCkubz7bQQ2qo73bSc",
+            "https://blogger.googleusercontent.com/img/a/AVvXsEgs590X4v6riaUrexeEHGLIJmLC94sg4gJeZ7iY42JMqc0KUBeJ9E4kalyFg61vzQ3gD4PPrFYzipkm10rzWHCoGPC5cbk4O5lxC4FxwD8SHVb4ujO6Z04NCyylpE7yaNawuikBj2tIzslUEP2I_aILElHaUwwdhj87OMychqjSXCkubz7bQQ2qo73bSc",
             "https://blogger.googleusercontent.com/img/a/AVvXsEgsjUrVy4mxWPctXMu1DAsj1wPTQ363HcbE8ftZvzt9-LGHTobjAKfeLw1V2CBES6lPPEnrC9dN-Z2Q7fwwTvLOkUNArqltlqdWy_7TlVlg59Resygq7s9Op8eq90kh_Z9qVpuvF0IQ0L2c0XViKCkoYjlpX63djYsKsQPBC7D2z2DG9bGZPltNYv2g974", 
             "https://blogger.googleusercontent.com/img/a/AVvXsEj2-YyfL8n8rMbL08S0ZD2ng26_dTs_VVtb0YphpTnWD43ohMWMQYEcAkuuOrLFcJ2vkm_1fmiytXd7ySmiuqp6_kh7AZWWSYfL4kqz-lOtfH2XuE9xQWqtSS0fMMLMBX8CkejWF3i0UEpo9KHFZbl430A41aij9tj7cWPLQ1xV6Q6bI--SW_S_7S5EjEM", 
-            "https://blogger.googleusercontent.com/img/a/AVvXsEi7wfD58k5-qcbMjpmW-46TYecIGa1_J18Ys77aL6YaEDXN7-gNXvXZiLZzJYEUcm9tnkmlF8LvlPRBAs04RKIY5qdKm-KZWIXmiA-qzWxbVS11GcSEnzHp5PBKqyeMWRlBXNBIMojz5iYGkTwl9zL1duKqxSkdp1BIWSmWLYKQv-RENR4e1aGT9Y6y8Z8",
+            "https://blogger.googleusercontent.com/img/a/AVvXsEi7wfD58p5-qcbMjpmW-46TYecIGa1_J18Ys77aL6YaEDXN7-gNXnXZiLZzJYEUcm9tnkmlF8LvlPRBAs04RKIY5qdKm-KZWIXmiA-qzWxbVS11GcSEnzHp5PBKqyeMWRlBXNBIMojz5iYGkTwl9zL1duLqKqxSkdp1BIWSmWLYKQv-RENR4e1aGT9Y6y8Z8",
             "https://blogger.googleusercontent.com/img/a/AVvXsEic3nBSl0NjjQy9jnUBOv-iqkdvDj5kOrIQ6Xk45OxN8ba7vsuX3aQ9N5MzQ10_6kShn2n_lqNj4D-XFatqYwbiGyq0veP1ZJaZXx6w09Eg34L_sP6q-0eHGAdAc9vpxHXUgs7S0dnhW4aRoz7qqssBRFrB0IOaiQifJSuVmKF_oDSGVe0HN2z9oaF_CR0g"
         ];
-        
-        // Genera modelos placeholder, ajustando la cantidad de Enterizos
+
+        // Se mantiene la estructura de datos CATÁLOGO
         const CATALOG_DATA_MODELS = BASE_CATEGORY_NAMES.reduce((acc, cat) => {
             const isEnterizo = cat === "Enterizos";
-            const count = isEnterizo ? ENTERIZO_IMAGES.length : 5; 
+            const isConjunto = cat === "Conjuntos Deportivos";
+            
+            let count = 5; // Default for most categories
+            if (isEnterizo) count = ENTERIZO_IMAGES.length;
+            if (isConjunto) count = CONJUNTO_IMAGES.length; // 12 modelos solicitados
 
             acc[cat] = Array.from({ length: count }, (_, i) => {
                 const isLegging1 = cat === "Leggings" && i === 0;
-                const isConjunto1 = cat === "Conjuntos Deportivos" && i === 0;
                 
                 let modelData = {
                     id: `${cat.substring(0, 3)}-${i + 1}`,
                     name: `${cat} - Modelo ${i + 1}`,
                     price: (250 + (i * 50)).toFixed(2), 
-                    image: `https://placehold.co/300x400/000000/ffffff?text=MOD+${i+1}`, 
-                    gallery: Array.from({ length: 5 }, (_, j) => `https://placehold.co/100x100/000000/ffffff?text=FOTO+${j+1}`), 
+                    // Imagen placeholder por defecto
+                    image: `https://placehold.co/300x400/cccccc/333333?text=MOD+${i+1}`, 
+                    gallery: Array.from({ length: 5 }, (_, j) => `https://placehold.co/100x100/cccccc/333333?text=FOTO+${j+1}`), 
                     colors: ["Negro", "Gris Humo", "Beige", "Rosa Pastel", "Azul Acero"],
                 };
 
@@ -324,12 +330,14 @@
                     modelData.image = imageUrl; 
                     modelData.gallery = [imageUrl];
                     modelData.colors = ["Negro", "Gris Oxford", "Azul Marino", "Vino", "Verde Militar", "Rosa Palo", "Beige (Nude)", "Lila"];
-                } else if (isConjunto1) {
-                    modelData.name = "Conjunto Deportivo V1 (Seamless)";
-                    modelData.price = '150.00'; 
-                    modelData.image = CONJUNTO_MODEL_1_IMAGES[0];
-                    modelData.gallery = CONJUNTO_MODEL_1_IMAGES;
-                    modelData.colors = ["Negro", "Gris", "Vino", "Verde Militar"];
+                } else if (isConjunto) {
+                    // Lógica para los 12 conjuntos nuevos
+                    modelData.id = `CONJ-${i + 1}`;
+                    modelData.name = `Conjunto Deportivo C${i + 1} (Seamless)`;
+                    modelData.price = (399.00 + (i * 10)).toFixed(2); // Precio inicial ajustado
+                    modelData.image = CONJUNTO_IMAGES[i]; // Asigna la imagen específica
+                    modelData.gallery = [CONJUNTO_IMAGES[i]]; // Galería simple con solo la imagen principal
+                    modelData.colors = ["Negro", "Gris", "Vino", "Verde Militar", "Azul"];
                 } else if (isLegging1) {
                     modelData.name = "Legging Ultra Seamless V1";
                     modelData.price = '85.00'; 
@@ -350,33 +358,37 @@
         let selectedColor = null; 
         let cart = []; 
 
+
+        // --- Elementos del DOM ---
         const categoryView = document.getElementById('category-view');
         const productListView = document.getElementById('product-list-view');
         const productDetailView = document.getElementById('product-detail-view');
         const cartView = document.getElementById('cart-view');
+        const zoomModal = document.getElementById('zoom-modal');
+        const zoomedImage = document.getElementById('zoomed-image');
+
         const categoriesContainer = document.getElementById('category-view');
         const modelsContainer = document.getElementById('models-container');
         const categoryTitle = document.getElementById('current-category-title');
         const cartCountSpan = document.getElementById('cart-count');
-        const cartIconContainer = document.getElementById('cart-icon-container'); // Nuevo ID para el contenedor del icono
         const toastContainer = document.getElementById('toast-container');
         const form = document.getElementById('order-form');
         const colorSelect = document.getElementById('selected-color');
         const colorSelectorGroup = document.getElementById('color-selector-group'); 
         const quantityInput = document.getElementById('selected-quantity');
-        const detailImage = document.getElementById('detail-main-image');
+        const detailImage = document.getElementById('detail-main-image'); // Imagen principal
         const detailModelName = document.getElementById('detail-model-name');
         const detailCategoryName = document.getElementById('detail-category-name');
         const detailPrice = document.getElementById('detail-price');
         const addToCartBtn = document.getElementById('add-to-cart-btn');
         const validationMessage = document.getElementById('validation-message');
-        const detailThumbnails = document.getElementById('detail-thumbnails');
         const cartItemsContainer = document.getElementById('cart-items-container');
         const cartTotalItems = document.getElementById('cart-total-items');
         const whatsappOrderBtn = document.getElementById('whatsapp-order-btn');
         const outfitIdeasBtn = document.getElementById('outfit-ideas-btn');
         const outfitLoading = document.getElementById('outfit-loading');
         const outfitIdeasOutput = document.getElementById('outfit-ideas-output');
+
 
         function showToast(message, type = 'success') {
             const colors = { success: 'bg-green-500', error: 'bg-red-500' };
@@ -423,15 +435,21 @@
             outfitIdeasOutput.innerHTML = '';
             outfitIdeasBtn.disabled = true;
             outfitLoading.classList.remove('hidden');
+            
             const cartItems = cart.map(item => `${item.quantity}x ${item.name} (Color: ${item.color}, Categoría: ${item.category})`).join('; ');
             const userQuery = `Eres un estilista personal virtual. El cliente tiene los siguientes artículos en su carrito: ${cartItems}. Genera 3 ideas de outfit diferentes. Cada idea debe incorporar al menos un artículo del carrito y sugerir 2 o 3 piezas complementarias (que no están en el carrito, como zapatillas, accesorios, o una chaqueta) para crear un look completo. Usa el siguiente formato para cada idea: *Idea #: [Nombre Corto del Look]*\n[Descripción de la combinación].`;
             const systemPrompt = "Actúa como un estilista de ropa deportiva que busca maximizar el potencial de las prendas seamless. Usa un tono moderno, juvenil y enfocado en la versatilidad de las piezas. Tu respuesta debe estar en español y ser fácil de leer con formato Markdown (negritas, saltos de línea).";
-            const payload = { contents: [{ parts: [{ text: userQuery }] }], systemInstruction: { parts: [{ text: systemPrompt }] } };
+            
+            const payload = { 
+                contents: [{ parts: [{ text: userQuery }] }], 
+                systemInstruction: { parts: [{ text: systemPrompt }] } 
+            };
+            
             try {
                 const text = await fetchGemini(payload);
                 outfitIdeasOutput.innerHTML = `<div class="llm-output">${text}</div>`;
             } catch (error) {
-                outfitIdeasOutput.innerHTML = `<div class="llm-output text-red-700">❌ Error al generar ideas de outfit: ${error.message}</div>`;
+                outfitIdeasOutput.innerHTML = `<div class="llm-output text-red-500">❌ Error al generar ideas de outfit: ${error.message}</div>`;
                 showToast('Error al conectar con el Estilista (Gemini API).', 'error');
             } finally {
                 outfitIdeasOutput.classList.remove('hidden');
@@ -440,8 +458,9 @@
             }
         }
 
+        // --- Funciones de Navegación y Vistas ---
         function updateView(viewId) {
-            ['category-view', 'product-list-view', 'product-detail-view', 'cart-view'].forEach(id => {
+            ['category-view', 'product-list-view', 'product-detail-view', 'cart-view', 'zoom-modal'].forEach(id => {
                 document.getElementById(id).classList.add('hidden');
             });
             document.getElementById(viewId).classList.remove('hidden');
@@ -458,10 +477,30 @@
             if (currentCategory) renderProductList(currentCategory);
             else goBackToCategories(); 
         }
+
+        // --- Funciones de Zoom (Nuevo) ---
+        function openZoomModal(event) {
+            event.preventDefault(); // Evita cualquier acción por defecto si el botón estuviera dentro de un form/link
+            event.stopPropagation(); // Evita cerrar el modal si se clica en la imagen
+
+            const imageUrl = detailImage.src;
+            if (!imageUrl) return;
+
+            zoomedImage.src = imageUrl;
+            zoomModal.classList.remove('hidden');
+        }
+
+        function closeZoomModal() {
+            zoomModal.classList.add('hidden');
+            zoomedImage.src = ''; 
+        }
         
+        // --- Funciones de Carrito ---
         function renderCartView() {
+            // Ocultar LLM Output al entrar al carrito
             outfitIdeasOutput.classList.add('hidden');
             outfitIdeasOutput.innerHTML = ''; 
+            
             updateView('cart-view');
             cartItemsContainer.innerHTML = '';
             let totalItems = 0;
@@ -474,7 +513,7 @@
                     totalItems += item.quantity;
                     const itemTotal = item.price * item.quantity;
                     const itemHtml = `
-                        <div class="flex items-start p-3 border rounded-xl shadow-sm bg-gray-50 space-x-3">
+                        <div class="flex items-start p-3 border border-gray-300 rounded-xl shadow-sm bg-gray-50 space-x-3">
                             <img src="${item.image}" onerror="this.onerror=null;this.src='https://placehold.co/60x80/cccccc/333333?text=N/A';" class="w-16 h-20 object-cover rounded-lg shadow-md flex-shrink-0" alt="${item.name}">
                             <div class="flex-grow">
                                 <p class="text-sm font-bold text-gray-800">${item.name}</p>
@@ -482,13 +521,13 @@
                                 <p class="text-sm font-semibold text-blue-600 mt-1">$${itemTotal.toFixed(2)} MXN</p>
                             </div>
                             <div class="flex flex-col items-end justify-between h-20">
-                                <button onclick="removeFromCart(${index})" class="text-red-500 hover:text-red-700 transition duration-150 p-1 rounded-full bg-white flex-shrink-0">
+                                <button onclick="removeFromCart(${index})" class="text-red-500 hover:text-red-700 transition duration-150 p-1 rounded-full bg-gray-200 flex-shrink-0">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
                                 </button>
-                                <div class="flex items-center space-x-2 bg-white border rounded-full p-1">
-                                    <button onclick="updateCartItemQuantity(${index}, -1)" class="w-6 h-6 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-lg font-bold">-</button>
+                                <div class="flex items-center space-x-2 bg-gray-200 border border-gray-300 rounded-full p-1 text-gray-800">
+                                    <button onclick="updateCartItemQuantity(${index}, -1)" class="w-6 h-6 flex items-center justify-center rounded-full bg-gray-300 hover:bg-gray-400 text-lg font-bold">-</button>
                                     <span class="font-semibold text-sm w-5 text-center">${item.quantity}</span>
-                                    <button onclick="updateCartItemQuantity(${index}, 1)" class="w-6 h-6 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-lg font-bold">+</button>
+                                    <button onclick="updateCartItemQuantity(${index}, 1)" class="w-6 h-6 flex items-center justify-center rounded-full bg-gray-300 hover:bg-gray-400 text-lg font-bold">+</button>
                                 </div>
                             </div>
                         </div>`;
@@ -522,16 +561,6 @@
             
             if (totalItems > 0) {
                 cartCountSpan.classList.remove('hidden');
-                
-                if (animate) {
-                    // Remover y añadir la clase de animación para dispararla de nuevo
-                    cartIconContainer.classList.remove('cart-pop');
-                    // Forzar reflow/repaint
-                    void cartIconContainer.offsetWidth; 
-                    cartIconContainer.classList.add('cart-pop');
-                    setTimeout(() => cartIconContainer.classList.remove('cart-pop'), 300);
-                }
-                
             } else {
                 cartCountSpan.classList.add('hidden');
             }
@@ -551,27 +580,17 @@
                 if (cart[index].quantity <= 0) removeFromCart(index);
                 else {
                     saveCart();
-                    renderCartView(); // Llama a renderCartView, que internamente llamará a updateCartCount(false)
-                    updateCartCount(); // Llama directamente para animar el icono
+                    renderCartView(); 
+                    updateCartCount(); 
                 }
             }
-        }
-        
-        function changeMainImage(imageUrl, thumbnailElement) {
-            detailImage.src = imageUrl;
-            document.querySelectorAll('#detail-thumbnails img').forEach(img => {
-                img.classList.remove('thumbnail-active', 'opacity-100');
-                img.classList.add('opacity-70');
-            });
-            thumbnailElement.classList.add('thumbnail-active', 'opacity-100');
-            thumbnailElement.classList.remove('opacity-70');
         }
 
         function updateDetailOptions() {
             if (!currentModel) return;
+            // Si el modelo no tiene colores, se considera listo para añadir
             if (currentModel.colors.length === 0) {
                 addToCartBtn.disabled = false;
-                addToCartBtn.classList.remove('disabled:opacity-50', 'disabled:cursor-not-allowed');
                 validationMessage.classList.add('hidden');
                 selectedColor = "Modelo Único (N/A)";
             } else {
@@ -579,10 +598,8 @@
                 const isValid = selectedColor && selectedColor !== 'placeholder';
                 addToCartBtn.disabled = !isValid;
                 if (isValid) {
-                    addToCartBtn.classList.remove('disabled:opacity-50', 'disabled:cursor-not-allowed');
                     validationMessage.classList.add('hidden');
                 } else {
-                    addToCartBtn.classList.add('disabled:opacity-50', 'disabled:cursor-not-allowed');
                     validationMessage.classList.remove('hidden');
                 }
             }
@@ -615,7 +632,7 @@
                 showToast(`✅ Añadido: ${currentModel.name}`, 'success');
             }
             saveCart();
-            updateCartCount(); // Llama para animar el carrito
+            updateCartCount(); 
             goBackToProducts();
         }
 
@@ -639,6 +656,7 @@
             window.open(whatsappLink, '_blank');
         }
 
+        // --- Funciones de Renderizado de Vistas ---
         function renderCategories() {
             updateView('category-view');
             categoriesContainer.innerHTML = '';
@@ -646,7 +664,7 @@
                 const modelsCount = CATALOG_DATA_MODELS[category]?.length || 0;
                 const cardHtml = `
                     <div onclick="renderProductList('${category}')"
-                        class="p-5 bg-white rounded-xl shadow-md hover:shadow-lg transition duration-300 cursor-pointer border border-gray-100 transform hover:scale-[1.02]">
+                        class="p-5 bg-white rounded-xl shadow-lg hover:shadow-xl transition duration-300 cursor-pointer border border-gray-300 transform hover:scale-[1.02]">
                         <h3 class="text-lg font-bold text-gray-800">${category}</h3>
                         <p class="text-sm text-gray-500 mt-1">${modelsCount} modelos</p>
                     </div>`;
@@ -660,10 +678,11 @@
             categoryTitle.textContent = categoryName.toUpperCase();
             modelsContainer.innerHTML = '';
             const models = CATALOG_DATA_MODELS[categoryName] || [];
+            
             models.forEach(model => {
                 const cardHtml = `
                     <div onclick="renderProductDetail('${model.id}')"
-                        class="bg-white rounded-xl shadow-md hover:shadow-lg transition duration-300 cursor-pointer overflow-hidden border border-gray-100">
+                        class="bg-white rounded-xl shadow-md hover:shadow-lg transition duration-300 overflow-hidden border border-gray-300 cursor-pointer">
                         <img src="${model.image}" onerror="this.onerror=null;this.src='https://placehold.co/300x400/cccccc/333333?text=${model.id}';"
                              alt="${model.name}" class="w-full h-48 object-cover object-center">
                         <div class="p-3">
@@ -686,7 +705,14 @@
             detailCategoryName.textContent = currentCategory; 
             detailPrice.textContent = `$${parseFloat(currentModel.price).toFixed(2)} MXN`;
             quantityInput.value = 1;
-            renderGallery(currentModel);
+            
+            // Carga de la ÚNICA imagen (la principal)
+            detailImage.src = currentModel.image;
+            detailImage.onerror = function() { 
+                this.onerror = null; 
+                this.src = 'https://placehold.co/300x400/cccccc/333333?text=N/A'; 
+            };
+            
             colorSelect.innerHTML = '';
             if (currentModel.colors && currentModel.colors.length > 0) {
                 colorSelectorGroup.classList.remove('hidden');
@@ -698,22 +724,6 @@
                 colorSelectorGroup.classList.add('hidden');
             }
             updateDetailOptions();
-        }
-
-        function renderGallery(model) {
-            detailThumbnails.innerHTML = '';
-            if (model.gallery && model.gallery.length > 0) {
-                detailImage.src = model.gallery[0];
-                model.gallery.forEach((url, index) => {
-                    const isFirst = index === 0;
-                    const thumbnailHtml = `
-                        <img src="${url}" onclick="changeMainImage('${url}', this)"
-                            class="w-full h-16 object-cover rounded-md cursor-pointer transition ${isFirst ? 'thumbnail-active opacity-100' : 'opacity-70'}"
-                            alt="Miniatura ${index + 1}"
-                            onerror="this.onerror=null;this.src='https://placehold.co/100x100/333333/ffffff?text=X';">`;
-                    detailThumbnails.insertAdjacentHTML('beforeend', thumbnailHtml);
-                });
-            }
         }
 
         form.addEventListener('submit', addToCart);
