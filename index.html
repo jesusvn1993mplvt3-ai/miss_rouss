@@ -49,6 +49,15 @@
         .back-nav-btn:hover {
             color: #1d4ed8;
         }
+        /* Animación para el contador del carrito */
+        @keyframes pop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); }
+        }
+        .cart-pop {
+            animation: pop 0.3s ease-out;
+        }
     </style>
     <!-- Iconos (Inline SVG para evitar dependencias) -->
     <svg style="display: none;">
@@ -108,7 +117,7 @@
                 
                 <h2 id="current-category-title" class="text-xl font-bold text-gray-700 mb-4"></h2>
                 <div id="models-container" class="grid grid-cols-2 gap-4">
-                    <!-- Los 5 modelos se inyectarán aquí por JS -->
+                    <!-- Los modelos se inyectarán aquí por JS -->
                 </div>
             </div>
             
@@ -142,7 +151,7 @@
                     <!-- Selector de Colores (Este grupo se oculta si no hay colores) -->
                     <div id="color-selector-group">
                         <label class="block text-sm font-semibold text-gray-700 mb-2">Color</label>
-                        <select id="selected-color" required
+                        <select id="selected-color" required onchange="updateDetailOptions()"
                                 class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-white">
                             <!-- Colores se inyectarán aquí -->
                         </select>
@@ -157,7 +166,7 @@
 
                     <!-- Botón de Añadir al Carrito -->
                     <button type="submit" id="add-to-cart-btn" disabled
-                            class="w-full p-4 mt-6 rounded-xl text-white font-bold text-lg flex items-center justify-center space-x-2 transition duration-300 bg-blue-600 hover:bg-blue-700 opacity-50 disabled:cursor-not-allowed">
+                            class="w-full p-4 mt-6 rounded-xl text-white font-bold text-lg flex items-center justify-center space-x-2 transition duration-300 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed">
                         Añadir al Carrito
                     </button>
                     <p id="validation-message" class="text-center text-red-500 text-sm hidden">Selecciona Color para añadir al carrito.</p>
@@ -196,8 +205,8 @@
 
                 <!-- Botón Final de WhatsApp -->
                 <button id="whatsapp-order-btn" onclick="sendWhatsAppOrder()" disabled
-                        class="whatsapp-btn w-full p-4 mt-6 rounded-xl text-white font-bold text-lg flex items-center justify-center space-x-2 transition duration-300 opacity-50 disabled:opacity-50 disabled:cursor-not-allowed">
-                    <svg class="w-6 h-6" aria-hidden="true"><use xlink:href="#icon-whatsapp"></use></use></svg>
+                        class="whatsapp-btn w-full p-4 mt-6 rounded-xl text-white font-bold text-lg flex items-center justify-center space-x-2 transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed">
+                    <svg class="w-6 h-6" aria-hidden="true"><use xlink:href="#icon-whatsapp"></use></svg>
                     <span>CONFIRMAR PEDIDO POR WHATSAPP</span>
                 </button>
             </div>
@@ -293,7 +302,6 @@
         // Genera modelos placeholder, ajustando la cantidad de Enterizos
         const CATALOG_DATA_MODELS = BASE_CATEGORY_NAMES.reduce((acc, cat) => {
             const isEnterizo = cat === "Enterizos";
-            // Si es Enterizos, usa la longitud de la lista completa (33)
             const count = isEnterizo ? ENTERIZO_IMAGES.length : 5; 
 
             acc[cat] = Array.from({ length: count }, (_, i) => {
@@ -310,18 +318,15 @@
                 };
 
                 if (isEnterizo) {
-                    // Modelos de Enterizos (un solo color, una sola foto)
                     const enterizoId = i + 1;
                     modelData.id = `ENT-${enterizoId}`;
                     modelData.name = `Enterizo Seamless E${enterizoId}`;
-                    // Un precio base para los nuevos modelos (se mantiene el esquema de precios anterior)
                     modelData.price = (299.00 + (i * 5)).toFixed(2); 
-                    
-                    // Usar la URL de la lista de ENTERIZO_IMAGES.
                     const imageUrl = ENTERIZO_IMAGES[i] || modelData.image; 
                     modelData.image = imageUrl; 
-                    modelData.gallery = [imageUrl]; // Unica foto como galería
-                    modelData.colors = []; // Sin opciones de color
+                    modelData.gallery = [imageUrl];
+                    // **CAMBIO AÑADIDO:** Agregar una lista de colores a todos los enterizos.
+                    modelData.colors = ["Negro", "Gris Oxford", "Azul Marino", "Vino", "Verde Militar", "Rosa Palo", "Beige (Nude)", "Lila"];
                 } else if (isConjunto1) {
                     modelData.name = "Conjunto Deportivo V1 (Seamless)";
                     modelData.price = '150.00'; 
@@ -365,7 +370,7 @@
         // Detalle del producto
         const form = document.getElementById('order-form');
         const colorSelect = document.getElementById('selected-color');
-        const colorSelectorGroup = document.getElementById('color-selector-group'); // Nuevo ID
+        const colorSelectorGroup = document.getElementById('color-selector-group'); 
         const quantityInput = document.getElementById('selected-quantity');
         const detailImage = document.getElementById('detail-main-image');
         const detailModelName = document.getElementById('detail-model-name');
@@ -432,11 +437,9 @@
                     });
 
                     if (!response.ok) {
-                        // Si es un error 429 (Too Many Requests) o 500/503, reintenta
                         if (response.status === 429 || response.status >= 500) {
                             throw new Error(`API Error: ${response.statusText}`, { status: response.status });
                         }
-                        // Otros errores (400, 403, etc.) se lanzan sin reintentar
                         const errorBody = await response.json();
                         throw new Error(`API Request Failed: ${JSON.stringify(errorBody)}`);
                     }
@@ -450,20 +453,17 @@
                     return text;
 
                 } catch (error) {
-                    // console.error(`Intento ${i + 1} fallido:`, error);
                     if (i < maxRetries - 1) {
-                        // console.log(`Reintentando en ${delay / 1000}s...`);
                         await new Promise(resolve => setTimeout(resolve, delay));
-                        delay *= 2; // Duplicar el retraso
+                        delay *= 2;
                     } else {
-                        // Último intento fallido
                         throw new Error('No se pudo obtener la respuesta del Asistente (Gemini API agotó los reintentos).');
                     }
                 }
             }
         }
 
-        // --- FUNCIONES LLM DE OUTFIT (Mantenida) ---
+        // --- FUNCIONES LLM DE OUTFIT ---
 
         async function getOutfitIdeas() {
             if (cart.length === 0) return;
@@ -473,7 +473,6 @@
             outfitIdeasBtn.disabled = true;
             outfitLoading.classList.remove('hidden');
 
-            // Formatear el carrito para el prompt
             const cartItems = cart.map(item => 
                 `${item.quantity}x ${item.name} (Color: ${item.color}, Categoría: ${item.category})`
             ).join('; ');
@@ -491,7 +490,6 @@
                 const text = await fetchGemini(payload);
                 outfitIdeasOutput.innerHTML = `<div class="llm-output">${text}</div>`;
             } catch (error) {
-                // console.error(error);
                 outfitIdeasOutput.innerHTML = `<div class="llm-output text-red-700">❌ Error al generar ideas de outfit: ${error.message}</div>`;
                 showToast('Error al conectar con el Estilista (Gemini API).', 'error');
             } finally {
@@ -505,327 +503,213 @@
         // --- FUNCIONES DE NAVEGACIÓN ---
 
         function updateView(viewId) {
-            categoryView.classList.add('hidden');
-            productListView.classList.add('hidden');
-            productDetailView.classList.add('hidden');
-            cartView.classList.add('hidden');
-            
-            if (viewId === 'category-view') {
-                categoryView.classList.remove('hidden');
-            } else if (viewId === 'product-list-view') {
-                productListView.classList.remove('hidden');
-            } else if (viewId === 'product-detail-view') {
-                productDetailView.classList.remove('hidden');
-            } else if (viewId === 'cart-view') {
-                cartView.classList.remove('hidden');
-            }
+            ['category-view', 'product-list-view', 'product-detail-view', 'cart-view'].forEach(id => {
+                document.getElementById(id).classList.add('hidden');
+            });
+            document.getElementById(viewId).classList.remove('hidden');
         }
         
-        /**
-         * Vuelve a la vista de categorías (Home).
-         */
         function goBackToCategories() {
             currentCategory = null;
             currentModel = null;
             updateView('category-view');
         }
 
-        /**
-         * Vuelve a la vista de la lista de productos de la categoría actual.
-         */
         function goBackToProducts() {
             currentModel = null;
             if (currentCategory) {
                  renderProductList(currentCategory);
             } else {
-                // Si por alguna razón no hay categoría, vuelve a categorías
                 goBackToCategories(); 
             }
         }
         
         function renderCartView() {
-            // Ocultar resultados LLM al entrar al carrito
             outfitIdeasOutput.classList.add('hidden');
-            outfitIdeasOutput.innerHTML = '';
-            
-            renderCartItems();
+            outfitIdeasOutput.innerHTML = ''; 
+
             updateView('cart-view');
-        }
 
-        // --- RENDERIZADO DE CATEGORÍAS ---
-
-        function renderCategories() {
-            categoriesContainer.innerHTML = '';
-            
-            const allCategories = ["Todas", ...BASE_CATEGORY_NAMES];
-
-            allCategories.forEach(category => {
-                const button = document.createElement('div');
-                button.className = 'w-full p-4 bg-gray-50 rounded-xl shadow-md transition duration-200 hover:bg-blue-50 hover:shadow-lg cursor-pointer text-center';
-                button.innerHTML = `<span class="text-lg font-semibold text-gray-700">${category}</span>`;
-                button.onclick = () => renderProductList(category);
-                categoriesContainer.appendChild(button);
-            });
-            updateView('category-view');
-        }
-
-        // --- RENDERIZADO DE LISTA DE PRODUCTOS ---
-
-        function renderProductList(category) {
-            currentCategory = category;
-            categoryTitle.textContent = category;
-            modelsContainer.innerHTML = '';
-
-            const modelsToDisplay = category === "Todas" 
-                ? ALL_MODELS
-                : CATALOG_DATA_MODELS[category];
-
-            if (!modelsToDisplay || modelsToDisplay.length === 0) {
-                 modelsContainer.innerHTML = '<p class="text-center text-gray-500 col-span-2 p-8 border rounded-lg">No hay modelos disponibles en esta categoría.</p>';
-            }
-
-            modelsToDisplay.forEach(model => {
-                const productCard = document.createElement('div');
-                productCard.className = 'bg-white rounded-xl shadow-lg border border-gray-100 p-2 overflow-hidden cursor-pointer hover:shadow-xl transition duration-300';
-                
-                const colorInfo = model.colors && model.colors.length > 0 
-                    ? `Colores: ${model.colors.length}` 
-                    : 'Color Único';
-
-                // Usamos el placeholder negro si la imagen principal falla
-                productCard.innerHTML = `
-                    <img src="${model.image}" alt="${model.name}" onerror="this.onerror=null; this.src='https://placehold.co/300x400/000000/ffffff?text=No+Photo';" class="w-full h-48 object-cover rounded-lg mb-2 transform hover:scale-105 transition duration-300">
-                    <h3 class="font-semibold text-gray-800 text-sm truncate">${model.name}</h3>
-                    <p class="text-xs text-gray-500">${colorInfo}</p>
-                    <p class="text-lg font-bold text-blue-600 mt-1">$${model.price} MXN</p>
-                    <button class="w-full mt-2 text-xs py-1.5 bg-blue-50 text-blue-600 rounded-md font-medium">Ver Modelo</button>
-                `;
-                productCard.onclick = () => renderProductDetail(category, model);
-                modelsContainer.appendChild(productCard);
-            });
-
-            updateView('product-list-view');
-        }
-
-        // --- RENDERIZADO DEL DETALLE DEL PRODUCTO ---
-
-        function renderProductDetail(category, model) {
-            currentModel = model;
-            
-            // 1. Actualizar información del modelo
-            detailModelName.textContent = model.name;
-            detailCategoryName.textContent = `Categoría: ${category === "Todas" ? 'Varios' : category}`;
-            detailPrice.textContent = `$${model.price} MXN`;
-            
-            // 2. Renderizar Galería (Miniaturas y Principal)
-            detailThumbnails.innerHTML = '';
-            
-            const images = model.gallery;
-
-            // Establece la primera imagen como principal. Usa placeholder negro en error.
-            detailImage.src = images[0]; 
-            detailImage.onerror = function() { this.onerror=null; this.src='https://placehold.co/400x500/000000/ffffff?text=Error+Loading+Image'; };
-
-            // Renderizar miniaturas solo si hay más de una imagen.
-            if (images.length > 1) {
-                detailThumbnails.classList.remove('hidden');
-                images.forEach((imgUrl, index) => {
-                    const thumbnail = document.createElement('img');
-                    thumbnail.src = imgUrl;
-                    thumbnail.alt = `Foto ${index + 1} de ${model.name}`;
-                    thumbnail.className = `w-full h-auto object-cover rounded-lg opacity-80 hover:opacity-100 cursor-pointer border-2 border-transparent transition duration-150`;
-                    
-                    if (index === 0) {
-                        thumbnail.classList.add('thumbnail-active'); // Marca la primera como activa
-                    }
-
-                    thumbnail.onclick = () => {
-                        // Cambiar la imagen principal
-                        detailImage.src = imgUrl;
-                        detailImage.onerror = function() { this.onerror=null; this.src='https://placehold.co/400x500/000000/ffffff?text=Error+Loading+Image'; }; // Placeholder negro en error
-                        // Actualizar estado activo de la miniatura
-                        document.querySelectorAll('#detail-thumbnails img').forEach(t => t.classList.remove('thumbnail-active'));
-                        thumbnail.classList.add('thumbnail-active');
-                    };
-                    detailThumbnails.appendChild(thumbnail);
-                });
-            } else {
-                detailThumbnails.classList.add('hidden');
-            }
-            
-            // 3. Manejar Colores y Formulario
-            const requiresColor = model.colors && model.colors.length > 0;
-            
-            if (requiresColor) {
-                // Mostrar selector de color
-                colorSelectorGroup.classList.remove('hidden');
-                validationMessage.textContent = 'Selecciona Color para añadir al carrito.';
-                
-                colorSelect.innerHTML = '<option value="" disabled selected>-- Elige un color --</option>';
-                model.colors.forEach(color => {
-                    const option = document.createElement('option');
-                    option.value = color;
-                    option.textContent = color;
-                    colorSelect.appendChild(option);
-                });
-                selectedColor = null; // Reiniciar
-            } else {
-                // Ocultar selector de color y usar un valor predeterminado
-                colorSelectorGroup.classList.add('hidden');
-                validationMessage.textContent = 'Añade la cantidad para confirmar.';
-                selectedColor = "Modelo Único"; // Valor de color por defecto para el carrito
-            }
-            
-            // 4. Resetear cantidad y estado del botón
-            quantityInput.value = 1;
-            checkFormValidity();
-
-            updateView('product-detail-view');
-        }
-
-        // --- LÓGICA DEL CARRITO ---
-
-        colorSelect.addEventListener('change', (e) => {
-            // Solo se ejecuta si el selector de color está visible
-            selectedColor = e.target.value;
-            checkFormValidity();
-        });
-
-        // Habilitar/Deshabilitar botón de Añadir al Carrito
-        function checkFormValidity() {
-            if (!currentModel) return;
-
-            const requiresColor = currentModel.colors && currentModel.colors.length > 0;
-            let isValid = true;
-            
-            if (requiresColor) {
-                // Si el color es requerido, es válido si se ha seleccionado algo diferente a null
-                isValid = !!selectedColor; 
-            } else {
-                // Si el color NO es requerido (como Enterizos), es válido por defecto
-                isValid = true;
-            }
-
-            if (isValid) {
-                addToCartBtn.disabled = false;
-                addToCartBtn.classList.remove('opacity-50');
-                validationMessage.classList.add('hidden');
-            } else {
-                addToCartBtn.disabled = true;
-                addToCartBtn.classList.add('opacity-50');
-                validationMessage.classList.remove('hidden');
-            }
-        }
-        
-        // Listener para añadir al carrito
-        form.addEventListener('submit', (e) => {
-            e.preventDefault();
-            
-            if (!currentModel || !checkFormValidity()) return;
-            
-            const requiresColor = currentModel.colors && currentModel.colors.length > 0;
-            const finalColor = requiresColor ? selectedColor : "Modelo Único";
-            
-            const quantity = parseInt(quantityInput.value);
-            
-            const newItem = {
-                // Generar un ID único para el item del carrito
-                cartId: Date.now() + Math.random(), 
-                id: currentModel.id,
-                name: currentModel.name,
-                category: detailCategoryName.textContent.replace('Categoría: ', ''),
-                price: parseFloat(currentModel.price),
-                color: finalColor, // Usar el color final
-                quantity: quantity,
-                image: currentModel.image // Guardar la URL de la imagen principal para el carrito
-            };
-            
-            cart.push(newItem);
-            
-            // Resetear y volver a la vista de productos con un mensaje de éxito
-            form.reset();
-            currentModel = null;
-            selectedColor = null; // Asegurar que se reinicie
-            updateCartCount();
-            
-            // Mostrar mensaje temporal de éxito (toast)
-            showToast(`✅ ¡${newItem.quantity}x ${newItem.name} añadido al carrito!`, 'success');
-            
-            setTimeout(() => {
-                renderProductList(currentCategory); // Volver a la lista después de añadir
-            }, 1000); 
-        });
-
-        function updateCartCount() {
-            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-            cartCountSpan.textContent = totalItems;
-
-            if (totalItems > 0) {
-                cartCountSpan.classList.remove('hidden');
-                whatsappOrderBtn.disabled = false;
-                whatsappOrderBtn.classList.remove('opacity-50');
-                outfitIdeasBtn.disabled = false; // Habilitar botón de ideas de outfit
-            } else {
-                cartCountSpan.classList.add('hidden');
-                whatsappOrderBtn.disabled = true;
-                whatsappOrderBtn.classList.add('opacity-50');
-                outfitIdeasBtn.disabled = true; // Deshabilitar botón de ideas de outfit
-            }
-        }
-        
-        // --- RENDERIZADO DE ITEMS DEL CARRITO ---
-        
-        function removeItemFromCart(cartId) {
-            cart = cart.filter(item => item.cartId !== cartId);
-            renderCartItems();
-            updateCartCount();
-            // Ocultar LLM output al cambiar el carrito
-            outfitIdeasOutput.classList.add('hidden');
-            outfitIdeasOutput.innerHTML = '';
-        }
-
-        function renderCartItems() {
             cartItemsContainer.innerHTML = '';
             let totalItems = 0;
-            
-            if (cart.length === 0) {
-                cartItemsContainer.innerHTML = '<p class="text-center text-gray-500 p-8 border rounded-lg">El carrito está vacío. ¡Añade algunos modelos!</p>';
-            } else {
-                cart.forEach(item => {
-                    totalItems += item.quantity;
-                    const itemTotal = (item.price * item.quantity).toFixed(2);
 
-                    const cartItemDiv = document.createElement('div');
-                    cartItemDiv.className = 'flex items-center space-x-3 p-3 bg-gray-50 rounded-lg shadow-sm border border-gray-200';
-                    cartItemDiv.innerHTML = `
-                        <img src="${item.image}" 
-                             alt="${item.name}" 
-                             onerror="this.onerror=null; this.src='https://placehold.co/80x80/94a3b8/ffffff?text=Item';"
-                             class="w-16 h-16 object-cover rounded-md flex-shrink-0">
-                        <div class="flex-grow">
-                            <p class="font-bold text-gray-800">${item.name}</p>
-                            <p class="text-sm text-gray-600">Color: ${item.color} | Cantidad: ${item.quantity}</p>
-                            <p class="text-md font-semibold text-blue-600">$${itemTotal} MXN</p>
+            if (cart.length === 0) {
+                cartItemsContainer.innerHTML = '<p class="text-center text-gray-500 py-8">Tu carrito está vacío. ¡Añade tu primera prenda Seamless!</p>';
+                whatsappOrderBtn.disabled = true;
+                outfitIdeasBtn.disabled = true;
+            } else {
+                cart.forEach((item, index) => {
+                    totalItems += item.quantity;
+                    const itemTotal = item.price * item.quantity;
+
+                    const itemHtml = `
+                        <div class="flex items-start p-3 border rounded-xl shadow-sm bg-gray-50 space-x-3">
+                            <img src="${item.image}" onerror="this.onerror=null;this.src='https://placehold.co/60x80/cccccc/333333?text=N/A';" class="w-16 h-20 object-cover rounded-lg shadow-md flex-shrink-0" alt="${item.name}">
+                            <div class="flex-grow">
+                                <p class="text-sm font-bold text-gray-800">${item.name}</p>
+                                <p class="text-xs text-gray-500">Color: ${item.color}</p>
+                                <p class="text-sm font-semibold text-blue-600 mt-1">$${itemTotal.toFixed(2)} MXN</p>
+                            </div>
+                            <div class="flex flex-col items-end justify-between h-20">
+                                <button onclick="removeFromCart(${index})" class="text-red-500 hover:text-red-700 transition duration-150 p-1 rounded-full bg-white flex-shrink-0">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
+                                </button>
+                                <div class="flex items-center space-x-2 bg-white border rounded-full p-1">
+                                    <button onclick="updateCartItemQuantity(${index}, -1)" class="w-6 h-6 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-lg font-bold">-</button>
+                                    <span class="font-semibold text-sm w-5 text-center">${item.quantity}</span>
+                                    <button onclick="updateCartItemQuantity(${index}, 1)" class="w-6 h-6 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-lg font-bold">+</button>
+                                </div>
+                            </div>
                         </div>
-                        <button onclick="removeItemFromCart(${item.cartId})" 
-                                class="text-red-500 hover:text-red-700 font-semibold text-sm flex-shrink-0 p-1">
-                            Eliminar
-                        </button>
                     `;
-                    cartItemsContainer.appendChild(cartItemDiv);
+                    cartItemsContainer.insertAdjacentHTML('beforeend', itemHtml);
                 });
+                whatsappOrderBtn.disabled = false;
+                outfitIdeasBtn.disabled = false;
             }
 
             cartTotalItems.textContent = totalItems;
             updateCartCount();
         }
-        
-        // --- FUNCIÓN DE WHATSAPP FINAL ---
-        
-        function sendWhatsAppOrder() {
-            if (cart.length === 0) return;
 
-            let orderSummary = "¡Hola! Me gustaría hacer un pedido de los siguientes modelos Seamless:\n\n";
+        // --- FUNCIONES DE PERSISTENCIA DEL CARRITO ---
+        
+        function saveCart() {
+            try {
+                localStorage.setItem('seamlessUserCart', JSON.stringify(cart));
+            } catch (e) {
+                console.error("No se pudo guardar el carrito en localStorage:", e);
+            }
+        }
+        
+        function loadCart() {
+            try {
+                const savedCart = localStorage.getItem('seamlessUserCart');
+                if (savedCart) {
+                    cart = JSON.parse(savedCart);
+                }
+            } catch (e) {
+                console.error("No se pudo cargar el carrito desde localStorage:", e);
+                cart = [];
+            }
+        }
+
+
+        // --- FUNCIONES DEL CARRITO Y DETALLE ---
+        
+        function updateCartCount() {
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            cartCountSpan.textContent = totalItems;
+            if (totalItems > 0) {
+                cartCountSpan.classList.remove('hidden');
+                cartCountSpan.classList.add('cart-pop');
+                setTimeout(() => cartCountSpan.classList.remove('cart-pop'), 300);
+            } else {
+                cartCountSpan.classList.add('hidden');
+            }
+        }
+        
+        function removeFromCart(index) {
+            const removedItemName = cart[index].name;
+            cart.splice(index, 1);
+            saveCart();
+            showToast(`✅ Eliminado: ${removedItemName}`, 'success');
+            renderCartView();
+        }
+
+        function updateCartItemQuantity(index, change) {
+            if (cart[index]) {
+                cart[index].quantity += change;
+                if (cart[index].quantity <= 0) {
+                    removeFromCart(index);
+                } else {
+                    saveCart();
+                    renderCartView();
+                }
+            }
+        }
+        
+        function changeMainImage(imageUrl, thumbnailElement) {
+            detailImage.src = imageUrl;
+            document.querySelectorAll('#detail-thumbnails img').forEach(img => {
+                img.classList.remove('thumbnail-active', 'opacity-100');
+                img.classList.add('opacity-70');
+            });
+            thumbnailElement.classList.add('thumbnail-active', 'opacity-100');
+            thumbnailElement.classList.remove('opacity-70');
+        }
+
+        function updateDetailOptions() {
+            if (!currentModel) return;
+            
+            if (currentModel.colors.length === 0) {
+                addToCartBtn.disabled = false;
+                addToCartBtn.classList.remove('disabled:opacity-50', 'disabled:cursor-not-allowed');
+                validationMessage.classList.add('hidden');
+                selectedColor = "Modelo Único (N/A)";
+            } else {
+                selectedColor = colorSelect.value;
+                const isValid = selectedColor && selectedColor !== 'placeholder';
+                addToCartBtn.disabled = !isValid;
+                
+                if (isValid) {
+                    addToCartBtn.classList.remove('disabled:opacity-50', 'disabled:cursor-not-allowed');
+                    validationMessage.classList.add('hidden');
+                } else {
+                    addToCartBtn.classList.add('disabled:opacity-50', 'disabled:cursor-not-allowed');
+                    validationMessage.classList.remove('hidden');
+                }
+            }
+        }
+
+        function addToCart(event) {
+            event.preventDefault();
+
+            if (!currentModel) return;
+            if (currentModel.colors.length > 0 && (!selectedColor || selectedColor === 'placeholder')) {
+                showToast('Por favor, selecciona un color.', 'error');
+                return;
+            }
+
+            const quantity = parseInt(quantityInput.value, 10);
+            if (quantity < 1 || isNaN(quantity)) {
+                showToast('La cantidad debe ser 1 o más.', 'error');
+                return;
+            }
+            
+            const color = selectedColor || 'N/A';
+
+            const existingItemIndex = cart.findIndex(item => item.id === currentModel.id && item.color === color);
+
+            if (existingItemIndex > -1) {
+                cart[existingItemIndex].quantity += quantity;
+                showToast(`✅ Cantidad actualizada: ${currentModel.name}`, 'success');
+            } else {
+                const itemToAdd = {
+                    id: currentModel.id,
+                    name: currentModel.name,
+                    category: currentCategory,
+                    color: color,
+                    price: parseFloat(currentModel.price),
+                    quantity: quantity,
+                    image: currentModel.image
+                };
+                cart.push(itemToAdd);
+                showToast(`✅ Añadido: ${currentModel.name}`, 'success');
+            }
+            
+            saveCart();
+            updateCartCount();
+            goBackToProducts();
+        }
+
+        function sendWhatsAppOrder() {
+            if (cart.length === 0) {
+                showToast('El carrito está vacío. Añade artículos antes de ordenar.', 'error');
+                return;
+            }
+            
+            let orderSummary = `¡Hola! Me gustaría hacer un pedido del Catálogo Seamless:\n\n*RESUMEN DEL PEDIDO*\n\n`;
             let grandTotal = 0;
             let totalItems = 0;
 
@@ -834,33 +718,131 @@
                 grandTotal += itemTotal;
                 totalItems += item.quantity;
                 
-                orderSummary += `*${index + 1}. ${item.name}*\n`;
+                orderSummary += `*${index + 1}. ${item.name}* (ID: ${item.id})\n`;
                 orderSummary += `   - Categoría: ${item.category}\n`;
                 orderSummary += `   - Color: ${item.color}\n`;
                 orderSummary += `   - Cantidad: ${item.quantity} unidades\n`;
-                orderSummary += `   - Precio Unitario: $${item.price} MXN\n`;
+                orderSummary += `   - Precio Unitario: $${item.price.toFixed(2)} MXN\n`;
                 orderSummary += `   - Subtotal: $${itemTotal.toFixed(2)} MXN\n\n`;
             });
 
             orderSummary += "--------------------------------------\n";
             orderSummary += `*TOTAL DE ARTÍCULOS:* ${totalItems}\n`;
             orderSummary += `*GRAN TOTAL ESTIMADO:* $${grandTotal.toFixed(2)} MXN\n\n`;
-            orderSummary += "Por favor, confirmen disponibilidad y costo total. ¡Gracias!";
+            orderSummary += "Por favor, confirmen disponibilidad, talla y costo total. ¡Gracias!";
 
 
-            // Codificar el mensaje para la URL
             const encodedMessage = encodeURIComponent(orderSummary);
-            
-            // Generar el enlace de WhatsApp
             const whatsappLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodedMessage}`;
-
-            // Redirigir al usuario
             window.open(whatsappLink, '_blank');
         }
 
+
+        // --- FUNCIONES DE RENDERIZADO DEL CATÁLOGO ---
+
+        function renderCategories() {
+            updateView('category-view');
+            categoriesContainer.innerHTML = '';
+            
+            BASE_CATEGORY_NAMES.forEach(category => {
+                const modelsCount = CATALOG_DATA_MODELS[category]?.length || 0;
+                const cardHtml = `
+                    <div onclick="renderProductList('${category}')"
+                        class="p-5 bg-white rounded-xl shadow-md hover:shadow-lg transition duration-300 cursor-pointer border border-gray-100 transform hover:scale-[1.02]">
+                        <h3 class="text-lg font-bold text-gray-800">${category}</h3>
+                        <p class="text-sm text-gray-500 mt-1">${modelsCount} modelos</p>
+                    </div>
+                `;
+                categoriesContainer.insertAdjacentHTML('beforeend', cardHtml);
+            });
+        }
+        
+        function renderProductList(categoryName) {
+            currentCategory = categoryName;
+            updateView('product-list-view');
+            categoryTitle.textContent = categoryName.toUpperCase();
+            modelsContainer.innerHTML = '';
+            
+            const models = CATALOG_DATA_MODELS[categoryName] || [];
+            
+            models.forEach(model => {
+                const cardHtml = `
+                    <div onclick="renderProductDetail('${model.id}')"
+                        class="bg-white rounded-xl shadow-md hover:shadow-lg transition duration-300 cursor-pointer overflow-hidden border border-gray-100">
+                        <img src="${model.image}" onerror="this.onerror=null;this.src='https://placehold.co/300x400/cccccc/333333?text=${model.id}';"
+                             alt="${model.name}" class="w-full h-48 object-cover object-center">
+                        <div class="p-3">
+                            <p class="text-sm font-semibold text-gray-800 truncate">${model.name}</p>
+                            <p class="text-lg font-extrabold text-blue-600 mt-1">$${model.price} MXN</p>
+                        </div>
+                    </div>
+                `;
+                modelsContainer.insertAdjacentHTML('beforeend', cardHtml);
+            });
+        }
+
+        function renderProductDetail(modelId) {
+            currentModel = ALL_MODELS.find(m => m.id === modelId);
+
+            if (!currentModel) {
+                showToast('Modelo no encontrado.', 'error');
+                return;
+            }
+
+            updateView('product-detail-view');
+
+            detailModelName.textContent = currentModel.name;
+            detailCategoryName.textContent = currentCategory; 
+            detailPrice.textContent = `$${parseFloat(currentModel.price).toFixed(2)} MXN`;
+            quantityInput.value = 1;
+
+            renderGallery(currentModel);
+
+            colorSelect.innerHTML = '';
+            if (currentModel.colors && currentModel.colors.length > 0) {
+                colorSelectorGroup.classList.remove('hidden');
+                colorSelect.insertAdjacentHTML('beforeend', '<option value="placeholder" disabled selected>-- Selecciona un Color --</option>');
+                currentModel.colors.forEach(color => {
+                    colorSelect.insertAdjacentHTML('beforeend', `<option value="${color}">${color}</option>`);
+                });
+            } else {
+                colorSelectorGroup.classList.add('hidden');
+            }
+            
+            updateDetailOptions();
+        }
+
+        function renderGallery(model) {
+            detailThumbnails.innerHTML = '';
+            if (model.gallery && model.gallery.length > 0) {
+                detailImage.src = model.gallery[0];
+                
+                model.gallery.forEach((url, index) => {
+                    const isFirst = index === 0;
+                    const thumbnailHtml = `
+                        <img src="${url}" onclick="changeMainImage('${url}', this)"
+                            class="w-full h-16 object-cover rounded-md cursor-pointer transition ${isFirst ? 'thumbnail-active opacity-100' : 'opacity-70'}"
+                            alt="Miniatura ${index + 1}"
+                            onerror="this.onerror=null;this.src='https://placehold.co/100x100/333333/ffffff?text=X';"
+                        >
+                    `;
+                    detailThumbnails.insertAdjacentHTML('beforeend', thumbnailHtml);
+                });
+            }
+        }
+
+
         // --- INICIALIZACIÓN ---
-        window.onload = renderCategories;
+        
+        form.addEventListener('submit', addToCart);
+
+        window.onload = () => {
+            loadCart();
+            updateCartCount();
+            renderCategories();
+        };
 
     </script>
 </body>
 </html>
+
