@@ -5,17 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Catálogo de Ropa Seamless | Venta WhatsApp</title>
 
-    <!-- METADATOS DE OPEN GRAPH PARA REDES SOCIALES (CRÍTICO PARA COMPARTIR) -->
     <meta property="og:title" content="Catálogo Oficial Miss Rouss | Ropa Seamless de Tendencia">
     <meta property="og:description" content="Explora nuestra colección exclusiva de ropa deportiva y casual Seamless de alta calidad. ¡Pide tu look favorito directamente por WhatsApp!">
     <meta property="og:image" content="https://raw.githubusercontent.com/jesusvn1993mplvt3-ai/miss_rouss/refs/heads/main/MISSROUSS.jpg">
     <meta property="og:url" content="https://tu.tienda/">
     <meta property="og:type" content="website">
-    <!-- FIN METADATOS DE OPEN GRAPH -->
-    
-    <!-- Carga de Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Configuración de la fuente Inter -->
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
         body {
@@ -60,7 +55,6 @@
             transform: scale(1.05);
         }
     </style>
-    <!-- Iconos (Inline SVG para evitar dependencias) -->
     <svg style="display: none;">
         <symbol id="icon-whatsapp" viewBox="0 0 24 24">
             <path fill="currentColor" d="M12.03 2.05c-5.46 0-9.92 4.46-9.92 9.92 0 1.94.57 3.8.31 5.43l-.42 2.74c-.07.45.36.8.81.74l3.18-.52c1.78.29 3.63.43 5.9.43 5.46 0 9.92-4.46 9.92-9.92.01-5.46-4.46-9.92-9.93-9.92zm3.32 12.87c-.07.13-.25.21-.49.21-.24 0-.44-.09-.64-.17-.46-.19-1.28-.52-2.17-1.34-.89-.83-1.48-1.92-1.66-2.31-.07-.15-.15-.22-.22-.36-.08-.14-.07-.33.02-.45.09-.13.25-.13.37-.13.12 0 .26.01.37.01.21 0 .28.05.4.31.11.23.38.93.42 1.01.04.09.07.18.01.29-.07.11-.13.17-.25.32-.1.14-.19.23-.29.35-.1.1-.19.23-.07.43.12.2.35.59.82.98.47.4.92.57 1.13.68.21.11.33.09.43.06.1-.03.22-.11.34-.19.12-.08.24-.13.38-.17.13-.04.28.01.38.15.1.14.1.4.01.52z"/>
@@ -71,71 +65,50 @@
     </svg>
 </head>
 <body class="antialiased flex flex-col items-center bg-gray-100">
-    <!-- IMAGEN DE ENCABEZADO -->
     <div class="w-full max-w-xl p-4 pt-6 pb-2">
         <img src="https://raw.githubusercontent.com/jesusvn1993mplvt3-ai/rosasandoval/main/Miss%20rouss.jpg" alt="Logo de la marca Seamless" class="w-full h-auto object-contain rounded-xl shadow-lg border border-gray-300 mx-auto">
     </div>
-    <!-- FIN IMAGEN -->
-
-    <!-- Contenedor Principal de la App -->
     <div id="app" class="min-h-screen w-full max-w-xl mx-auto shadow-2xl bg-white">
         
-        <!-- Header Fijo (Solo Título y Carrito) -->
         <header class="p-4 bg-white border-b border-gray-200 sticky top-0 z-10 shadow-md flex justify-between items-center">
             <h1 class="text-2xl font-extrabold text-gray-800 text-center flex-grow">CATÁLOGO</h1>
-            <!-- Botón y Contador del Carrito -->
             <button id="cart-button" onclick="renderCartView()" class="relative rounded-full hover:opacity-90 transition-opacity duration-150 p-1">
                 <span id="cart-icon-container" class="text-3xl">🛒</span>
                 <span id="cart-count" class="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full hidden">0</span>
             </button>
         </header>
 
-        <!-- Vistas -->
         <main class="p-4">
             
-            <!-- 1. Vista de Categorías -->
             <div id="category-view" class="space-y-3">
                 <p class="text-gray-600 mb-4 text-center text-sm">Selecciona una categoría para ver los modelos disponibles.</p>
-                <!-- Las categorías se inyectarán aquí por JS -->
-            </div>
+                </div>
 
-            <!-- 2. Vista de Modelos de la Categoría -->
             <div id="product-list-view" class="hidden">
-                <!-- Botón de Retroceso a Categorías -->
                 <button onclick="goBackToCategories()" class="back-nav-btn cursor-pointer">
                     <svg class="w-4 h-4 mr-1" aria-hidden="true"><use xlink:href="#icon-back"></use></svg> Volver a Categorías
                 </button>
                 <h2 id="current-category-title" class="text-xl font-bold text-gray-800 mb-4"></h2>
                 <div id="models-container" class="grid grid-cols-2 gap-4">
-                    <!-- Los modelos se inyectarán aquí por JS -->
-                </div>
+                    </div>
             </div>
 
-            <!-- 3. Vista de Detalle del Producto (Galería + Opciones) -->
             <div id="product-detail-view" class="hidden p-4 bg-white rounded-xl">
-                <!-- Botón de Retroceso a Lista de Productos -->
                 <button onclick="goBackToProducts()" class="back-nav-btn cursor-pointer">
                     <svg class="w-4 h-4 mr-1" aria-hidden="true"><use xlink:href="#icon-back"></use></svg> Volver a Modelos
                 </button>
 
-                <!-- Galería de Fotos -->
                 <div class="space-y-4 mb-6 p-2 rounded-xl border border-gray-200">
-                    <!-- Contenedor de la Imagen Principal y el Botón de Zoom -->
                     <div class="relative group">
-                        <!-- Imagen Principal -->
                         <img id="detail-main-image" src="" alt="Foto principal del modelo" class="w-full h-auto object-cover rounded-xl shadow-lg border-2 border-gray-200 cursor-pointer">
-                        <!-- Botón de Zoom (Overlay) -->
                         <button onclick="openZoomModal(event)" class="absolute bottom-3 right-3 p-2 bg-blue-600/80 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 shadow-xl flex items-center space-x-1 hover:bg-blue-700/90 focus:outline-none focus:ring-4 focus:ring-blue-300">
-                            <!-- Icono de lupa con + -->
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="8" y1="11" x2="14" y2="11"/><line x1="11" y1="8" x2="11" y2="14"/></svg>
                             <span class="text-xs font-semibold">Zoom</span>
                         </button>
                     </div>
 
-                    <!-- Miniaturas de la Galería -->
                     <div id="gallery-thumbnails" class="flex flex-row space-x-2 overflow-x-auto pb-1 justify-center">
-                        <!-- Las miniaturas se inyectarán aquí por JS -->
-                    </div>
+                        </div>
                 </div>
 
                 <div class="mb-6">
@@ -144,23 +117,18 @@
                     <p id="detail-price" class="text-3xl font-extrabold text-blue-600 mb-4">$X.XXX MXN</p>
                 </div>
 
-                <!-- Formulario de Opciones para el Carrito -->
                 <form id="order-form" class="space-y-4">
-                    <!-- Selector de Colores (Este grupo se oculta si no hay colores) -->
                     <div id="color-selector-group">
                         <label class="block text-sm font-semibold text-gray-700 mb-2">Color</label>
                         <select id="selected-color" required onchange="updateDetailOptions()" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900">
-                            <!-- Colores se inyectarán aquí -->
-                        </select>
+                            </select>
                     </div>
                     
-                    <!-- Cantidad -->
                     <div>
                         <label for="selected-quantity" class="block text-sm font-semibold text-gray-700 mb-2">Cantidad</label>
                         <input type="number" id="selected-quantity" value="1" min="1" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900">
                     </div>
                     
-                    <!-- Botón de Añadir al Carrito -->
                     <button type="submit" id="add-to-cart-btn" disabled class="w-full p-4 mt-6 rounded-xl text-white font-bold text-lg flex items-center justify-center space-x-2 transition duration-300 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed">
                         Añadir al Carrito
                     </button>
@@ -168,48 +136,39 @@
                 </form>
             </div>
 
-            <!-- 4. Vista del Carrito de Compras -->
             <div id="cart-view" class="hidden p-4 bg-white rounded-xl">
-                <!-- Botón de Retroceso a Lista de Productos -->
                 <button onclick="goBackToProducts()" class="back-nav-btn cursor-pointer">
                     <svg class="w-4 h-4 mr-1" aria-hidden="true"><use xlink:href="#icon-back"></use></svg> Seguir Comprando
                 </button>
                 <h2 class="text-2xl font-bold text-gray-800 mb-4">Tu Carrito de Compras</h2>
                 
                 <div id="cart-items-container" class="space-y-4 mb-6">
-                    <!-- Items del carrito se inyectarán aquí -->
-                </div>
+                    </div>
 
                 <div class="text-right text-xl font-semibold text-gray-700 border-t border-gray-300 pt-4">
                     Total de artículos: <span id="cart-total-items" class="text-blue-600">0</span>
                 </div>
                 
-                <!-- Botón Final de WhatsApp -->
                 <button id="whatsapp-order-btn" onclick="sendWhatsAppOrder()" disabled class="whatsapp-btn w-full p-4 mt-6 rounded-xl text-white font-bold text-lg flex items-center justify-center space-x-2 transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed">
                     <svg class="w-6 h-6" aria-hidden="true"><use xlink:href="#icon-whatsapp"></use></svg>
                     <span>CONFIRMAR PEDIDO POR WHATSAPP</span>
                 </button>
             </div>
 
-            <!-- Contenedor para mensajes de error (toast) -->
             <div id="toast-container" class="fixed bottom-4 right-4 z-50"></div>
 
         </main>
     </div>
 
-    <!-- 5. Modal de Zoom (Nueva Vista) -->
     <div id="zoom-modal" class="fixed inset-0 z-50 hidden bg-black bg-opacity-90 flex items-center justify-center p-4" onclick="closeZoomModal()">
         <div class="relative w-full h-full flex items-center justify-center" onclick="event.stopPropagation()">
-            <!-- Imagen Zoom -->
             <img id="zoomed-image" src="" alt="Imagen ampliada del modelo" class="max-w-full max-h-full object-contain rounded-lg shadow-2xl">
-            <!-- Botón de Cerrar -->
             <button onclick="closeZoomModal()" class="absolute top-4 right-4 p-2 bg-white/30 text-white rounded-full hover:bg-white/50 transition duration-200">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
             </button>
         </div>
     </div>
 
-    <!-- JavaScript del Catálogo -->
     <script>
         // --- DATA MOCKUP (Simulación de la Base de Datos Estática) ---
         const WHATSAPP_NUMBER = "+524451103626";
@@ -324,7 +283,27 @@
             "https://raw.githubusercontent.com/jesusvn1993mplvt3-ai/miss_rouss/refs/heads/main/fotos/Oversize/Fuerza%20Regida/FR3.jpg",
             "https://raw.githubusercontent.com/jesusvn1993mplvt3-ai/miss_rouss/refs/heads/main/fotos/Oversize/Fuerza%20Regida/FR4.jpg",
         ];
-
+        
+        // ******************************************************************
+        // ********* NUEVOS ARRAYS DE IMAGEN PARA LOS MODELOS DE CAMISETAS **********
+        // ******************************************************************
+        
+        // NOTA: Deja las matrices vacías si aún no tienes las URLs.
+        // La lógica de abajo usará el placeholder en su lugar.
+        
+        const PESO_PLUMA_IMAGES = [
+            "https://raw.githubusercontent.com/jesusvn1993mplvt3-ai/miss_rouss/refs/heads/main/fotos/Oversize/AlfredoO/AO1.jpg",
+            "https://raw.githubusercontent.com/jesusvn1993mplvt3-ai/miss_rouss/refs/heads/main/fotos/Oversize/AlfredoO/AO2.jpg",
+            "https://raw.githubusercontent.com/jesusvn1993mplvt3-ai/miss_rouss/refs/heads/main/fotos/Oversize/AlfredoO/AO3.jpg",
+            "https://raw.githubusercontent.com/jesusvn1993mplvt3-ai/miss_rouss/refs/heads/main/fotos/Oversize/AlfredoO/AO4.jpg",
+        ];
+        
+        const ALFREDO_OLIVAS_IMAGES = [
+            // "AQUÍ_VA_LA_URL_DE_ALFREDO_OLIVAS_IMAGEN_1.jpg",
+            // "AQUÍ_VA_LA_URL_DE_ALFREDO_OLIVAS_IMAGEN_2.jpg",
+        ];
+        
+        // ******************************************************************
 
         // Se mantiene la estructura de datos CATALOGO
         const CATALOG_DATA_MODELS = BASE_CATEGORY_NAMES.reduce((acc, cat) => {
@@ -334,28 +313,44 @@
                 const artistas = [
                     { name: "Junior H", id: "TUMB-JH" },
                     { name: "Peso Pluma", id: "TUMB-PP" },
-                    { name: "Fuerza Regida", id: "TUMB-FR" }, // <--- ID del modelo Fuerza Regida
+                    { name: "Fuerza Regida", id: "TUMB-FR" },
                     { name: "Alfredo Olivas", id: "TUMB-AO" } 
                 ];
 
+                // ******************************************************************
+                // *** COLORES COMUNES PARA CAMISETAS TUMBADAS (Junior H y F. Regida los usan) ***
+                // ******************************************************************
+                const TUMBADA_COLORS = ["Negro/Rojo", "Negro/Plata", "Negro/Dorado"]; 
+
                 acc[cat] = artistas.map(artista => {
                     const isJuniorH = artista.id === 'TUMB-JH';
-                    const isFuerzaRegida = artista.id === 'TUMB-FR'; // <--- Nueva bandera para Fuerza Regida
+                    const isFuerzaRegida = artista.id === 'TUMB-FR';
+                    const isPesoPluma = artista.id === 'TUMB-PP'; // NUEVA bandera
+                    const isAlfredoOlivas = artista.id === 'TUMB-AO'; // NUEVA bandera
+                    
                     const defaultImage = `https://placehold.co/300x400/3d3d3d/ffffff?text=${artista.name.replace(/\s/g, '+')}`;
                     
-                    // Lógica para los colores específicos: aplica para Junior H y Fuerza Regida
-                    const colors = isJuniorH || isFuerzaRegida
-                        ? ["Negro/Rojo", "Negro/Plata", "Negro/Dorado"] 
-                        : ["Negro", "Blanco", "Gris", "Vino", "Azul Marino"];
-                    
                     // Lógica para las imágenes de galería
-                    let modelImages = [defaultImage]; // Default is placeholder
+                    let modelImages = []; 
+                    
                     if (isJuniorH) {
                         modelImages = JUNIOR_H_IMAGES;
-                    } else if (isFuerzaRegida) { // <--- Asignación de imágenes de Fuerza Regida
+                    } else if (isFuerzaRegida) {
                         modelImages = FUERZA_REGIDA_IMAGES;
+                    } else if (isPesoPluma) { // *** ASIGNACIÓN DE IMÁGENES DE PESO PLUMA ***
+                        modelImages = PESO_PLUMA_IMAGES;
+                    } else if (isAlfredoOlivas) { // *** ASIGNACIÓN DE IMÁGENES DE ALFREDO OLIVAS ***
+                        modelImages = ALFREDO_OLIVAS_IMAGES;
+                    }
+                    
+                    // Asegura que si el array de imágenes está vacío, use el placeholder
+                    if (modelImages.length === 0) {
+                        modelImages.push(defaultImage);
                     }
 
+                    // *** LOS COLORES SIEMPRE SON TUMBADA_COLORS ***
+                    const colors = TUMBADA_COLORS;
+                    
                     return {
                         id: artista.id,
                         name: `Camiseta Tumbada - ${artista.name}`,
@@ -730,11 +725,9 @@
                 // Se modificó la estructura para que el nombre de la categoría esté SOBRE la imagen con fondo transparente.
                 const cardHtml = `
                     <div onclick="renderProductList('${category}')" class="bg-white rounded-xl shadow-lg hover:shadow-xl transition duration-300 cursor-pointer border border-gray-300 transform hover:scale-[1.02] overflow-hidden relative">
-                        <!-- Imagen de Portada -->
                         <img src="${coverImage}" onerror="this.onerror=null;this.src='https://placehold.co/300x200/cccccc/333333?text=${category}';" 
                             alt="Imagen de ${category}" class="w-full h-32 object-cover object-center">
                         
-                        <!-- Contenido SUPERPUESTO -->
                         <div class="absolute inset-0 flex flex-col justify-end p-4 bg-black/20 hover:bg-black/10 transition duration-300">
                             <h3 class="text-xl font-extrabold text-white shadow-text">${category}</h3>
                             <p class="text-sm text-gray-200 mt-1">${modelsCount} modelos disponibles</p>
