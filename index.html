@@ -308,6 +308,14 @@
             "https://raw.githubusercontent.com/jesusvn1993mplvt3-ai/rosasandoval/refs/heads/main/fotos/Oversize/Junior%20H/Junior%20H%20%20(5).jpg",
         ];
 
+        // NUEVAS IMÁGENES DE CAMISETAS OVERSIZE - FUERZA REGIDA (Añadidas)
+        const FUERZA_REGIDA_IMAGES = [
+            "https://raw.githubusercontent.com/jesusvn1993mplvt3-ai/miss_rouss/refs/heads/main/fotos/Oversize/Fuerza%20Regida/FR1.jpg",
+            "https://raw.githubusercontent.com/jesusvn1993mplvt3-ai/miss_rouss/refs/heads/main/fotos/Oversize/Fuerza%20Regida/FR2.jpg",
+            "https://raw.githubusercontent.com/jesusvn1993mplvt3-ai/miss_rouss/refs/heads/main/fotos/Oversize/Fuerza%20Regida/FR3.jpg",
+            "https://raw.githubusercontent.com/jesusvn1993mplvt3-ai/miss_rouss/refs/heads/main/fotos/Oversize/Fuerza%20Regida/FR4.jpg",
+        ];
+
 
         // Se mantiene la estructura de datos CATALOGO
         const CATALOG_DATA_MODELS = BASE_CATEGORY_NAMES.reduce((acc, cat) => {
@@ -317,27 +325,36 @@
                 const artistas = [
                     { name: "Junior H", id: "TUMB-JH" },
                     { name: "Peso Pluma", id: "TUMB-PP" },
-                    { name: "Fuerza Regida", id: "TUMB-FR" },
-                    { name: "Alfredo Olivas", id: "TUMB-AO" } //
+                    { name: "Fuerza Regida", id: "TUMB-FR" }, // <--- ID del modelo Fuerza Regida
+                    { name: "Alfredo Olivas", id: "TUMB-AO" } 
                 ];
 
                 acc[cat] = artistas.map(artista => {
                     const isJuniorH = artista.id === 'TUMB-JH';
+                    const isFuerzaRegida = artista.id === 'TUMB-FR'; // <--- Nueva bandera para Fuerza Regida
                     const defaultImage = `https://placehold.co/300x400/3d3d3d/ffffff?text=${artista.name.replace(/\s/g, '+')}`;
                     
-                    // Lógica para los colores específicos de Junior H
-                    const colors = isJuniorH 
+                    // Lógica para los colores específicos: aplica para Junior H y Fuerza Regida
+                    const colors = isJuniorH || isFuerzaRegida
                         ? ["Negro/Rojo", "Negro/Plata", "Negro/Dorado"] 
                         : ["Negro", "Blanco", "Gris", "Vino", "Azul Marino"];
                     
+                    // Lógica para las imágenes de galería
+                    let modelImages = [defaultImage]; // Default is placeholder
+                    if (isJuniorH) {
+                        modelImages = JUNIOR_H_IMAGES;
+                    } else if (isFuerzaRegida) { // <--- Asignación de imágenes de Fuerza Regida
+                        modelImages = FUERZA_REGIDA_IMAGES;
+                    }
+
                     return {
                         id: artista.id,
                         name: `Camiseta Tumbada - ${artista.name}`,
                         price: (200.00).toFixed(2),
-                        // Usar imagen real si es Junior H, sino placeholder
-                        image: isJuniorH ? JUNIOR_H_IMAGES[0] : defaultImage,
-                        // Usar galería real si es Junior H, sino un array con el placeholder
-                        gallery: isJuniorH ? JUNIOR_H_IMAGES : [defaultImage],
+                        // Usar la primera imagen real si existe, sino placeholder
+                        image: modelImages[0] || defaultImage,
+                        // Usar la galería de imágenes reales, sino un array con el placeholder
+                        gallery: modelImages,
                         colors: colors, // <--- APLICACIÓN DE COLORES DINÁMICA
                     };
                 });
