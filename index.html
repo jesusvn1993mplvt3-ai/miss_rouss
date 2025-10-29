@@ -175,8 +175,6 @@
                     Total de artículos: <span id="cart-total-items" class="text-blue-600">0</span>
                 </div>
                 
-                <!-- El bloque de ideas de outfit con Gemini ha sido eliminado, como solicitaste. -->
-
                 <!-- Botón Final de WhatsApp -->
                 <button id="whatsapp-order-btn" onclick="sendWhatsAppOrder()" disabled class="whatsapp-btn w-full p-4 mt-6 rounded-xl text-white font-bold text-lg flex items-center justify-center space-x-2 transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed">
                     <svg class="w-6 h-6" aria-hidden="true"><use xlink:href="#icon-whatsapp"></use></svg>
@@ -207,20 +205,26 @@
         // --- DATA MOCKUP (Simulación de la Base de Datos Estática) ---
         const WHATSAPP_NUMBER = "+524451103626";
 
+        // LISTA DE CATEGORÍAS ACTUALIZADA: "Camisetas Tumbadas" al inicio.
         const BASE_CATEGORY_NAMES = [
-            "Conjuntos Deportivos", "Enterizos", "Leggings", "Shorts", 
-            "Oversize", "Blusas", "Calcetas"
+            "Camisetas Tumbadas", 
+            "Conjuntos Deportivos", 
+            "Enterizos", 
+            "Leggings", 
+            "Shorts", 
+            "Blusas", 
+            "Calcetas"
         ];
 
         // Imágenes representativas para las tarjetas de categoría
         const CATEGORY_COVERS = {
-            "Conjuntos Deportivos": "https://placehold.co/300x200/4c3f73/ffffff?text=CONJUNTOS",
-            "Enterizos": "https://placehold.co/300x200/945417/ffffff?text=ENTERIZOS",
-            "Leggings": "https://placehold.co/300x200/2f5b8c/ffffff?text=LEGGINGS",
-            "Shorts": "https://placehold.co/300x200/39735d/ffffff?text=SHORTS",
-            "Oversize": "https://placehold.co/300x200/734c6e/ffffff?text=OVERSIZE",
-            "Blusas": "https://placehold.co/300x200/3d3d3d/ffffff?text=BLUSAS",
-            "Calcetas": "https://placehold.co/300x200/a39f68/ffffff?text=CALCETAS",
+            "Camisetas Tumbadas": "https://raw.githubusercontent.com/jesusvn1993mplvt3-ai/rosasandoval/refs/heads/main/fotos/Oversize/Kamisetas%201%20HD.jpg",
+            "Conjuntos Deportivos": "https://raw.githubusercontent.com/jesusvn1993mplvt3-ai/rosasandoval/refs/heads/main/fotos/Conjunto/Conjuntos%20.jpg",
+            "Enterizos": "AQUÍ_VA_LA_URL_DE_TU_IMAGEN_DE_600x400_O_300x200.jpg",
+            "Leggings": "AQUÍ_VA_LA_URL_DE_TU_IMAGEN_DE_600x400_O_300x200.jpg",
+            "Shorts": "AQUÍ_VA_LA_URL_DE_TU_IMAGEN_DE_600x400_O_300x200.jpg",
+            "Blusas": "AQUÍ_VA_LA_URL_DE_TU_IMAGEN_DE_600x400_O_300x200.jpg",
+            "Calcetas": "AQUÍ_VA_LA_URL_DE_TU_IMAGEN_DE_600x400_O_300x200.jpg",
         };
 
 
@@ -280,7 +284,7 @@
             "https://blogger.googleusercontent.com/img/a/AVvXsEgs590X4v6riaUrexeEHGLIJmLC94sg4gJeZ7iY42JMqc0KUBeJ9E4kalyFg61vzQ3gD4PPrFYzipkm10rzWHCoGPC5cbk4O5lxC4FxwD8SHVb4ujO6Z04NCyylpE7yaNawuikBj2tIzslUEP2I_aILElHaUwwdhj87OMychqjSXCkubz7bQQ2qo73bSc",
             "https://blogger.googleusercontent.com/img/a/AVvXsEgsjUrVy4mxWPctXMu1DAsj1wPTQ363HcbE8ftZvzt9-LGHTobjAKfeLw1V2CBES6lPPEnrC9dN-Z2Q7fwwTvLOkUNArqltlqdWy_7TlVlg59Resygq7s9Op8eq90kh_Z9qVpuvF0IQ0L2c0XViKCkoYjlpX63djYsKsQPBC7D2z2DG9bGZPltNYv2g974",
             "https://blogger.googleusercontent.com/img/a/AVvXsEj2-YyfL8n8rMbL08S0ZD2ng26_dTs_VVtb0YphpTnWD43ohMWMQYEcAkuuOrLFcJ2vkm_1fmiytXd7ySmiuqp6_kh7AZWWSYfL4kqz-lOtfH2XuE9xQWqtSS0fMMLMBX8CkejWF3i0UEpo9KHFZbl430A41aij5tj7cWPLQ1xV6Q6bI--SW_S_7S5EjEM",
-            "https://blogger.googleusercontent.com/img/a/AVvXsEi7wfD58p5-qcbMjpmW-46TYecIGa1_J18Ys77aL6YaEDXN7-gNXnXZiLZzJYEUcm9tnkmlF8LvlPRBAs04RKIY5qdKm-KZWIXmiA-qzWxbVS11GcSEnzHp5PBKqyeMWRlBXNBIMojz5iYGkTwl9zL1duLqKqxSkdp1BIWSmWLYKQv-RENR4e1aGT9Y6y8Z8",
+            "https://blogger.googleusercontent.com/img/a/AVvXsEi7wfD58p-qcbMjpmW-46TYecIG1_J18Ys77aL6YaEDXN7-gNXNXZiLZzJYEUcm9tnkmlF8LvlPRBAs04RKIY5qdKm-KZWIXmiA-qzWxbVS11GcSEnzHp5PBKqyeMWRlBXNBIMojz5iYGkTwl9zL1duLqKqxSkdp1BIWSmWLYKQv-RENR4e1aGT9Y6y8Z8",
             "https://blogger.googleusercontent.com/img/a/AVvXsEic3nBSl0NjjQy9jnUBOv-iqkdvDj5kOrIQ6Xk45OxN8ba7vsuX3aQ9N5MzQ10_6kShn2n_lqNj4D-XFatqYwbiGyq0veP1ZJaZXx6w09Eg34L_sP6q-0eHGAdAc9vpxHXUgs7S0dnhW4aRoz7qqssBRFrB0IOaiQifJSuVmKF_oDSGVe0HN2z9oaF_CR0g"
         ];
         
@@ -296,9 +300,51 @@
             "https://github.com/jesusvn1993mplvt3-ai/rosasandoval/blob/main/fotos%2FShorts%2FSHORTS_08.jpg?raw=true",
         ];
 
+        // NUEVAS IMÁGENES DE CAMISETAS OVERSIZE - JUNIOR H
+        const JUNIOR_H_IMAGES = [
+            "https://raw.githubusercontent.com/jesusvn1993mplvt3-ai/rosasandoval/refs/heads/main/fotos/Oversize/Junior%20H/Junior%20H%20%20(9).jpg",
+            "https://raw.githubusercontent.com/jesusvn1993mplvt3-ai/rosasandoval/refs/heads/main/fotos/Oversize/Junior%20H/Junior%20H%20%20(4).jpg",
+            "https://raw.githubusercontent.com/jesusvn1993mplvt3-ai/rosasandoval/refs/heads/main/fotos/Oversize/Junior%20H/Junior%20H%20%20(3).jpg",
+            "https://raw.githubusercontent.com/jesusvn1993mplvt3-ai/rosasandoval/refs/heads/main/fotos/Oversize/Junior%20H/Junior%20H%20%20(5).jpg",
+        ];
+
 
         // Se mantiene la estructura de datos CATALOGO
         const CATALOG_DATA_MODELS = BASE_CATEGORY_NAMES.reduce((acc, cat) => {
+            
+            // --- LÓGICA ESPECÍFICA PARA 'Camisetas Tumbadas' ---
+            if (cat === "Camisetas Tumbadas") {
+                const artistas = [
+                    { name: "Junior H", id: "TUMB-JH" },
+                    { name: "Peso Pluma", id: "TUMB-PP" },
+                    { name: "Fuerza Regida", id: "TUMB-FR" },
+                    { name: "Alfredo Olivas", id: "TUMB-AO" } //
+                ];
+
+                acc[cat] = artistas.map(artista => {
+                    const isJuniorH = artista.id === 'TUMB-JH';
+                    const defaultImage = `https://placehold.co/300x400/3d3d3d/ffffff?text=${artista.name.replace(/\s/g, '+')}`;
+                    
+                    // Lógica para los colores específicos de Junior H
+                    const colors = isJuniorH 
+                        ? ["Negro/Rojo", "Negro/Plata", "Negro/Dorado"] 
+                        : ["Negro", "Blanco", "Gris", "Vino", "Azul Marino"];
+                    
+                    return {
+                        id: artista.id,
+                        name: `Camiseta Tumbada - ${artista.name}`,
+                        price: (200.00).toFixed(2),
+                        // Usar imagen real si es Junior H, sino placeholder
+                        image: isJuniorH ? JUNIOR_H_IMAGES[0] : defaultImage,
+                        // Usar galería real si es Junior H, sino un array con el placeholder
+                        gallery: isJuniorH ? JUNIOR_H_IMAGES : [defaultImage],
+                        colors: colors, // <--- APLICACIÓN DE COLORES DINÁMICA
+                    };
+                });
+                return acc; // Finaliza aquí para esta categoría
+            }
+            // --- FIN LÓGICA 'Camisetas Tumbadas' ---
+            
             const isEnterizo = cat === "Enterizos";
             const isConjunto = cat === "Conjuntos Deportivos";
             const isLegging = cat === "Leggings";
@@ -353,6 +399,17 @@
                     modelData.image = LEGGINGS_MODEL_1_IMAGES[0];
                     modelData.gallery = LEGGINGS_MODEL_1_IMAGES;
                     modelData.colors = ["Negro", "Beige (Nude)", "Gris Oscuro", "Azul Marino", "Vino (Borgoña)"];
+                } else if (cat === "Blusas") {
+                    // Lógica simple para Blusas (que antes usaba el índice 5)
+                    modelData.id = `BLUSA-${i + 1}`;
+                    modelData.name = `Blusa B${i + 1} (Casual/Deportiva)`;
+                    modelData.price = (150.00 + (i * 10)).toFixed(2);
+                } else if (cat === "Calcetas") {
+                    // Lógica simple para Calcetas
+                    modelData.id = `CALC-${i + 1}`;
+                    modelData.name = `Calcetas Deportivas C${i + 1}`;
+                    modelData.price = (50.00 + (i * 5)).toFixed(2);
+                    modelData.colors = ["Negro", "Blanco", "Gris"];
                 }
 
                 // Asegurar que la primera imagen del gallery sea la principal
@@ -406,9 +463,6 @@
         const cartTotalItems = document.getElementById('cart-total-items');
         const whatsappOrderBtn = document.getElementById('whatsapp-order-btn');
 
-        // Las referencias a outfitIdeasBtn, outfitLoading y outfitIdeasOutput han sido eliminadas.
-
-
         // --- Funciones de Utilidad ---
 
         function showToast(message, type = 'success') {
@@ -433,9 +487,6 @@
                 setTimeout(() => toast.remove(), 300);
             }, 3000);
         }
-
-        // Se ha eliminado la función fetchGemini, ya no es necesaria.
-        // Se ha eliminado la función getOutfitIdeas, ya no es necesaria.
 
         // --- Funciones de Navegación y Vistas ---
 
@@ -545,7 +596,7 @@
             if (!currentModel) return;
 
             // Si el modelo no tiene colores, se considera listo para añadir
-            if (currentModel.colors.length === 0) {
+            if (!currentModel.colors || currentModel.colors.length === 0) {
                 addToCartBtn.disabled = false;
                 validationMessage.classList.add('hidden');
                 selectedColor = "Modelo Único (N/A)";
@@ -568,7 +619,8 @@
 
             if (!currentModel) return;
 
-            if (currentModel.colors.length > 0 && (!selectedColor || selectedColor === 'placeholder')) {
+            // Si hay colores disponibles y no se ha seleccionado uno
+            if (currentModel.colors && currentModel.colors.length > 0 && (!selectedColor || selectedColor === 'placeholder')) {
                 showToast('Por favor, selecciona un color.', 'error');
                 return;
             }
@@ -649,13 +701,17 @@
                 const modelsCount = CATALOG_DATA_MODELS[category]?.length || 0;
                 const coverImage = CATEGORY_COVERS[category];
                 
+                // Se modificó la estructura para que el nombre de la categoría esté SOBRE la imagen con fondo transparente.
                 const cardHtml = `
-                    <div onclick="renderProductList('${category}')" class="bg-white rounded-xl shadow-lg hover:shadow-xl transition duration-300 cursor-pointer border border-gray-300 transform hover:scale-[1.02] overflow-hidden">
+                    <div onclick="renderProductList('${category}')" class="bg-white rounded-xl shadow-lg hover:shadow-xl transition duration-300 cursor-pointer border border-gray-300 transform hover:scale-[1.02] overflow-hidden relative">
+                        <!-- Imagen de Portada -->
                         <img src="${coverImage}" onerror="this.onerror=null;this.src='https://placehold.co/300x200/cccccc/333333?text=${category}';" 
                             alt="Imagen de ${category}" class="w-full h-32 object-cover object-center">
-                        <div class="p-4">
-                            <h3 class="text-lg font-bold text-gray-800">${category}</h3>
-                            <p class="text-sm text-gray-500 mt-1">${modelsCount} modelos disponibles</p>
+                        
+                        <!-- Contenido SUPERPUESTO -->
+                        <div class="absolute inset-0 flex flex-col justify-end p-4 bg-black/20 hover:bg-black/10 transition duration-300">
+                            <h3 class="text-xl font-extrabold text-white shadow-text">${category}</h3>
+                            <p class="text-sm text-gray-200 mt-1">${modelsCount} modelos disponibles</p>
                         </div>
                     </div>`;
                 categoriesContainer.insertAdjacentHTML('beforeend', cardHtml);
