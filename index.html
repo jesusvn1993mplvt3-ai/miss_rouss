@@ -2,728 +2,341 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Catálogo de Ropa Seamless | Venta WhatsApp</title>
-    <!-- Carga de Tailwind CSS -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MAES26 V2 - Núcleo de Planeación</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Configuración de la fuente Inter -->
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #fcfcfc;
-        }
-        .seamless-bg {
-            background-color: #fcfcfc;
-        }
-        .whatsapp-btn {
-            background: linear-gradient(135deg, #128C7E 0%, #25D366 100%);
-            box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4);
-        }
-        .whatsapp-btn:hover {
-            background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
-        }
-        .thumbnail-active {
-            border: 3px solid #3b82f6; /* Borde azul para la foto activa */
-            opacity: 100% !important;
-        }
-        .llm-output {
-            white-space: pre-wrap;
-            text-align: left;
-            padding: 1rem;
-            border-radius: 0.75rem;
-            background-color: #f3f4f6;
-            margin-top: 1rem;
-            font-size: 0.9rem;
-            border-left: 4px solid #3b82f6;
-        }
-        /* Estilo para el botón de ir atrás */
-        .back-nav-btn {
-            font-weight: 600;
-            margin-bottom: 1.5rem;
-            display: flex;
-            align-items: center;
-            color: #3b82f6;
-            transition: color 150ms;
-        }
-        .back-nav-btn:hover {
-            color: #1d4ed8;
-        }
-        /* Animación para el contador del carrito */
-        @keyframes pop {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.3); }
-            100% { transform: scale(1); }
-        }
-        .cart-pop {
-            animation: pop 0.3s ease-out;
-        }
-        /* Estilo para el contenedor del emoji del carrito */
-        .cart-icon-container {
-            font-size: 2.2rem; /* Tamaño grande para el emoji */
-            line-height: 1; /* Asegura que el contador se posicione correctamente */
-            padding: 0.25rem;
-            display: inline-block;
-            transition: transform 0.3s ease-out; /* Para la animación de escalado */
-        }
+        /* Estilos mínimos necesarios */
+        body { background-color: #0f172a; color: #e2e8f0; }
+        .slot-input { @apply bg-transparent border-none outline-none text-center w-full font-bold p-0; }
+        .slot-input:focus { @apply bg-slate-700 text-blue-400; }
     </style>
-    <!-- Iconos (Inline SVG para evitar dependencias) -->
-    <svg style="display: none;">
-        <symbol id="icon-whatsapp" viewBox="0 0 24 24">
-            <path fill="currentColor" d="M12.03 2.05c-5.46 0-9.92 4.46-9.92 9.92 0 1.94.57 3.8.31 5.43l-.42 2.74c-.07.45.36.8.81.74l3.18-.52c1.78.29 3.63.43 5.9.43 5.46 0 9.92-4.46 9.92-9.92.01-5.46-4.46-9.92-9.93-9.92zm3.32 12.87c-.07.13-.25.21-.49.21-.24 0-.44-.09-.64-.17-.46-.19-1.28-.52-2.17-1.34-.89-.83-1.48-1.92-1.66-2.31-.07-.15-.15-.22-.22-.36-.08-.14-.07-.33.02-.45.09-.13.25-.13.37-.13.12 0 .26.01.37.01.21 0 .28.05.4.31.11.23.38.93.42 1.01.04.09.07.18.01.29-.07.11-.13.17-.25.32-.1.14-.19.23-.29.35-.1.1-.19.23-.07.43.12.2.35.59.82.98.47.4.92.57 1.13.68.21.11.33.09.43.06.1-.03.22-.11.34-.19.12-.08.24-.13.38-.17.13-.04.28.01.38.15.1.14.1.4.01.52z"/>
-        </symbol>
-        <symbol id="icon-back" viewBox="0 0 24 24">
-            <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-        </symbol>
-    </svg>
 </head>
-<body class="seamless-bg antialiased flex flex-col items-center">
+<body>
+    <div id="root"></div>
 
-    <!-- IMAGEN DE ENCABEZADO -->
-    <div class="w-full max-w-xl p-4 pt-6 pb-2">
-        <img src="https://raw.githubusercontent.com/jesusvn1993mplvt3-ai/rosasandoval/refs/heads/main/Miss%20rouss.jpg" 
-             alt="Logo de la marca Seamless" 
-             class="w-full h-auto object-contain rounded-xl shadow-lg border border-gray-100 mx-auto">
-    </div>
-    <!-- FIN IMAGEN -->
+    <script type="text/babel" data-type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getFirestore, collection, doc, setDoc, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
-    <!-- Contenedor Principal de la App (Pantalla completa en móvil) -->
-    <div id="app" class="min-h-screen w-full max-w-xl mx-auto shadow-xl bg-white">
+        const { useState, useEffect, useContext, createContext, useMemo } = React;
 
-        <!-- Header Fijo (Solo Título y Carrito) -->
-        <header class="p-4 bg-white border-b border-gray-100 sticky top-0 z-10 shadow-sm flex justify-between items-center">
-            <h1 class="text-2xl font-extrabold text-gray-800 text-center flex-grow">
-                CATÁLOGO
-            </h1>
-            
-            <!-- **CAMBIO:** Botón y Contador del Carrito con emoji y animación -->
-            <button id="cart-button" onclick="renderCartView()" class="relative rounded-full hover:opacity-90 transition-opacity duration-150 p-1">
-                <span id="cart-icon-container" class="cart-icon-container">🛒</span>
-                <span id="cart-count" class="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full hidden">0</span>
-            </button>
-        </header>
+        // --- CONFIGURACIÓN (Reemplazar con tus credenciales reales) ---
+        const firebaseConfig = {
+            apiKey: "TU_API_KEY",
+            authDomain: "TU_PROJECT_ID.firebaseapp.com",
+            projectId: "TU_PROJECT_ID",
+            storageBucket: "TU_PROJECT_ID.firebasestorage.app",
+            messagingSenderId: "TU_SENDER_ID",
+            appId: "TU_APP_ID"
+        };
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
 
-        <!-- Vistas -->
-        <main class="p-4">
-
-            <!-- 1. Vista de Categorías -->
-            <div id="category-view" class="space-y-3">
-                <p class="text-gray-500 mb-4 text-center text-sm">Selecciona una categoría para ver los modelos disponibles.</p>
-                <!-- Las categorías se inyectarán aquí por JS -->
-            </div>
-
-            <!-- 2. Vista de Modelos de la Categoría -->
-            <div id="product-list-view" class="hidden">
-                <!-- Botón de Retroceso a Categorías -->
-                <button onclick="goBackToCategories()" class="back-nav-btn cursor-pointer">
-                    <svg class="w-4 h-4 mr-1" aria-hidden="true"><use xlink:href="#icon-back"></use></svg>
-                    Volver a Categorías
-                </button>
-                
-                <h2 id="current-category-title" class="text-xl font-bold text-gray-700 mb-4"></h2>
-                <div id="models-container" class="grid grid-cols-2 gap-4">
-                    <!-- Los modelos se inyectarán aquí por JS -->
-                </div>
-            </div>
-            
-            <!-- 3. Vista de Detalle del Producto (Modal simulado) -->
-            <div id="product-detail-view" class="hidden p-4 bg-white rounded-xl">
-                <!-- Botón de Retroceso a Lista de Productos -->
-                <button onclick="goBackToProducts()" class="back-nav-btn cursor-pointer">
-                    <svg class="w-4 h-4 mr-1" aria-hidden="true"><use xlink:href="#icon-back"></use></svg>
-                    Volver a Modelos
-                </button>
-                
-                <!-- Galería de Fotos - FONDO NEGRO FORZADO -->
-                <div class="space-y-2 mb-6 p-4 bg-gray-900 text-white rounded-xl shadow-inner" style="background-color: #000000;">
-                    <!-- Foto Principal -->
-                    <img id="detail-main-image" src="" alt="Foto principal del modelo" class="w-full h-auto object-cover rounded-xl shadow-lg">
-                    <!-- Miniaturas -->
-                    <div id="detail-thumbnails" class="grid grid-cols-5 gap-2 pt-2">
-                        <!-- Las miniaturas se inyectarán aquí por JS -->
-                    </div>
-                </div>
-
-                <div class="mb-6">
-                    <h3 id="detail-model-name" class="text-2xl font-bold text-gray-800 mb-1">Modelo de Ejemplo</h3>
-                    <p id="detail-category-name" class="text-md font-medium text-gray-500 mb-3"></p>
-                    <p id="detail-price" class="text-3xl font-extrabold text-blue-600 mb-4">$X.XXX MXN</p>
-                </div>
-                
-                <!-- Formulario de Opciones para el Carrito -->
-                <form id="order-form" class="space-y-4">
-                    
-                    <!-- Selector de Colores (Este grupo se oculta si no hay colores) -->
-                    <div id="color-selector-group">
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">Color</label>
-                        <select id="selected-color" required onchange="updateDetailOptions()"
-                                class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-white">
-                            <!-- Colores se inyectarán aquí -->
-                        </select>
-                    </div>
-
-                    <!-- Cantidad -->
-                    <div>
-                        <label for="selected-quantity" class="block text-sm font-semibold text-gray-700 mb-2">Cantidad</label>
-                        <input type="number" id="selected-quantity" value="1" min="1" required
-                               class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
-                    </div>
-
-                    <!-- Botón de Añadir al Carrito -->
-                    <button type="submit" id="add-to-cart-btn" disabled
-                            class="w-full p-4 mt-6 rounded-xl text-white font-bold text-lg flex items-center justify-center space-x-2 transition duration-300 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed">
-                        Añadir al Carrito
-                    </button>
-                    <p id="validation-message" class="text-center text-red-500 text-sm hidden">Selecciona Color para añadir al carrito.</p>
-                </form>
-            </div>
-
-            <!-- 4. Vista del Carrito de Compras -->
-            <div id="cart-view" class="hidden p-4 bg-white rounded-xl">
-                <!-- Botón de Retroceso a Lista de Productos -->
-                <button onclick="goBackToProducts()" class="back-nav-btn cursor-pointer">
-                    <svg class="w-4 h-4 mr-1" aria-hidden="true"><use xlink:href="#icon-back"></use></svg>
-                    Seguir Comprando
-                </button>
-
-                <h2 class="text-2xl font-bold text-gray-800 mb-4">Tu Carrito de Compras</h2>
-                
-                <div id="cart-items-container" class="space-y-4 mb-6">
-                    <!-- Items del carrito se inyectarán aquí -->
-                </div>
-                
-                <div class="text-right text-xl font-semibold text-gray-700 border-t pt-4">
-                    Total de artículos: <span id="cart-total-items" class="text-blue-600">0</span>
-                </div>
-
-                <!-- Ideas de Outfit LLM -->
-                <button id="outfit-ideas-btn" 
-                        onclick="getOutfitIdeas()" 
-                        disabled
-                        class="w-full p-3 mt-4 rounded-lg text-sm font-bold flex items-center justify-center space-x-2 transition duration-300 
-                               bg-indigo-100 text-indigo-800 hover:bg-indigo-200 disabled:opacity-50 disabled:cursor-not-allowed">
-                    <span>✨ Generar Ideas de Outfit con Gemini</span>
-                    <span id="outfit-loading" class="hidden animate-spin h-4 w-4 border-2 border-indigo-800 border-t-transparent rounded-full"></span>
-                </button>
-                <div id="outfit-ideas-output" class="hidden"></div>
-                <!-- END NEW -->
-
-                <!-- Botón Final de WhatsApp -->
-                <button id="whatsapp-order-btn" onclick="sendWhatsAppOrder()" disabled
-                        class="whatsapp-btn w-full p-4 mt-6 rounded-xl text-white font-bold text-lg flex items-center justify-center space-x-2 transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed">
-                    <svg class="w-6 h-6" aria-hidden="true"><use xlink:href="#icon-whatsapp"></use></svg>
-                    <span>CONFIRMAR PEDIDO POR WHATSAPP</span>
-                </button>
-            </div>
-            
-            <!-- Contenedor para mensajes de error (toast) -->
-            <div id="toast-container" class="fixed bottom-4 right-4 z-50"></div>
-
-        </main>
-    </div>
-
-    <!-- JavaScript del Catálogo -->
-    <script>
-        // --- CONFIGURACIÓN DE GEMINI API ---
-        const API_MODEL = 'gemini-2.5-flash-preview-05-20';
-        const apiKey = "";
-        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${API_MODEL}:generateContent?key=${apiKey}`;
-
-        // --- DATA MOCKUP (Simulación de la Base de Datos Estática) ---
-        const WHATSAPP_NUMBER = "+524451103626";
-        const BASE_CATEGORY_NAMES = [
-            "Conjuntos Deportivos", "Enterizos", "Leggings", "Shorts", "Oversize",
-            "Blusas", "Calcetas"
+        // --- CONSTANTES ---
+        const MACHINES = [
+            { id: 'm1', name: 'MAQ 1', type: 'CIXING' }, { id: 'm35', name: 'MAQ 35', type: 'SANTONI SM8' },
+            { id: 'm29', name: 'MAQ 29', type: 'SANTONI EVO4' },{ id: 'm8',  name: 'MAQ 8',  type: 'SANTONI TOP2' },
+            // ... (Se pueden agregar el resto de máquinas aquí)
         ];
         
-        // -------------------------------------------------------------
-        // CONJUNTOS DEPORTIVOS - MODELO 1 
-        // -------------------------------------------------------------
-        const CONJUNTO_MODEL_1_IMAGES = [
-            "https://raw.githubusercontent.com/jesusvn1993mplvt3-ai/rosasandoval/refs/heads/main/CONJUNTO1%20(4).png", 
-            "https://raw.githubusercontent.com/jesusvn1993mplvt3-ai/rosasandoval/refs/heads/main/CONJUNTO1%20(1).png",
-            "https://raw.githubusercontent.com/jesusvn1993mplvt3-ai/rosasandoval/refs/heads/main/CONJUNTO1%20(2).png",
-            "https://raw.githubusercontent.com/jesusvn1993mplvt3-ai/rosasandoval/refs/heads/main/CONJUNTO1%20(3).png",
-            "https://raw.githubusercontent.com/jesusvn1993mplvt3-ai/rosasandoval/refs/heads/main/CONJUNTO1%20(5).png"
-        ];
-        
-        // -------------------------------------------------------------
-        // ENTERIZOS (Lista completa de 33 URLs)
-        // -------------------------------------------------------------
-        const ENTERIZO_IMAGES = [
-            "https://github.com/jesusvn1993mplvt3-ai/rosasandoval/blob/main/fotos/Enterizos/IMG-20251011-WA0013.jpg?raw=true",
-            "https://github.com/jesusvn1993mplvt3-ai/rosasandoval/blob/main/fotos/Enterizos/IMG-20251011-WA0014.jpg?raw=true",
-            "https://github.com/jesusvn1993mplvt3-ai/rosasandoval/blob/main/fotos/Enterizos/IMG-20251011-WA0043.jpg?raw=true",
-            "https://github.com/jesusvn1993mplvt3-ai/rosasandoval/blob/main/fotos/Enterizos/IMG-20251011-WA0045.jpg?raw=true",
-            "https://github.com/jesusvn1993mplvt3-ai/rosasandoval/blob/main/fotos/Enterizos/IMG-20251011-WA0046.jpg?raw=true",
-            "https://github.com/jesusvn1993mplvt3-ai/rosasandoval/blob/main/fotos/Enterizos/IMG-20251011-WA0047.jpg?raw=true",
-            "https://github.com/jesusvn1993mplvt3-ai/rosasandoval/blob/main/fotos/Enterizos/IMG-20251011-WA0048.jpg?raw=true",
-            "https://github.com/jesusvn1993mplvt3-ai/rosasandoval/blob/main/fotos/Enterizos/IMG-20251011-WA0049.jpg?raw=true",
-            "https://github.com/jesusvn1993mplvt3-ai/rosasandoval/blob/main/fotos/Enterizos/IMG-20251011-WA0050.jpg?raw=true",
-            "https://github.com/jesusvn1993mplvt3-ai/rosasandoval/blob/main/fotos/Enterizos/IMG-20251011-WA0058.jpg?raw=true",
-            "https://github.com/jesusvn1993mplvt3-ai/rosasandoval/blob/main/fotos/Enterizos/IMG-20251011-WA0059.jpg?raw=true",
-            "https://github.com/jesusvn1993mplvt3-ai/rosasandoval/blob/main/fotos/Enterizos/IMG-20251011-WA0060.jpg?raw=true",
-            "https://github.com/jesusvn1993mplvt3-ai/rosasandoval/blob/main/fotos/Enterizos/IMG-20251011-WA0061.jpg?raw=true",
-            "https://github.com/jesusvn1993mplvt3-ai/rosasandoval/blob/main/fotos/Enterizos/IMG-20251011-WA0062.jpg?raw=true",
-            "https://github.com/jesusvn1993mplvt3-ai/rosasandoval/blob/main/fotos/Enterizos/IMG-20251011-WA0063.jpg?raw=true",
-            "https://github.com/jesusvn1993mplvt3-ai/rosasandoval/blob/main/fotos/Enterizos/IMG-20251011-WA0064.jpg?raw=true",
-            "https://github.com/jesusvn1993mplvt3-ai/rosasandoval/blob/main/fotos/Enterizos/IMG-20251011-WA0065.jpg?raw=true",
-            "https://github.com/jesusvn1993mplvt3-ai/rosasandoval/blob/main/fotos/Enterizos/IMG-20251011-WA0066.jpg?raw=true",
-            "https://github.com/jesusvn1993mplvt3-ai/rosasandoval/blob/main/fotos/Enterizos/IMG-20251011-WA0067.jpg?raw=true",
-            "https://github.com/jesusvn1993mplvt3-ai/rosasandoval/blob/main/fotos/Enterizos/IMG-20251011-WA0068.jpg?raw=true",
-            "https://github.com/jesusvn1993mplvt3-ai/rosasandoval/blob/main/fotos/Enterizos/IMG-20251011-WA0073.jpg?raw=true",
-            "https://github.com/jesusvn1993mplvt3-ai/rosasandoval/blob/main/fotos/Enterizos/IMG-20251011-WA0074.jpg?raw=true",
-            "https://github.com/jesusvn1993mplvt3-ai/rosasandoval/blob/main/fotos/Enterizos/IMG-20251011-WA0082.jpg?raw=true",
-            "https://github.com/jesusvn1993mplvt3-ai/rosasandoval/blob/main/fotos/Enterizos/IMG-20251011-WA0083.jpg?raw=true",
-            "https://github.com/jesusvn1993mplvt3-ai/rosasandoval/blob/main/fotos/Enterizos/IMG-20251011-WA0084.jpg?raw=true",
-            "https://github.com/jesusvn1993mplvt3-ai/rosasandoval/blob/main/fotos/Enterizos/IMG-20251011-WA0086.jpg?raw=true",
-            "https://github.com/jesusvn1993mplvt3-ai/rosasandoval/blob/main/fotos/Enterizos/IMG-20251011-WA0087.jpg?raw=true",
-            "https://github.com/jesusvn1993mplvt3-ai/rosasandoval/blob/main/fotos/Enterizos/IMG-20251011-WA0090.jpg?raw=true",
-            "https://github.com/jesusvn1993mplvt3-ai/rosasandoval/blob/main/fotos/Enterizos/IMG-20251011-WA0091.jpg?raw=true",
-            "https://github.com/jesusvn1993mplvt3-ai/rosasandoval/blob/main/fotos/Enterizos/IMG-20251011-WA0092.jpg?raw=true",
-            "https://github.com/jesusvn1993mplvt3-ai/rosasandoval/blob/main/fotos/Enterizos/IMG-20251011-WA0093.jpg?raw=true",
-            "https://github.com/jesusvn1993mplvt3-ai/rosasandoval/blob/main/fotos/Enterizos/IMG-20251011-WA0096.jpg?raw=true",
-            "https://github.com/jesusvn1993mplvt3-ai/rosasandoval/blob/main/fotos/Enterizos/IMG-20251011-WA0097.jpg?raw=true"
-        ];
-
-        // -------------------------------------------------------------
-        // LEGGINGS - MODELO 1 
-        // -------------------------------------------------------------
-        const LEGGINGS_MODEL_1_IMAGES = [
-            "https://blogger.googleusercontent.com/img/a/AVvXsEgs590X4v6riaUrexeEHGLIJmLC94sg4gJeZ7iY42JMqc0KUBeJ9E4kalyFg61vzQ3gD4PPrFYzipkm10rzWHCoGPC5cbk4O5lxC4FxwD8SHVb4ujO6Z04NCwyyLpE7yaNawuikBj2tIzslUEP2I_aILElHaUwwdhj87OMychqjSXCkubz7bQQ2qo73bSc",
-            "https://blogger.googleusercontent.com/img/a/AVvXsEgsjUrVy4mxWPctXMu1DAsj1wPTQ363HcbE8ftZvzt9-LGHTobjAKfeLw1V2CBES6lPPEnrC9dN-Z2Q7fwwTvLOkUNArqltlqdWy_7TlVlg59Resygq7s9Op8eq90kh_Z9qVpuvF0IQ0L2c0XViKCkoYjlpX63djYsKsQPBC7D2z2DG9bGZPltNYv2g974", 
-            "https://blogger.googleusercontent.com/img/a/AVvXsEj2-YyfL8n8rMbL08S0ZD2ng26_dTs_VVtb0YphpTnWD43ohMWMQYEcAkuuOrLFcJ2vkm_1fmiytXd7ySmiuqp6_kh7AZWWSYfL4kqz-lOtfH2XuE9xQWqtSS0fMMLMBX8CkejWF3i0UEpo9KHFZbl430A41aij9tj7cWPLQ1xV6Q6bI--SW_S_7S5EjEM", 
-            "https://blogger.googleusercontent.com/img/a/AVvXsEi7wfD58k5-qcbMjpmW-46TYecIGa1_J18Ys77aL6YaEDXN7-gNXvXZiLZzJYEUcm9tnkmlF8LvlPRBAs04RKIY5qdKm-KZWIXmiA-qzWxbVS11GcSEnzHp5PBKqyeMWRlBXNBIMojz5iYGkTwl9zL1duKqxSkdp1BIWSmWLYKQv-RENR4e1aGT9Y6y8Z8",
-            "https://blogger.googleusercontent.com/img/a/AVvXsEic3nBSl0NjjQy9jnUBOv-iqkdvDj5kOrIQ6Xk45OxN8ba7vsuX3aQ9N5MzQ10_6kShn2n_lqNj4D-XFatqYwbiGyq0veP1ZJaZXx6w09Eg34L_sP6q-0eHGAdAc9vpxHXUgs7S0dnhW4aRoz7qqssBRFrB0IOaiQifJSuVmKF_oDSGVe0HN2z9oaF_CR0g"
-        ];
-        
-        // Genera modelos placeholder, ajustando la cantidad de Enterizos
-        const CATALOG_DATA_MODELS = BASE_CATEGORY_NAMES.reduce((acc, cat) => {
-            const isEnterizo = cat === "Enterizos";
-            const count = isEnterizo ? ENTERIZO_IMAGES.length : 5; 
-
-            acc[cat] = Array.from({ length: count }, (_, i) => {
-                const isLegging1 = cat === "Leggings" && i === 0;
-                const isConjunto1 = cat === "Conjuntos Deportivos" && i === 0;
-                
-                let modelData = {
-                    id: `${cat.substring(0, 3)}-${i + 1}`,
-                    name: `${cat} - Modelo ${i + 1}`,
-                    price: (250 + (i * 50)).toFixed(2), 
-                    image: `https://placehold.co/300x400/000000/ffffff?text=MOD+${i+1}`, 
-                    gallery: Array.from({ length: 5 }, (_, j) => `https://placehold.co/100x100/000000/ffffff?text=FOTO+${j+1}`), 
-                    colors: ["Negro", "Gris Humo", "Beige", "Rosa Pastel", "Azul Acero"],
-                };
-
-                if (isEnterizo) {
-                    const enterizoId = i + 1;
-                    modelData.id = `ENT-${enterizoId}`;
-                    modelData.name = `Enterizo Seamless E${enterizoId}`;
-                    modelData.price = (299.00 + (i * 5)).toFixed(2); 
-                    const imageUrl = ENTERIZO_IMAGES[i] || modelData.image; 
-                    modelData.image = imageUrl; 
-                    modelData.gallery = [imageUrl];
-                    modelData.colors = ["Negro", "Gris Oxford", "Azul Marino", "Vino", "Verde Militar", "Rosa Palo", "Beige (Nude)", "Lila"];
-                } else if (isConjunto1) {
-                    modelData.name = "Conjunto Deportivo V1 (Seamless)";
-                    modelData.price = '150.00'; 
-                    modelData.image = CONJUNTO_MODEL_1_IMAGES[0];
-                    modelData.gallery = CONJUNTO_MODEL_1_IMAGES;
-                    modelData.colors = ["Negro", "Gris", "Vino", "Verde Militar"];
-                } else if (isLegging1) {
-                    modelData.name = "Legging Ultra Seamless V1";
-                    modelData.price = '85.00'; 
-                    modelData.image = LEGGINGS_MODEL_1_IMAGES[0]; 
-                    modelData.gallery = LEGGINGS_MODEL_1_IMAGES;
-                    modelData.colors = ["Negro", "Beige (Nude)", "Gris Oscuro", "Azul Marino", "Vino (Borgoña)"];
-                }
-                
-                return modelData;
-            });
-            return acc;
-        }, {});
-
-        const ALL_MODELS = Object.values(CATALOG_DATA_MODELS).flat();
-
-        let currentCategory = null;
-        let currentModel = null;
-        let selectedColor = null; 
-        let cart = []; 
-
-        const categoryView = document.getElementById('category-view');
-        const productListView = document.getElementById('product-list-view');
-        const productDetailView = document.getElementById('product-detail-view');
-        const cartView = document.getElementById('cart-view');
-        const categoriesContainer = document.getElementById('category-view');
-        const modelsContainer = document.getElementById('models-container');
-        const categoryTitle = document.getElementById('current-category-title');
-        const cartCountSpan = document.getElementById('cart-count');
-        const cartIconContainer = document.getElementById('cart-icon-container'); // Nuevo ID para el contenedor del icono
-        const toastContainer = document.getElementById('toast-container');
-        const form = document.getElementById('order-form');
-        const colorSelect = document.getElementById('selected-color');
-        const colorSelectorGroup = document.getElementById('color-selector-group'); 
-        const quantityInput = document.getElementById('selected-quantity');
-        const detailImage = document.getElementById('detail-main-image');
-        const detailModelName = document.getElementById('detail-model-name');
-        const detailCategoryName = document.getElementById('detail-category-name');
-        const detailPrice = document.getElementById('detail-price');
-        const addToCartBtn = document.getElementById('add-to-cart-btn');
-        const validationMessage = document.getElementById('validation-message');
-        const detailThumbnails = document.getElementById('detail-thumbnails');
-        const cartItemsContainer = document.getElementById('cart-items-container');
-        const cartTotalItems = document.getElementById('cart-total-items');
-        const whatsappOrderBtn = document.getElementById('whatsapp-order-btn');
-        const outfitIdeasBtn = document.getElementById('outfit-ideas-btn');
-        const outfitLoading = document.getElementById('outfit-loading');
-        const outfitIdeasOutput = document.getElementById('outfit-ideas-output');
-
-        function showToast(message, type = 'success') {
-            const colors = { success: 'bg-green-500', error: 'bg-red-500' };
-            const toast = document.createElement('div');
-            toast.className = `p-3 mb-2 ${colors[type]} text-white rounded-lg shadow-xl opacity-0 transform translate-y-2 transition-all duration-300`;
-            toast.textContent = message;
-            toastContainer.appendChild(toast);
-            setTimeout(() => toast.classList.remove('opacity-0', 'translate-y-2'), 10);
-            setTimeout(() => {
-                toast.classList.add('opacity-0', 'translate-y-2');
-                setTimeout(() => toast.remove(), 300);
-            }, 3000);
-        }
-
-        async function fetchGemini(payload, maxRetries = 3, delay = 1000) {
-            for (let i = 0; i < maxRetries; i++) {
-                try {
-                    const response = await fetch(apiUrl, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
-                    if (!response.ok) {
-                        if (response.status === 429 || response.status >= 500) throw new Error(`API Error: ${response.statusText}`);
-                        const errorBody = await response.json();
-                        throw new Error(`API Request Failed: ${JSON.stringify(errorBody)}`);
-                    }
-                    const result = await response.json();
-                    const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
-                    if (!text) throw new Error('Respuesta del LLM vacía o mal formada.');
-                    return text;
-                } catch (error) {
-                    if (i < maxRetries - 1) {
-                        await new Promise(resolve => setTimeout(resolve, delay));
-                        delay *= 2;
-                    } else throw new Error('No se pudo obtener la respuesta del Asistente (Gemini API agotó los reintentos).');
-                }
-            }
-        }
-
-        async function getOutfitIdeas() {
-            if (cart.length === 0) return;
-            outfitIdeasOutput.classList.add('hidden');
-            outfitIdeasOutput.innerHTML = '';
-            outfitIdeasBtn.disabled = true;
-            outfitLoading.classList.remove('hidden');
-            const cartItems = cart.map(item => `${item.quantity}x ${item.name} (Color: ${item.color}, Categoría: ${item.category})`).join('; ');
-            const userQuery = `Eres un estilista personal virtual. El cliente tiene los siguientes artículos en su carrito: ${cartItems}. Genera 3 ideas de outfit diferentes. Cada idea debe incorporar al menos un artículo del carrito y sugerir 2 o 3 piezas complementarias (que no están en el carrito, como zapatillas, accesorios, o una chaqueta) para crear un look completo. Usa el siguiente formato para cada idea: *Idea #: [Nombre Corto del Look]*\n[Descripción de la combinación].`;
-            const systemPrompt = "Actúa como un estilista de ropa deportiva que busca maximizar el potencial de las prendas seamless. Usa un tono moderno, juvenil y enfocado en la versatilidad de las piezas. Tu respuesta debe estar en español y ser fácil de leer con formato Markdown (negritas, saltos de línea).";
-            const payload = { contents: [{ parts: [{ text: userQuery }] }], systemInstruction: { parts: [{ text: systemPrompt }] } };
-            try {
-                const text = await fetchGemini(payload);
-                outfitIdeasOutput.innerHTML = `<div class="llm-output">${text}</div>`;
-            } catch (error) {
-                outfitIdeasOutput.innerHTML = `<div class="llm-output text-red-700">❌ Error al generar ideas de outfit: ${error.message}</div>`;
-                showToast('Error al conectar con el Estilista (Gemini API).', 'error');
-            } finally {
-                outfitIdeasOutput.classList.remove('hidden');
-                outfitIdeasBtn.disabled = false;
-                outfitLoading.classList.add('hidden');
-            }
-        }
-
-        function updateView(viewId) {
-            ['category-view', 'product-list-view', 'product-detail-view', 'cart-view'].forEach(id => {
-                document.getElementById(id).classList.add('hidden');
-            });
-            document.getElementById(viewId).classList.remove('hidden');
-        }
-        
-        function goBackToCategories() {
-            currentCategory = null;
-            currentModel = null;
-            updateView('category-view');
-        }
-
-        function goBackToProducts() {
-            currentModel = null;
-            if (currentCategory) renderProductList(currentCategory);
-            else goBackToCategories(); 
-        }
-        
-        function renderCartView() {
-            outfitIdeasOutput.classList.add('hidden');
-            outfitIdeasOutput.innerHTML = ''; 
-            updateView('cart-view');
-            cartItemsContainer.innerHTML = '';
-            let totalItems = 0;
-            if (cart.length === 0) {
-                cartItemsContainer.innerHTML = '<p class="text-center text-gray-500 py-8">Tu carrito está vacío. ¡Añade tu primera prenda Seamless!</p>';
-                whatsappOrderBtn.disabled = true;
-                outfitIdeasBtn.disabled = true;
-            } else {
-                cart.forEach((item, index) => {
-                    totalItems += item.quantity;
-                    const itemTotal = item.price * item.quantity;
-                    const itemHtml = `
-                        <div class="flex items-start p-3 border rounded-xl shadow-sm bg-gray-50 space-x-3">
-                            <img src="${item.image}" onerror="this.onerror=null;this.src='https://placehold.co/60x80/cccccc/333333?text=N/A';" class="w-16 h-20 object-cover rounded-lg shadow-md flex-shrink-0" alt="${item.name}">
-                            <div class="flex-grow">
-                                <p class="text-sm font-bold text-gray-800">${item.name}</p>
-                                <p class="text-xs text-gray-500">Color: ${item.color}</p>
-                                <p class="text-sm font-semibold text-blue-600 mt-1">$${itemTotal.toFixed(2)} MXN</p>
-                            </div>
-                            <div class="flex flex-col items-end justify-between h-20">
-                                <button onclick="removeFromCart(${index})" class="text-red-500 hover:text-red-700 transition duration-150 p-1 rounded-full bg-white flex-shrink-0">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
-                                </button>
-                                <div class="flex items-center space-x-2 bg-white border rounded-full p-1">
-                                    <button onclick="updateCartItemQuantity(${index}, -1)" class="w-6 h-6 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-lg font-bold">-</button>
-                                    <span class="font-semibold text-sm w-5 text-center">${item.quantity}</span>
-                                    <button onclick="updateCartItemQuantity(${index}, 1)" class="w-6 h-6 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-lg font-bold">+</button>
-                                </div>
-                            </div>
-                        </div>`;
-                    cartItemsContainer.insertAdjacentHTML('beforeend', itemHtml);
-                });
-                whatsappOrderBtn.disabled = false;
-                outfitIdeasBtn.disabled = false;
-            }
-            cartTotalItems.textContent = totalItems;
-            updateCartCount(false); // No animar si solo se renderiza la vista
-        }
-
-        function saveCart() {
-            try { localStorage.setItem('seamlessUserCart', JSON.stringify(cart)); } 
-            catch (e) { console.error("No se pudo guardar el carrito en localStorage:", e); }
-        }
-        
-        function loadCart() {
-            try {
-                const savedCart = localStorage.getItem('seamlessUserCart');
-                if (savedCart) cart = JSON.parse(savedCart);
-            } catch (e) {
-                console.error("No se pudo cargar el carrito desde localStorage:", e);
-                cart = [];
-            }
-        }
-
-        function updateCartCount(animate = true) {
-            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-            cartCountSpan.textContent = totalItems;
-            
-            if (totalItems > 0) {
-                cartCountSpan.classList.remove('hidden');
-                
-                if (animate) {
-                    // Remover y añadir la clase de animación para dispararla de nuevo
-                    cartIconContainer.classList.remove('cart-pop');
-                    // Forzar reflow/repaint
-                    void cartIconContainer.offsetWidth; 
-                    cartIconContainer.classList.add('cart-pop');
-                    setTimeout(() => cartIconContainer.classList.remove('cart-pop'), 300);
-                }
-                
-            } else {
-                cartCountSpan.classList.add('hidden');
-            }
-        }
-        
-        function removeFromCart(index) {
-            const removedItemName = cart[index].name;
-            cart.splice(index, 1);
-            saveCart();
-            showToast(`✅ Eliminado: ${removedItemName}`, 'success');
-            renderCartView();
-        }
-
-        function updateCartItemQuantity(index, change) {
-            if (cart[index]) {
-                cart[index].quantity += change;
-                if (cart[index].quantity <= 0) removeFromCart(index);
-                else {
-                    saveCart();
-                    renderCartView(); // Llama a renderCartView, que internamente llamará a updateCartCount(false)
-                    updateCartCount(); // Llama directamente para animar el icono
-                }
-            }
-        }
-        
-        function changeMainImage(imageUrl, thumbnailElement) {
-            detailImage.src = imageUrl;
-            document.querySelectorAll('#detail-thumbnails img').forEach(img => {
-                img.classList.remove('thumbnail-active', 'opacity-100');
-                img.classList.add('opacity-70');
-            });
-            thumbnailElement.classList.add('thumbnail-active', 'opacity-100');
-            thumbnailElement.classList.remove('opacity-70');
-        }
-
-        function updateDetailOptions() {
-            if (!currentModel) return;
-            if (currentModel.colors.length === 0) {
-                addToCartBtn.disabled = false;
-                addToCartBtn.classList.remove('disabled:opacity-50', 'disabled:cursor-not-allowed');
-                validationMessage.classList.add('hidden');
-                selectedColor = "Modelo Único (N/A)";
-            } else {
-                selectedColor = colorSelect.value;
-                const isValid = selectedColor && selectedColor !== 'placeholder';
-                addToCartBtn.disabled = !isValid;
-                if (isValid) {
-                    addToCartBtn.classList.remove('disabled:opacity-50', 'disabled:cursor-not-allowed');
-                    validationMessage.classList.add('hidden');
-                } else {
-                    addToCartBtn.classList.add('disabled:opacity-50', 'disabled:cursor-not-allowed');
-                    validationMessage.classList.remove('hidden');
-                }
-            }
-        }
-
-        function addToCart(event) {
-            event.preventDefault();
-            if (!currentModel) return;
-            if (currentModel.colors.length > 0 && (!selectedColor || selectedColor === 'placeholder')) {
-                showToast('Por favor, selecciona un color.', 'error');
-                return;
-            }
-            const quantity = parseInt(quantityInput.value, 10);
-            if (quantity < 1 || isNaN(quantity)) {
-                showToast('La cantidad debe ser 1 o más.', 'error');
-                return;
-            }
-            const color = selectedColor || 'N/A';
-            const existingItemIndex = cart.findIndex(item => item.id === currentModel.id && item.color === color);
-            if (existingItemIndex > -1) {
-                cart[existingItemIndex].quantity += quantity;
-                showToast(`✅ Cantidad actualizada: ${currentModel.name}`, 'success');
-            } else {
-                const itemToAdd = {
-                    id: currentModel.id, name: currentModel.name, category: currentCategory,
-                    color: color, price: parseFloat(currentModel.price), quantity: quantity,
-                    image: currentModel.image
-                };
-                cart.push(itemToAdd);
-                showToast(`✅ Añadido: ${currentModel.name}`, 'success');
-            }
-            saveCart();
-            updateCartCount(); // Llama para animar el carrito
-            goBackToProducts();
-        }
-
-        function sendWhatsAppOrder() {
-            if (cart.length === 0) {
-                showToast('El carrito está vacío. Añade artículos antes de ordenar.', 'error');
-                return;
-            }
-            let orderSummary = `¡Hola! Me gustaría hacer un pedido del Catálogo Seamless:\n\n*RESUMEN DEL PEDIDO*\n\n`;
-            let grandTotal = 0;
-            let totalItems = 0;
-            cart.forEach((item, index) => {
-                const itemTotal = item.price * item.quantity;
-                grandTotal += itemTotal;
-                totalItems += item.quantity;
-                orderSummary += `*${index + 1}. ${item.name}* (ID: ${item.id})\n   - Categoría: ${item.category}\n   - Color: ${item.color}\n   - Cantidad: ${item.quantity} unidades\n   - Precio Unitario: $${item.price.toFixed(2)} MXN\n   - Subtotal: $${itemTotal.toFixed(2)} MXN\n\n`;
-            });
-            orderSummary += `--------------------------------------\n*TOTAL DE ARTÍCULOS:* ${totalItems}\n*GRAN TOTAL ESTIMADO:* $${grandTotal.toFixed(2)} MXN\n\nPor favor, confirmen disponibilidad, talla y costo total. ¡Gracias!`;
-            const encodedMessage = encodeURIComponent(orderSummary);
-            const whatsappLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodedMessage}`;
-            window.open(whatsappLink, '_blank');
-        }
-
-        function renderCategories() {
-            updateView('category-view');
-            categoriesContainer.innerHTML = '';
-            BASE_CATEGORY_NAMES.forEach(category => {
-                const modelsCount = CATALOG_DATA_MODELS[category]?.length || 0;
-                const cardHtml = `
-                    <div onclick="renderProductList('${category}')"
-                        class="p-5 bg-white rounded-xl shadow-md hover:shadow-lg transition duration-300 cursor-pointer border border-gray-100 transform hover:scale-[1.02]">
-                        <h3 class="text-lg font-bold text-gray-800">${category}</h3>
-                        <p class="text-sm text-gray-500 mt-1">${modelsCount} modelos</p>
-                    </div>`;
-                categoriesContainer.insertAdjacentHTML('beforeend', cardHtml);
-            });
-        }
-        
-        function renderProductList(categoryName) {
-            currentCategory = categoryName;
-            updateView('product-list-view');
-            categoryTitle.textContent = categoryName.toUpperCase();
-            modelsContainer.innerHTML = '';
-            const models = CATALOG_DATA_MODELS[categoryName] || [];
-            models.forEach(model => {
-                const cardHtml = `
-                    <div onclick="renderProductDetail('${model.id}')"
-                        class="bg-white rounded-xl shadow-md hover:shadow-lg transition duration-300 cursor-pointer overflow-hidden border border-gray-100">
-                        <img src="${model.image}" onerror="this.onerror=null;this.src='https://placehold.co/300x400/cccccc/333333?text=${model.id}';"
-                             alt="${model.name}" class="w-full h-48 object-cover object-center">
-                        <div class="p-3">
-                            <p class="text-sm font-semibold text-gray-800 truncate">${model.name}</p>
-                            <p class="text-lg font-extrabold text-blue-600 mt-1">$${model.price} MXN</p>
-                        </div>
-                    </div>`;
-                modelsContainer.insertAdjacentHTML('beforeend', cardHtml);
-            });
-        }
-
-        function renderProductDetail(modelId) {
-            currentModel = ALL_MODELS.find(m => m.id === modelId);
-            if (!currentModel) {
-                showToast('Modelo no encontrado.', 'error');
-                return;
-            }
-            updateView('product-detail-view');
-            detailModelName.textContent = currentModel.name;
-            detailCategoryName.textContent = currentCategory; 
-            detailPrice.textContent = `$${parseFloat(currentModel.price).toFixed(2)} MXN`;
-            quantityInput.value = 1;
-            renderGallery(currentModel);
-            colorSelect.innerHTML = '';
-            if (currentModel.colors && currentModel.colors.length > 0) {
-                colorSelectorGroup.classList.remove('hidden');
-                colorSelect.insertAdjacentHTML('beforeend', '<option value="placeholder" disabled selected>-- Selecciona un Color --</option>');
-                currentModel.colors.forEach(color => {
-                    colorSelect.insertAdjacentHTML('beforeend', `<option value="${color}">${color}</option>`);
-                });
-            } else {
-                colorSelectorGroup.classList.add('hidden');
-            }
-            updateDetailOptions();
-        }
-
-        function renderGallery(model) {
-            detailThumbnails.innerHTML = '';
-            if (model.gallery && model.gallery.length > 0) {
-                detailImage.src = model.gallery[0];
-                model.gallery.forEach((url, index) => {
-                    const isFirst = index === 0;
-                    const thumbnailHtml = `
-                        <img src="${url}" onclick="changeMainImage('${url}', this)"
-                            class="w-full h-16 object-cover rounded-md cursor-pointer transition ${isFirst ? 'thumbnail-active opacity-100' : 'opacity-70'}"
-                            alt="Miniatura ${index + 1}"
-                            onerror="this.onerror=null;this.src='https://placehold.co/100x100/333333/ffffff?text=X';">`;
-                    detailThumbnails.insertAdjacentHTML('beforeend', thumbnailHtml);
-                });
-            }
-        }
-
-        form.addEventListener('submit', addToCart);
-
-        window.onload = () => {
-            loadCart();
-            updateCartCount(false); // No animar en la carga inicial
-            renderCategories();
+        const USERS = {
+            '1392': { name: 'Andrés', role: 'operator', allowedSlots: [0] },
+            '7914': { name: 'Balta', role: 'operator', allowedSlots: [1] },
+            '1111': { name: 'Marco Admin', role: 'admin' }
         };
 
+        // --- UTILIDADES (Motor de Cálculo Puro) ---
+        const CalculationEngine = {
+            getTodayISO: () => new Date().toISOString().split('T')[0],
+            
+            generateLastDays: (days = 7) => {
+                const dates = [];
+                for (let i = days - 1; i >= 0; i--) {
+                    const d = new Date();
+                    d.setDate(d.getDate() - i);
+                    dates.push({
+                        isoDate: d.toISOString().split('T')[0],
+                        label: d.toLocaleDateString('es-MX', { weekday: 'short', day: 'numeric' })
+                    });
+                }
+                return dates.reverse(); // Primero hoy
+            },
+
+            // LA FUNCIÓN CLAVE: Calcula el estado actual basado en el historial
+            calculateProgress: (machineId, order, allProductionData) => {
+                 if (!order || !order.startDate || order.totalQty <= 0) return { progress: 0, produced: 0, status: 'Sin Orden' };
+
+                 const todayISO = CalculationEngine.getTodayISO();
+                 let totalProduced = 0;
+                 
+                 // 1. Iterar sobre todos los datos de producción disponibles en la base de datos
+                 // Esto asegura que si se metió un dato de hace 3 días, se cuente.
+                 Object.keys(allProductionData).forEach(dateKey => {
+                     // Solo contar si la fecha es igual o posterior al inicio de la orden
+                     // Y si la fecha no es futura (aunque la DB no debería tener datos futuros)
+                     if (dateKey >= order.startDate && dateKey <= todayISO) {
+                         const dailyMachineData = allProductionData[dateKey]?.[machineId];
+                         if (dailyMachineData && dailyMachineData.slots) {
+                             dailyMachineData.slots.forEach(slot => {
+                                 // Aquí se podría validar si el slot.model coincide con order.model si fuera necesario
+                                 totalProduced += (Number(slot.qty) || 0);
+                             });
+                         }
+                     }
+                 });
+
+                 const progress = Math.min(100, (totalProduced / order.totalQty) * 100);
+                 const remaining = order.totalQty - totalProduced;
+                 
+                 return {
+                     progress: progress.toFixed(1),
+                     produced: totalProduced,
+                     remaining: Math.max(0, remaining),
+                     status: remaining <= 0 ? 'Completado' : 'En Proceso',
+                     model: order.model
+                 };
+            }
+        };
+
+
+        // --- CONTEXTO GLOBAL DE DATOS ---
+        // Esto permite que toda la app reaccione a cambios en Firebase
+        const DataContext = createContext(null);
+
+        const DataProvider = ({ children }) => {
+            const [productionData, setProductionData] = useState({});
+            const [ordersData, setOrdersData] = useState({});
+            const [loading, setLoading] = useState(true);
+
+            useEffect(() => {
+                setLoading(true);
+                // Suscripción a datos de producción (historial y actual)
+                const unsubProd = onSnapshot(collection(db, 'produccion_2026'), (snap) => {
+                    const data = {};
+                    snap.forEach(doc => data[doc.id] = doc.data());
+                    setProductionData(data);
+                });
+                // Suscripción a órdenes activas
+                const unsubOrders = onSnapshot(doc(db, 'settings', 'orders'), (docSnap) => {
+                    if (docSnap.exists()) setOrdersData(docSnap.data());
+                });
+                setLoading(false);
+                return () => { unsubProd(); unsubOrders(); };
+            }, []);
+
+            return (
+                <DataContext.Provider value={{ productionData, ordersData, loading }}>
+                    {children}
+                </DataContext.Provider>
+            );
+        };
+
+
+        // --- COMPONENTES DE INTERFAZ ---
+
+        // 1. Componente de Slot Individual (Input)
+        const SlotInput = ({ dateIso, machineId, slotIndex, currentQty, user }) => {
+            const [val, setVal] = useState(currentQty || '');
+            
+            // Determinar si el usuario puede editar este slot
+            const canEdit = user.role === 'admin' || (user.role === 'operator' && user.allowedSlots.includes(slotIndex));
+
+            const handleBlur = async () => {
+                if (val == currentQty || !canEdit) return; // No guardar si no hubo cambios o no tiene permisos
+
+                const numVal = val === '' ? null : Number(val);
+                
+                // Referencia al documento del día específico
+                const dayRef = doc(db, 'produccion_2026', dateIso);
+                
+                // Usamos setDoc con merge para actualizar datos profundos de forma segura
+                // Nota: Esto requiere una estructura de datos cuidadosa en Firestore. 
+                // Para simplificar este ejemplo, asumimos que leemos todo el objeto de la máquina, lo modificamos y lo guardamos.
+                
+                // En una implementación real de producción, usaríamos transacciones o 'arrayUnion' si la estructura lo permite,
+                // pero para mantener la estructura del ejemplo original (slots: [{}, {}]):
+                
+                // Solución temporal para el ejemplo: Leeremos el estado global, pero esto no es ideal para concurrencia.
+                // Para este prototipo funcional, asumiremos que la estructura existe.
+                // Un enfoque más robusto sería usar una Cloud Function o una estructura de datos más plana.
+                
+                try {
+                    // Simulamos la actualización profunda necesaria
+                    // NOTA CRÍTICA: Esta es una simplificación. Actualizar un índice específico de un array 
+                    // dentro de un mapa anidado en Firestore es complejo sin leer primero.
+                    // Para que este ejemplo funcione "desde cero" de forma simple, usaremos un truco de notación de puntos,
+                    // PERO requiere que el documento y el mapa de la máquina ya existan.
+                    
+                    const fieldPath = `${machineId}.slots`;
+                    // Esta parte es compleja de hacer atómicamente sin leer primero en esta estructura.
+                    // Para garantizar que funcione en este ejemplo, haremos una escritura un poco "sucia" 
+                    // que asume que el cliente tiene la última verdad.
+                    
+                    // Leemos el dato actual del contexto (que viene de Firebase)
+                    // const currentMachineData = useContext(DataContext).productionData[dateIso]?.[machineId] || { slots: [{}, {}] };
+                    // const newSlots = [...(currentMachineData.slots || [{},{}])];
+                    // newSlots[slotIndex] = { ...newSlots[slotIndex], qty: numVal };
+                    
+                    // await setDoc(dayRef, { [machineId]: { ...currentMachineData, slots: newSlots } }, { merge: true });
+
+                    alert(`Simulación: Guardando valor ${numVal} en ${dateIso} M-${machineId} S-${slotIndex}. \n(La escritura anidada compleja se omite en esta variante simplificada, pero la lógica de lectura funciona).`);
+                    // En la app real, aquí iría el `handleUpdateSlot` del original.
+
+                } catch (e) {
+                    console.error("Error guardando:", e);
+                }
+            };
+
+            return (
+                <div className={`border border-slate-600 rounded h-10 flex items-center justify-center ${canEdit ? 'bg-slate-800' : 'bg-slate-900/50 opacity-50'}`}>
+                    <input 
+                        type="number" 
+                        value={val}
+                        disabled={!canEdit}
+                        onChange={(e) => setVal(e.target.value)}
+                        onBlur={handleBlur}
+                        className="slot-input text-white text-sm"
+                        placeholder="-"
+                    />
+                </div>
+            );
+        };
+
+
+        // 2. Tarjeta de Máquina (Muestra estado y días recientes)
+        const MachineCard = ({ machine, user }) => {
+            const { productionData, ordersData } = useContext(DataContext);
+            
+            // Usamos useMemo para que el cálculo solo se ejecute si cambian los datos relevantes
+            const metrics = useMemo(() => {
+                return CalculationEngine.calculateProgress(machine.id, ordersData[machine.id], productionData);
+            }, [machine.id, ordersData[machine.id], productionData]);
+
+            // Generar los últimos 3 días para mostrar
+            const recentDays = useMemo(() => CalculationEngine.generateLastDays(3), []);
+
+            return (
+                <div className="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden mb-4 shadow-lg">
+                    {/* Encabezado de la Máquina y Orden */}
+                    <div className="p-3 bg-slate-800 border-b border-slate-700 flex justify-between items-center">
+                        <div>
+                            <h3 className="font-bold text-white">{machine.name}</h3>
+                            <p className="text-xs text-slate-400">{machine.type}</p>
+                        </div>
+                         {metrics.progress > 0 && (
+                            <div className="text-right">
+                                <div className="text-yellow-400 font-bold text-sm">{metrics.model}</div>
+                                <div className="text-xs text-blue-300 font-bold">{metrics.progress}% Avance</div>
+                                <div className="text-[10px] text-slate-500">Faltan: {metrics.remaining.toLocaleString()}</div>
+                            </div>
+                        )}
+                    </div>
+                    
+                     {/* Barra de Progreso Visual */}
+                     {metrics.progress > 0 && (
+                        <div className="h-2 bg-slate-900">
+                            <div className="h-full bg-blue-600 transition-all duration-500" style={{ width: `${metrics.progress}%` }}></div>
+                        </div>
+                    )}
+
+                    {/* Sección de Captura de Datos (Últimos días) */}
+                    <div className="p-3 bg-slate-900/50">
+                        <h4 className="text-xs text-slate-400 mb-2 uppercase font-bold">Captura Reciente</h4>
+                        <div className="flex gap-2 overflow-x-auto">
+                            {recentDays.map(day => {
+                                // Obtener datos reales de ese día para esta máquina
+                                const daySlots = productionData[day.isoDate]?.[machine.id]?.slots || [{}, {}];
+                                return (
+                                    <div key={day.isoDate} className="min-w-[80px] bg-slate-800 rounded p-2 border border-slate-700">
+                                        <div className="text-center text-[10px] text-slate-400 mb-1">{day.label}</div>
+                                        <div className="space-y-1">
+                                            {/* Slots fijos 0 (Andrés) y 1 (Balta) para el ejemplo */}
+                                            <SlotInput dateIso={day.isoDate} machineId={machine.id} slotIndex={0} currentQty={daySlots[0]?.qty} user={user} />
+                                            <SlotInput dateIso={day.isoDate} machineId={machine.id} slotIndex={1} currentQty={daySlots[1]?.qty} user={user} />
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                        <div className="flex justify-between text-[9px] text-slate-500 px-2 mt-1">
+                            <span>OP A (Andrés)</span><span>OP B (Balta)</span>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+
+        // 3. Pantalla Principal
+        const Dashboard = ({ user, logout }) => {
+            return (
+                <DataProvider>
+                    <div className="min-h-screen bg-slate-900 pb-10">
+                        {/* Header Simple */}
+                        <header className="bg-slate-800 p-4 flex justify-between items-center border-b border-slate-700 sticky top-0 z-10">
+                            <h1 className="text-white font-bold text-lg flex items-center gap-2">
+                                <i data-lucide="grid" className="text-blue-500"></i> Control Tejido V2
+                            </h1>
+                            <div className="flex items-center gap-4">
+                                <div className="text-right">
+                                    <p className="text-sm text-white font-bold">{user.name}</p>
+                                    <p className="text-xs text-slate-400 uppercase">{user.role}</p>
+                                </div>
+                                <button onClick={logout} className="p-2 bg-red-900/30 text-red-400 rounded hover:bg-red-900/50"><i data-lucide="log-out" className="w-4 h-4"></i></button>
+                            </div>
+                        </header>
+                        
+                        {/* Lista de Máquinas */}
+                        <main className="p-4 max-w-3xl mx-auto">
+                            {MACHINES.map(machine => (
+                                <MachineCard key={machine.id} machine={machine} user={user} />
+                            ))}
+                        </main>
+                         <div className="text-center text-xs text-slate-500 p-4">
+                            Esta es una variante simplificada que demuestra cómo el historial de producción afecta el cálculo del avance.
+                        </div>
+                    </div>
+                </DataProvider>
+            );
+        };
+
+        // 4. Login Simple
+        const Login = ({ onLogin }) => {
+            const [pin, setPin] = useState('');
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                if (USERS[pin]) onLogin(USERS[pin]);
+                else alert('PIN no válido');
+            };
+            return (
+                <div className="h-screen flex items-center justify-center bg-slate-900">
+                    <form onSubmit={handleSubmit} className="bg-slate-800 p-8 rounded-2xl shadow-xl border border-slate-700 text-center">
+                        <h2 className="text-white text-xl font-bold mb-4">Ingreso Operador</h2>
+                        <input type="tel" value={pin} onChange={e => setPin(e.target.value)} className="text-4xl bg-slate-900 text-white text-center p-4 rounded-xl border-2 border-slate-700 font-bold tracking-[0.5em] mb-6 outline-none focus:border-blue-500" placeholder="••••" maxLength={4}/>
+                        <button type="submit" className="w-full bg-blue-600 text-white py-3 rounded-xl font-bold">ENTRAR</button>
+                        <p className="mt-4 text-xs text-slate-400">PINs demo: 1392, 7914, 1111</p>
+                    </form>
+                </div>
+            )
+        }
+
+
+        // --- APP PRINCIPAL ---
+        const App = () => {
+            const [user, setUser] = useState(null);
+            useEffect(() => { if (window.lucide) window.lucide.createIcons(); });
+
+            if (!user) return <Login onLogin={setUser} />;
+            return <Dashboard user={user} logout={() => setUser(null)} />;
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
     </script>
 </body>
 </html>
