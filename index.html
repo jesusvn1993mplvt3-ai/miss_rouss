@@ -2,337 +2,487 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MAES26 V2 - Núcleo de Planeación</title>
-    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema Textil Cloud - Cirineo</title>
+    
+    <link id="appIcon" rel="icon" href="https://raw.githubusercontent.com/jesusvn1993mplvt3-ai/CIRINEO/refs/heads/main/icon.ico">
+    <link id="appAppleIcon" rel="apple-touch-icon" href="https://raw.githubusercontent.com/jesusvn1993mplvt3-ai/CIRINEO/refs/heads/main/icon.ico">
+    <meta name="theme-color" content="#1e293b">
+    
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <style>
-        /* Estilos mínimos necesarios */
-        body { background-color: #0f172a; color: #e2e8f0; }
-        .slot-input { @apply bg-transparent border-none outline-none text-center w-full font-bold p-0; }
-        .slot-input:focus { @apply bg-slate-700 text-blue-400; }
-    </style>
-</head>
-<body>
-    <div id="root"></div>
 
-    <script type="text/babel" data-type="module">
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-        import { getFirestore, collection, doc, setDoc, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
-        const { useState, useEffect, useContext, createContext, useMemo } = React;
-
-        // --- CONFIGURACIÓN (Reemplazar con tus credenciales reales) ---
+    <script type="text/babel">
+        // 1. CONFIGURACIÓN
         const firebaseConfig = {
-            apiKey: "TU_API_KEY",
-            authDomain: "TU_PROJECT_ID.firebaseapp.com",
-            projectId: "TU_PROJECT_ID",
-            storageBucket: "TU_PROJECT_ID.firebasestorage.app",
-            messagingSenderId: "TU_SENDER_ID",
-            appId: "TU_APP_ID"
+            // [AQUÍ IRÍAN LAS CLAVES DE CONFIGURACIÓN DE FIREBASE]
         };
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
 
-        // --- CONSTANTES ---
-        const MACHINES = [
-            { id: 'm1', name: 'MAQ 1', type: 'CIXING' }, { id: 'm35', name: 'MAQ 35', type: 'SANTONI SM8' },
-            { id: 'm29', name: 'MAQ 29', type: 'SANTONI EVO4' },{ id: 'm8',  name: 'MAQ 8',  type: 'SANTONI TOP2' },
-            // ... (Se pueden agregar el resto de máquinas aquí)
-        ];
-        
-        const USERS = {
-            '1392': { name: 'Andrés', role: 'operator', allowedSlots: [0] },
-            '7914': { name: 'Balta', role: 'operator', allowedSlots: [1] },
-            '1111': { name: 'Marco Admin', role: 'admin' }
-        };
+        // 2. COMPONENTES DE LUCIDE (ICONOS)
+        const { Menu, Home, CheckCircle, Clock, Archive, Settings, ArrowUp, ArrowDown, Search, Filter } = lucide;
 
-        // --- UTILIDADES (Motor de Cálculo Puro) ---
-        const CalculationEngine = {
-            getTodayISO: () => new Date().toISOString().split('T')[0],
-            
-            generateLastDays: (days = 7) => {
-                const dates = [];
-                for (let i = days - 1; i >= 0; i--) {
-                    const d = new Date();
-                    d.setDate(d.getDate() - i);
-                    dates.push({
-                        isoDate: d.toISOString().split('T')[0],
-                        label: d.toLocaleDateString('es-MX', { weekday: 'short', day: 'numeric' })
+        // 3. ESTADOS Y CONTEXTO
+        const App = () => {
+            const [orders, setOrders] = React.useState([]);
+            const [loading, setLoading] = React.useState(true);
+            const [viewMode, setViewMode] = React.useState('active'); // 'active' o 'history'
+            const [selectedOrder, setSelectedOrder] = React.useState(null);
+            const [searchQuery, setSearchQuery] = React.useState('');
+            const [filterStatus, setFilterStatus] = React.useState('ALL'); // 'ALL', 'PENDIENTE', 'EN PROCESO', 'FINALIZADO'
+
+            // Mapeo de estados de producción
+            const statusMap = {
+                'PENDIENTE': { step: 1, totalSteps: 4, color: 'bg-amber-500' },
+                'EN PROCESO': { step: 2, totalSteps: 4, color: 'bg-blue-500' },
+                'FINALIZADO': { step: 3, totalSteps: 4, color: 'bg-green-500' },
+                'ENVIADO': { step: 4, totalSteps: 4, color: 'bg-indigo-500' },
+                'ARCHIVADO': { step: 4, totalSteps: 4, color: 'bg-slate-500' }, // Se mantiene a 4 para la barra, aunque el color lo diferencia
+            };
+
+            // 4. FUNCIÓN PARA OBTENER DATOS
+            React.useEffect(() => {
+                const unsubscribe = db.collection('pedidos')
+                    .orderBy('fechaEntrega', 'asc')
+                    .onSnapshot(snapshot => {
+                        const loadedOrders = snapshot.docs.map(doc => ({
+                            id: doc.id,
+                            ...doc.data(),
+                            // Asegurar campos esenciales y parsear números
+                            totalPedido: parseInt(doc.data().totalPedido || 0),
+                            totalCompletado: parseInt(doc.data().totalCompletado || 0),
+                            status: doc.data().status || 'PENDIENTE',
+                            cliente: doc.data().cliente || 'N/A',
+                            modelo: doc.data().modelo || 'N/A',
+                            fechaEntrega: doc.data().fechaEntrega ? new Date(doc.data().fechaEntrega.seconds * 1000) : null
+                        }));
+                        setOrders(loadedOrders);
+                        setLoading(false);
+                    }, error => {
+                        console.error("Error fetching documents: ", error);
+                        setLoading(false);
                     });
-                }
-                return dates.reverse(); // Primero hoy
-            },
-
-            // LA FUNCIÓN CLAVE: Calcula el estado actual basado en el historial
-            calculateProgress: (machineId, order, allProductionData) => {
-                 if (!order || !order.startDate || order.totalQty <= 0) return { progress: 0, produced: 0, status: 'Sin Orden' };
-
-                 const todayISO = CalculationEngine.getTodayISO();
-                 let totalProduced = 0;
-                 
-                 // 1. Iterar sobre todos los datos de producción disponibles en la base de datos
-                 // Esto asegura que si se metió un dato de hace 3 días, se cuente.
-                 Object.keys(allProductionData).forEach(dateKey => {
-                     // Solo contar si la fecha es igual o posterior al inicio de la orden
-                     // Y si la fecha no es futura (aunque la DB no debería tener datos futuros)
-                     if (dateKey >= order.startDate && dateKey <= todayISO) {
-                         const dailyMachineData = allProductionData[dateKey]?.[machineId];
-                         if (dailyMachineData && dailyMachineData.slots) {
-                             dailyMachineData.slots.forEach(slot => {
-                                 // Aquí se podría validar si el slot.model coincide con order.model si fuera necesario
-                                 totalProduced += (Number(slot.qty) || 0);
-                             });
-                         }
-                     }
-                 });
-
-                 const progress = Math.min(100, (totalProduced / order.totalQty) * 100);
-                 const remaining = order.totalQty - totalProduced;
-                 
-                 return {
-                     progress: progress.toFixed(1),
-                     produced: totalProduced,
-                     remaining: Math.max(0, remaining),
-                     status: remaining <= 0 ? 'Completado' : 'En Proceso',
-                     model: order.model
-                 };
-            }
-        };
-
-
-        // --- CONTEXTO GLOBAL DE DATOS ---
-        // Esto permite que toda la app reaccione a cambios en Firebase
-        const DataContext = createContext(null);
-
-        const DataProvider = ({ children }) => {
-            const [productionData, setProductionData] = useState({});
-            const [ordersData, setOrdersData] = useState({});
-            const [loading, setLoading] = useState(true);
-
-            useEffect(() => {
-                setLoading(true);
-                // Suscripción a datos de producción (historial y actual)
-                const unsubProd = onSnapshot(collection(db, 'produccion_2026'), (snap) => {
-                    const data = {};
-                    snap.forEach(doc => data[doc.id] = doc.data());
-                    setProductionData(data);
-                });
-                // Suscripción a órdenes activas
-                const unsubOrders = onSnapshot(doc(db, 'settings', 'orders'), (docSnap) => {
-                    if (docSnap.exists()) setOrdersData(docSnap.data());
-                });
-                setLoading(false);
-                return () => { unsubProd(); unsubOrders(); };
+                
+                return () => unsubscribe();
             }, []);
 
-            return (
-                <DataContext.Provider value={{ productionData, ordersData, loading }}>
-                    {children}
-                </DataContext.Provider>
-            );
-        };
+            // 5. MANEJADORES DE ACCIONES
+            const handleOrderClick = (order) => {
+                setSelectedOrder(order);
+            };
 
+            const handleCloseDetail = () => {
+                setSelectedOrder(null);
+            };
 
-        // --- COMPONENTES DE INTERFAZ ---
-
-        // 1. Componente de Slot Individual (Input)
-        const SlotInput = ({ dateIso, machineId, slotIndex, currentQty, user }) => {
-            const [val, setVal] = useState(currentQty || '');
-            
-            // Determinar si el usuario puede editar este slot
-            const canEdit = user.role === 'admin' || (user.role === 'operator' && user.allowedSlots.includes(slotIndex));
-
-            const handleBlur = async () => {
-                if (val == currentQty || !canEdit) return; // No guardar si no hubo cambios o no tiene permisos
-
-                const numVal = val === '' ? null : Number(val);
-                
-                // Referencia al documento del día específico
-                const dayRef = doc(db, 'produccion_2026', dateIso);
-                
-                // Usamos setDoc con merge para actualizar datos profundos de forma segura
-                // Nota: Esto requiere una estructura de datos cuidadosa en Firestore. 
-                // Para simplificar este ejemplo, asumimos que leemos todo el objeto de la máquina, lo modificamos y lo guardamos.
-                
-                // En una implementación real de producción, usaríamos transacciones o 'arrayUnion' si la estructura lo permite,
-                // pero para mantener la estructura del ejemplo original (slots: [{}, {}]):
-                
-                // Solución temporal para el ejemplo: Leeremos el estado global, pero esto no es ideal para concurrencia.
-                // Para este prototipo funcional, asumiremos que la estructura existe.
-                // Un enfoque más robusto sería usar una Cloud Function o una estructura de datos más plana.
-                
+            const handleUpdateStatus = async (orderId, newStatus) => {
+                if(viewMode === 'history') {
+                    alert('No se pueden modificar órdenes en modo historial.');
+                    return;
+                }
+                setLoading(true);
                 try {
-                    // Simulamos la actualización profunda necesaria
-                    // NOTA CRÍTICA: Esta es una simplificación. Actualizar un índice específico de un array 
-                    // dentro de un mapa anidado en Firestore es complejo sin leer primero.
-                    // Para que este ejemplo funcione "desde cero" de forma simple, usaremos un truco de notación de puntos,
-                    // PERO requiere que el documento y el mapa de la máquina ya existan.
-                    
-                    const fieldPath = `${machineId}.slots`;
-                    // Esta parte es compleja de hacer atómicamente sin leer primero en esta estructura.
-                    // Para garantizar que funcione en este ejemplo, haremos una escritura un poco "sucia" 
-                    // que asume que el cliente tiene la última verdad.
-                    
-                    // Leemos el dato actual del contexto (que viene de Firebase)
-                    // const currentMachineData = useContext(DataContext).productionData[dateIso]?.[machineId] || { slots: [{}, {}] };
-                    // const newSlots = [...(currentMachineData.slots || [{},{}])];
-                    // newSlots[slotIndex] = { ...newSlots[slotIndex], qty: numVal };
-                    
-                    // await setDoc(dayRef, { [machineId]: { ...currentMachineData, slots: newSlots } }, { merge: true });
-
-                    alert(`Simulación: Guardando valor ${numVal} en ${dateIso} M-${machineId} S-${slotIndex}. \n(La escritura anidada compleja se omite en esta variante simplificada, pero la lógica de lectura funciona).`);
-                    // En la app real, aquí iría el `handleUpdateSlot` del original.
-
-                } catch (e) {
-                    console.error("Error guardando:", e);
+                    await db.collection('pedidos').doc(orderId).update({ status: newStatus });
+                    alert(`El estado de la orden ${orderId} ha sido actualizado a ${newStatus}.`);
+                } catch (error) {
+                    console.error("Error al actualizar el estado: ", error);
+                    alert("Error al actualizar el estado.");
+                } finally {
+                    setLoading(false);
+                    setSelectedOrder(null); // Cerrar detalle después de actualizar
+                }
+            };
+            
+            const handleArchive = async (orderId) => {
+                if(viewMode === 'history') {
+                    alert('No se pueden modificar órdenes en modo historial.');
+                    return;
+                }
+                if (!window.confirm("¿Está seguro de que desea ARCHIVAR esta orden? Solo las órdenes FINALIZADAS o ENVIADAS deben archivarse.")) return;
+                setLoading(true);
+                try {
+                    await db.collection('pedidos').doc(orderId).update({ status: 'ARCHIVADO' });
+                    alert(`La orden ${orderId} ha sido archivada.`);
+                } catch (error) {
+                    console.error("Error al archivar la orden: ", error);
+                    alert("Error al archivar la orden.");
+                } finally {
+                    setLoading(false);
+                    setSelectedOrder(null);
+                }
+            };
+            
+            const handleUnarchive = async (orderId) => {
+                if (!window.confirm("¿Está seguro de que desea RE-ACTIVAR esta orden? Se establecerá como EN PROCESO.")) return;
+                setLoading(true);
+                try {
+                    await db.collection('pedidos').doc(orderId).update({ status: 'EN PROCESO' });
+                    alert(`La orden ${orderId} ha sido reactivada.`);
+                } catch (error) {
+                    console.error("Error al reactivar la orden: ", error);
+                    alert("Error al reactivar la orden.");
+                } finally {
+                    setLoading(false);
+                    setSelectedOrder(null);
                 }
             };
 
-            return (
-                <div className={`border border-slate-600 rounded h-10 flex items-center justify-center ${canEdit ? 'bg-slate-800' : 'bg-slate-900/50 opacity-50'}`}>
-                    <input 
-                        type="number" 
-                        value={val}
-                        disabled={!canEdit}
-                        onChange={(e) => setVal(e.target.value)}
-                        onBlur={handleBlur}
-                        className="slot-input text-white text-sm"
-                        placeholder="-"
-                    />
-                </div>
-            );
-        };
-
-
-        // 2. Tarjeta de Máquina (Muestra estado y días recientes)
-        const MachineCard = ({ machine, user }) => {
-            const { productionData, ordersData } = useContext(DataContext);
+            const handleDelete = async (orderId) => {
+                if(viewMode === 'history') {
+                    alert('No se pueden eliminar órdenes en modo historial.');
+                    return;
+                }
+                if (!window.confirm("¡ADVERTENCIA! ¿Está seguro de que desea ELIMINAR permanentemente esta orden?")) return;
+                setLoading(true);
+                try {
+                    await db.collection('pedidos').doc(orderId).delete();
+                    alert(`La orden ${orderId} ha sido eliminada permanentemente.`);
+                } catch (error) {
+                    console.error("Error al eliminar la orden: ", error);
+                    alert("Error al eliminar la orden.");
+                } finally {
+                    setLoading(false);
+                    setSelectedOrder(null);
+                }
+            };
             
-            // Usamos useMemo para que el cálculo solo se ejecute si cambian los datos relevantes
-            const metrics = useMemo(() => {
-                return CalculationEngine.calculateProgress(machine.id, ordersData[machine.id], productionData);
-            }, [machine.id, ordersData[machine.id], productionData]);
-
-            // Generar los últimos 3 días para mostrar
-            const recentDays = useMemo(() => CalculationEngine.generateLastDays(3), []);
-
-            return (
-                <div className="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden mb-4 shadow-lg">
-                    {/* Encabezado de la Máquina y Orden */}
-                    <div className="p-3 bg-slate-800 border-b border-slate-700 flex justify-between items-center">
-                        <div>
-                            <h3 className="font-bold text-white">{machine.name}</h3>
-                            <p className="text-xs text-slate-400">{machine.type}</p>
-                        </div>
-                         {metrics.progress > 0 && (
-                            <div className="text-right">
-                                <div className="text-yellow-400 font-bold text-sm">{metrics.model}</div>
-                                <div className="text-xs text-blue-300 font-bold">{metrics.progress}% Avance</div>
-                                <div className="text-[10px] text-slate-500">Faltan: {metrics.remaining.toLocaleString()}</div>
-                            </div>
-                        )}
-                    </div>
+            // Función de filtrado y búsqueda
+            const filteredOrders = orders
+                .filter(order => {
+                    const isArchived = order.status === 'ARCHIVADO';
                     
-                     {/* Barra de Progreso Visual */}
-                     {metrics.progress > 0 && (
-                        <div className="h-2 bg-slate-900">
-                            <div className="h-full bg-blue-600 transition-all duration-500" style={{ width: `${metrics.progress}%` }}></div>
-                        </div>
-                    )}
+                    // Filtrar por modo de vista
+                    if (viewMode === 'active' && isArchived) return false;
+                    if (viewMode === 'history' && !isArchived) return false;
 
-                    {/* Sección de Captura de Datos (Últimos días) */}
-                    <div className="p-3 bg-slate-900/50">
-                        <h4 className="text-xs text-slate-400 mb-2 uppercase font-bold">Captura Reciente</h4>
-                        <div className="flex gap-2 overflow-x-auto">
-                            {recentDays.map(day => {
-                                // Obtener datos reales de ese día para esta máquina
-                                const daySlots = productionData[day.isoDate]?.[machine.id]?.slots || [{}, {}];
-                                return (
-                                    <div key={day.isoDate} className="min-w-[80px] bg-slate-800 rounded p-2 border border-slate-700">
-                                        <div className="text-center text-[10px] text-slate-400 mb-1">{day.label}</div>
-                                        <div className="space-y-1">
-                                            {/* Slots fijos 0 (Andrés) y 1 (Balta) para el ejemplo */}
-                                            <SlotInput dateIso={day.isoDate} machineId={machine.id} slotIndex={0} currentQty={daySlots[0]?.qty} user={user} />
-                                            <SlotInput dateIso={day.isoDate} machineId={machine.id} slotIndex={1} currentQty={daySlots[1]?.qty} user={user} />
+                    // Filtrar por estado
+                    if (filterStatus !== 'ALL' && order.status !== filterStatus) {
+                        // El modo historial también permite ver ARCHIVADO, pero solo si el filtro es 'ALL' o el propio 'ARCHIVADO' (que no está en el selector de activos, pero por si acaso)
+                        if (viewMode === 'active' && isArchived) return false; // Ya manejado arriba
+                        if (viewMode === 'history' && filterStatus === 'ARCHIVADO' && !isArchived) return false;
+                        if (viewMode === 'history' && filterStatus !== 'ARCHIVADO' && isArchived) return false;
+                        
+                        // En modo activo, si el filtro no es 'ALL', solo muestra el estado seleccionado.
+                        if (viewMode === 'active' && order.status !== filterStatus) return false;
+                        
+                        // Si está en historial, y el filtro es un estado ACTIVO, no mostrar.
+                        if (viewMode === 'history' && order.status !== filterStatus && order.status !== 'ARCHIVADO') return false;
+                        
+                        // Si el filtro no es ALL, y el status no coincide.
+                        if (filterStatus !== 'ALL' && order.status !== filterStatus) return false;
+                    }
+                    
+                    // Búsqueda
+                    if (searchQuery) {
+                        const query = searchQuery.toLowerCase();
+                        return (
+                            order.id.toLowerCase().includes(query) ||
+                            (order.cliente && order.cliente.toLowerCase().includes(query)) ||
+                            (order.modelo && order.modelo.toLowerCase().includes(query)) ||
+                            (order.totalPedido && order.totalPedido.toString().includes(query))
+                        );
+                    }
+                    
+                    return true;
+                })
+                .sort((a, b) => {
+                    // Si ambos tienen fecha de entrega, ordenar por fecha
+                    if (a.fechaEntrega && b.fechaEntrega) {
+                        return a.fechaEntrega.getTime() - b.fechaEntrega.getTime();
+                    }
+                    // Si uno no tiene fecha, el que tiene va primero
+                    if (a.fechaEntrega && !b.fechaEntrega) return -1;
+                    if (!a.fechaEntrega && b.fechaEntrega) return 1;
+                    // Si ninguno tiene, ordenar por ID
+                    return a.id.localeCompare(b.id);
+                });
+                
+            // Órdenes a mostrar según el modo y el filtro
+            const displayedOrders = filteredOrders;
+
+            // 6. COMPONENTES DE VISTA
+
+            // SideNav (Barra lateral)
+            const SideNav = ({ viewMode, setViewMode, totalOrders }) => {
+                const navItems = [
+                    { name: 'Activas', icon: Clock, mode: 'active', count: orders.filter(o => o.status !== 'ARCHIVADO').length },
+                    { name: 'Historial', icon: Archive, mode: 'history', count: orders.filter(o => o.status === 'ARCHIVADO').length },
+                ];
+                
+                return (
+                    <div className="w-56 bg-slate-900 text-white flex flex-col p-4 h-full">
+                        <div className="flex items-center mb-6">
+                            <img src="https://raw.githubusercontent.com/jesusvn1993mplvt3-ai/CIRINEO/refs/heads/main/icon.ico" alt="Logo" className="w-8 h-8 mr-2"/>
+                            <h1 className="text-xl font-bold">Cirineo</h1>
+                        </div>
+                        <nav className="flex-grow">
+                            {navItems.map(item => (
+                                <div 
+                                    key={item.mode}
+                                    className={`flex items-center p-3 rounded-lg cursor-pointer transition-colors mb-2 ${viewMode === item.mode ? 'bg-slate-700' : 'hover:bg-slate-800'}`}
+                                    onClick={() => setViewMode(item.mode)}
+                                >
+                                    <item.icon className="w-5 h-5 mr-3"/>
+                                    <span>{item.name}</span>
+                                    <span className="ml-auto bg-slate-600 text-xs px-2 py-0.5 rounded-full">{item.count}</span>
+                                </div>
+                            ))}
+                        </nav>
+                        <div className="text-xs text-slate-500 mt-4 border-t border-slate-800 pt-3">
+                            Sistema Textil Cloud v1.0
+                        </div>
+                    </div>
+                );
+            };
+
+            // OrderDetail (Detalle de la Orden)
+            const OrderDetail = ({ order, onClose, onUpdateStatus, onArchive, onUnarchive, onDelete, viewMode }) => {
+                if (!order) return null;
+
+                const { status, totalPedido, totalCompletado, cliente, modelo, fechaEntrega, notas, id } = order;
+                const statusInfo = statusMap[status] || { step: 0, totalSteps: 4, color: 'bg-gray-500' };
+                const pctCompleted = totalPedido > 0 ? ((totalCompletado / totalPedido) * 100).toFixed(1) : 0;
+                const progressText = `${totalCompletado} / ${totalPedido} pzs`;
+                const isArchived = status === 'ARCHIVADO';
+                const isFinalState = status === 'FINALIZADO' || status === 'ENVIADO';
+
+                // Determinar las acciones disponibles
+                const availableActions = Object.keys(statusMap).filter(s => s !== status && s !== 'ARCHIVADO');
+                
+                return (
+                    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-end">
+                        <div className="w-full md:w-1/3 bg-white h-full shadow-2xl overflow-y-auto">
+                            <div className="p-6">
+                                <div className="flex justify-between items-start mb-6 border-b pb-3">
+                                    <h2 className="text-2xl font-bold text-slate-800">Orden #{id}</h2>
+                                    <button onClick={onClose} className="text-slate-500 hover:text-slate-800">
+                                        <ArrowUp className="w-6 h-6 rotate-45"/>
+                                    </button>
+                                </div>
+
+                                <div className="mb-6 p-4 border rounded-lg bg-slate-50">
+                                    <div className="flex items-center mb-2">
+                                        <Clock className={`w-5 h-5 mr-3 ${isArchived ? 'text-slate-500' : 'text-green-600'}`}/>
+                                        <span className={`text-xl font-extrabold ${isArchived ? 'text-slate-600' : 'text-green-600'}`}>{status}</span>
+                                    </div>
+                                    <p className="text-sm text-slate-600">Cliente: <span className="font-semibold">{cliente}</span></p>
+                                    <p className="text-sm text-slate-600">Modelo: <span className="font-semibold">{modelo}</span></p>
+                                    <p className="text-sm text-slate-600">Entrega: <span className="font-semibold">{fechaEntrega ? fechaEntrega.toLocaleDateString('es-ES') : 'N/A'}</span></p>
+                                </div>
+                                
+                                <h3 className="text-lg font-semibold mb-3 text-slate-700">Progreso de Producción</h3>
+                                <div className="bg-slate-100 p-4 rounded-lg mb-6">
+                                    <div className="flex justify-between text-sm font-medium mb-1">
+                                        <span>Total: {totalPedido} pzs</span>
+                                        <span>Completado: {totalCompletado} pzs</span>
+                                    </div>
+                                    <div className="w-full bg-slate-300 h-6 rounded-full overflow-hidden">
+                                        <div 
+                                            className={`${isArchived ? 'bg-slate-500' : statusInfo.color} h-full transition-all duration-500`} 
+                                            style={{width:`${pctCompleted}%`}}
+                                        >
+                                            <span className="text-white text-xs font-bold ml-2 leading-6">{pctCompleted}%</span>
                                         </div>
                                     </div>
-                                );
-                            })}
-                        </div>
-                        <div className="flex justify-between text-[9px] text-slate-500 px-2 mt-1">
-                            <span>OP A (Andrés)</span><span>OP B (Balta)</span>
+                                    <p className="text-xs text-center mt-2 text-slate-500">{progressText}</p>
+                                </div>
+
+                                <h3 className="text-lg font-semibold mb-3 text-slate-700">Notas</h3>
+                                <p className="p-4 border rounded-lg bg-slate-50 text-sm text-slate-700 h-20 overflow-y-auto mb-6">
+                                    {notas || 'No hay notas registradas para esta orden.'}
+                                </p>
+
+                                {viewMode === 'active' && !isArchived && (
+                                    <>
+                                        <h3 className="text-lg font-semibold mb-3 text-slate-700">Cambiar Estado</h3>
+                                        <div className="flex flex-wrap gap-2 mb-6">
+                                            {availableActions.map(s => (
+                                                <button 
+                                                    key={s}
+                                                    onClick={() => onUpdateStatus(id, s)}
+                                                    className={`px-3 py-1 text-sm font-medium rounded-full transition-colors ${statusMap[s].color.replace('bg-', 'hover:bg-')} bg-slate-200 text-slate-800 hover:text-white`}
+                                                >
+                                                    Mover a {s}
+                                                </button>
+                                            ))}
+                                            {isFinalState && (
+                                                <button 
+                                                    onClick={() => onArchive(id)}
+                                                    className="px-3 py-1 text-sm font-medium rounded-full bg-slate-500 text-white hover:bg-slate-600 transition-colors"
+                                                >
+                                                    <Archive className="w-4 h-4 inline mr-1"/> Archivar
+                                                </button>
+                                            )}
+                                        </div>
+                                        <div className="mt-6 pt-4 border-t border-slate-200">
+                                            <button 
+                                                onClick={() => onDelete(id)}
+                                                className="w-full py-2 text-sm font-medium rounded-lg bg-red-100 text-red-600 hover:bg-red-200 transition-colors"
+                                            >
+                                                Eliminar Orden (Permanente)
+                                            </button>
+                                        </div>
+                                    </>
+                                )}
+                                
+                                {viewMode === 'history' && isArchived && (
+                                    <div className="mt-6 pt-4 border-t border-slate-200">
+                                        <div className="text-center text-sm font-medium text-slate-500 mb-4">
+                                            Esta orden está **ARCHIVADA**. Solo puede ser reactivada.
+                                        </div>
+                                        <button 
+                                            onClick={() => onUnarchive(id)}
+                                            className="w-full py-2 text-sm font-medium rounded-lg bg-yellow-500 text-white hover:bg-yellow-600 transition-colors mb-2"
+                                        >
+                                            Re-Activar Orden (Mover a EN PROCESO)
+                                        </button>
+                                    </div>
+                                )}
+                                
+                                {viewMode === 'history' && !isArchived && (
+                                    <div className="mt-6 p-4 border border-blue-200 rounded-lg bg-blue-50 text-sm font-medium text-blue-800">
+                                        Esta orden es activa y aparece en Historial porque el filtro no está en 'ARCHIVADO'. Los cambios están deshabilitados.
+                                    </div>
+                                )}
+                                
+                            </div>
                         </div>
                     </div>
-                </div>
-            );
-        };
+                );
+            };
 
+            // DashboardBottom (Estadísticas y Resumen)
+            const DashboardBottom = ({ activeOrders }) => {
+                const totalActivePzs = activeOrders.reduce((sum, o) => sum + o.totalPedido, 0);
+                const totalCompletedActivePzs = activeOrders.reduce((sum, o) => sum + o.totalCompletado, 0);
+                const ordersByStatus = activeOrders.reduce((acc, o) => {
+                    acc[o.status] = (acc[o.status] || 0) + 1;
+                    return acc;
+                }, {});
 
-        // 3. Pantalla Principal
-        const Dashboard = ({ user, logout }) => {
-            return (
-                <DataProvider>
-                    <div className="min-h-screen bg-slate-900 pb-10">
-                        {/* Header Simple */}
-                        <header className="bg-slate-800 p-4 flex justify-between items-center border-b border-slate-700 sticky top-0 z-10">
-                            <h1 className="text-white font-bold text-lg flex items-center gap-2">
-                                <i data-lucide="grid" className="text-blue-500"></i> Control Tejido V2
-                            </h1>
-                            <div className="flex items-center gap-4">
-                                <div className="text-right">
-                                    <p className="text-sm text-white font-bold">{user.name}</p>
-                                    <p className="text-xs text-slate-400 uppercase">{user.role}</p>
+                const stats = [
+                    { name: 'Órdenes Activas', value: activeOrders.length, icon: Home, color: 'text-blue-500', bgColor: 'bg-blue-100' },
+                    { name: 'Pzs Totales', value: totalActivePzs, icon: ArrowUp, color: 'text-green-500', bgColor: 'bg-green-100' },
+                    { name: 'Pzs Completadas', value: totalCompletedActivePzs, icon: CheckCircle, color: 'text-teal-500', bgColor: 'bg-teal-100' },
+                    { name: 'En Proceso', value: ordersByStatus['EN PROCESO'] || 0, icon: Clock, color: 'text-yellow-500', bgColor: 'bg-yellow-100' },
+                ];
+                
+                return (
+                    <div className="p-6 bg-white border-t border-slate-200 grid grid-cols-4 gap-4">
+                        {stats.map(stat => (
+                            <div key={stat.name} className="flex items-center p-4 border rounded-lg shadow-sm">
+                                <div className={`p-2 rounded-full ${stat.bgColor} mr-3`}>
+                                    <stat.icon className={`w-5 h-5 ${stat.color}`}/>
                                 </div>
-                                <button onClick={logout} className="p-2 bg-red-900/30 text-red-400 rounded hover:bg-red-900/50"><i data-lucide="log-out" className="w-4 h-4"></i></button>
+                                <div>
+                                    <p className="text-xs text-slate-500 font-medium">{stat.name}</p>
+                                    <p className="text-xl font-bold text-slate-800">{stat.value.toLocaleString()}</p>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                );
+            };
+            
+            // 7. RENDERIZADO PRINCIPAL
+            return (
+                <div className="flex h-screen bg-slate-100">
+                    <SideNav viewMode={viewMode} setViewMode={setViewMode} orders={orders} />
+                    
+                    {selectedOrder && (
+                        <OrderDetail 
+                            order={selectedOrder} 
+                            onClose={handleCloseDetail}
+                            onUpdateStatus={handleUpdateStatus}
+                            onArchive={handleArchive}
+                            onUnarchive={handleUnarchive}
+                            onDelete={handleDelete}
+                            viewMode={viewMode}
+                        />
+                    )}
+                    
+                    <div className="flex-grow flex flex-col overflow-hidden">
+                        
+                        <header className="bg-white p-4 shadow-md flex justify-between items-center z-10">
+                            <h1 className="text-2xl font-semibold text-slate-800">
+                                {viewMode === 'active' ? 'Órdenes Activas' : 'Historial de Órdenes'}
+                            </h1>
+                            <div className="flex items-center space-x-4">
+                                <div className="relative">
+                                    <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400"/>
+                                    <input 
+                                        type="text"
+                                        placeholder="Buscar por ID, cliente o modelo..."
+                                        value={searchQuery}
+                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                        className="pl-10 pr-4 py-2 border rounded-full text-sm w-64 focus:ring-blue-500 focus:border-blue-500"
+                                    />
+                                </div>
+                                
+                                <select 
+                                    value={filterStatus}
+                                    onChange={(e) => setFilterStatus(e.target.value)}
+                                    className="p-2 border rounded-full text-sm appearance-none bg-white pr-8"
+                                >
+                                    <option value="ALL">Mostrar todos los estados</option>
+                                    {Object.keys(statusMap)
+                                        .filter(s => viewMode === 'active' ? s !== 'ARCHIVADO' : true) // Mostrar ARCHIVADO solo en historial
+                                        .map(status => (
+                                            <option key={status} value={status}>{status}</option>
+                                        ))}
+                                    {viewMode === 'history' && <option value="ARCHIVADO">ARCHIVADO</option>}
+                                </select>
                             </div>
                         </header>
                         
-                        {/* Lista de Máquinas */}
-                        <main className="p-4 max-w-3xl mx-auto">
-                            {MACHINES.map(machine => (
-                                <MachineCard key={machine.id} machine={machine} user={user} />
-                            ))}
-                        </main>
-                         <div className="text-center text-xs text-slate-500 p-4">
-                            Esta es una variante simplificada que demuestra cómo el historial de producción afecta el cálculo del avance.
+                        <div className="flex-grow overflow-y-auto p-6">
+                            {loading && <div className="text-center text-slate-500 py-10 font-bold">Cargando órdenes...</div>}
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                                {displayedOrders.map(o => {
+                                    const statusInfo = statusMap[o.status] || { step: 0, totalSteps: 4, color: 'bg-gray-500' };
+                                    const pct = o.totalPedido > 0 ? (o.totalCompletado / o.totalPedido) * 100 : 0;
+                                    const isDueSoon = o.fechaEntrega && (o.fechaEntrega.getTime() - Date.now()) < (7 * 24 * 60 * 60 * 1000) && o.status !== 'FINALIZADO' && o.status !== 'ENVIADO' && o.status !== 'ARCHIVADO';
+                                    
+                                    return (
+                                        <div 
+                                            key={o.id} 
+                                            onClick={() => handleOrderClick(o)}
+                                            className={`p-4 border rounded-xl shadow-lg bg-white cursor-pointer transition-shadow hover:shadow-xl relative ${isDueSoon ? 'border-amber-500 ring-2 ring-amber-500' : 'border-slate-200'}`}
+                                        >
+                                            <div className="flex justify-between items-start mb-2">
+                                                <h3 className="font-extrabold text-sm text-slate-900">#{o.id}</h3>
+                                                <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${o.status === 'ARCHIVADO' ? 'bg-slate-200 text-slate-600' : `${statusInfo.color.replace('bg-', 'bg-')} text-white`}`}>
+                                                    {o.status}
+                                                </span>
+                                            </div>
+                                            <p className="text-sm font-semibold text-slate-700">{o.cliente}</p>
+                                            <p className="text-xs text-slate-500 mb-2">{o.modelo}</p>
+                                            <div className="text-[10px] text-slate-400">Entrega: {o.fechaEntrega ? o.fechaEntrega.toLocaleDateString('es-ES') : 'N/A'}</div>
+                                            <div className="text-[10px] text-slate-400">Total: {o.totalPedido} pzs</div>
+                                            <div className="mt-2 w-full bg-slate-100 h-2 rounded overflow-hidden">
+                                                <div className={`${o.status === 'ARCHIVADO' ? 'bg-slate-500' : 'bg-green-500'} h-full`} style={{width:`${pct}%`}}></div>
+                                            </div>
+                                            {o.status === 'ARCHIVADO' && <div className="text-center text-[10px] font-bold text-slate-500 mt-1">ARCHIVADO</div>}
+                                        </div>
+                                    );
+                                })}
+                                {displayedOrders.length === 0 && <div className="col-span-4 text-center text-slate-400 py-10 font-bold">No hay órdenes en esta vista.</div>}
+                            </div>
                         </div>
+                        
+                        {viewMode === 'active' && <DashboardBottom activeOrders={displayedOrders} />}
+                        {viewMode === 'history' && <div className="bg-slate-800 text-white flex items-center justify-center p-10 font-bold text-xl opacity-50">MODO HISTORIAL - SOLO LECTURA</div>}
+                        
                     </div>
-                </DataProvider>
-            );
-        };
-
-        // 4. Login Simple
-        const Login = ({ onLogin }) => {
-            const [pin, setPin] = useState('');
-            const handleSubmit = (e) => {
-                e.preventDefault();
-                if (USERS[pin]) onLogin(USERS[pin]);
-                else alert('PIN no válido');
-            };
-            return (
-                <div className="h-screen flex items-center justify-center bg-slate-900">
-                    <form onSubmit={handleSubmit} className="bg-slate-800 p-8 rounded-2xl shadow-xl border border-slate-700 text-center">
-                        <h2 className="text-white text-xl font-bold mb-4">Ingreso Operador</h2>
-                        <input type="tel" value={pin} onChange={e => setPin(e.target.value)} className="text-4xl bg-slate-900 text-white text-center p-4 rounded-xl border-2 border-slate-700 font-bold tracking-[0.5em] mb-6 outline-none focus:border-blue-500" placeholder="••••" maxLength={4}/>
-                        <button type="submit" className="w-full bg-blue-600 text-white py-3 rounded-xl font-bold">ENTRAR</button>
-                        <p className="mt-4 text-xs text-slate-400">PINs demo: 1392, 7914, 1111</p>
-                    </form>
                 </div>
-            )
-        }
-
-
-        // --- APP PRINCIPAL ---
-        const App = () => {
-            const [user, setUser] = useState(null);
-            useEffect(() => { if (window.lucide) window.lucide.createIcons(); });
-
-            if (!user) return <Login onLogin={setUser} />;
-            return <Dashboard user={user} logout={() => setUser(null)} />;
+            );
         };
 
         const root = ReactDOM.createRoot(document.getElementById('root'));
